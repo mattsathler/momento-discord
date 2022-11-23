@@ -1,0 +1,18 @@
+{
+  "name": "momento-discord",
+  "version": "1.0.0",
+  "description": "RPG Social Media",
+  "main": "momento.js",
+  "scripts": {
+    "start": "node momento.js",
+    "deploy": "node deployCommands.js"
+  },
+  "author": "Matheus Sathler",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.10.2",
+    "discord.js": "^14.6.0",
+    "mongoose": "^6.7.3",
+    "mongoose-long": "^0.6.0"
+  }
+}

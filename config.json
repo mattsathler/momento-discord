@@ -1,0 +1,6 @@
+{
+    "appId": "1042472796846034955",
+    "publicKey": "59e745dbaa58549bbda1e6aff6dbddc1e9ac9a183853ec249af5e87dd6655282",
+    "token": "MTA0MjQ3Mjc5Njg0NjAzNDk1NQ.GD77E5.TjBKa-LHdF2lWGmPYuKMDAC4fOku8qqPcS4qak",
+    "mongoURI": "mongodb+srv://momentobot:rTuuaz6KOcxHlqvn@momento.kqwng.mongodb.net/momento?retryWrites=true&w=majority"
+}
