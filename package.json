@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "RPG Social Media",
   "main": "momento.js",
+  "target": "esnext",
+  "type": "commonjs",
   "scripts": {
-    "start": "node momento.js",
-    "deploy": "node deployCommands.js"
+    "start": "node momento.js"
   },
   "author": "Matheus Sathler",
   "license": "ISC",
@@ -13,6 +14,7 @@
     "canvas": "^2.10.2",
     "discord.js": "^14.6.0",
     "mongoose": "^6.7.3",
-    "mongoose-long": "^0.6.0"
+    "mongoose-long": "^0.6.0",
+    "typescript": "^4.9.3"
   }
 }
