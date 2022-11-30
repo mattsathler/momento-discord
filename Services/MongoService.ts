@@ -1,24 +1,19 @@
 import { MomentoUser } from "../Classes/MomentoUser";
-import { ServerConfig } from "../Classes/ServerConfig";
-import User from "../Schemas/User";
+import { MomentoServer } from "../Classes/MomentoServer";
+import mongo from "mongoose"
+import * as config from "../config.json";
 
-const mongo = require("mongoose");
+const MomentoUserSchema = require("../Schemas/MomentoUserSchema");
+const MomentoServerSchema = require("../Schemas/MomentoServerSchema");
 
 export class MongoService {
-    private client: any
-
-    constructor(client: any) {
-        this.client = client
-    }
-
-    public connect(): Boolean {
+    static async connect(): Promise<Boolean> {
         try {
-            mongo.connect(
-                this.client.config.mongoURI || '', {
+            await mongo.connect(
+                config.mongoURI || '', {
                 keepAlive: true,
             }
             )
-            console.log('MOMENTO - Banco de Dados iniciado com sucesso!')
             return true;
         }
         catch (err) {
@@ -27,12 +22,25 @@ export class MongoService {
         }
     }
 
-    async getServerConfigById(serverId: String): Promise<ServerConfig> {
-        const servers = mongo.model('servers');
-
+    public disconnect(): Boolean {
         try {
-            const response = await servers.find({ id: serverId })
-            const serverConfig: ServerConfig = new ServerConfig(response.id, response.profilesChannelId, response.askProfileChannelId, response.uploaderChannelId)
+            mongo.disconnect()
+            return true;
+        }
+        catch (err) {
+            console.error(err)
+            return false
+        }
+    }
+
+    static async getServerConfigById(serverId: String): Promise<MomentoServer> {
+        console.log(`MOMENTO - Buscando configurações do servidor ${serverId}...`)
+
+        const servers = mongo.model('servers');
+        try {
+            const response: any = await servers.findOne({ id: serverId })
+            if(!response){return null}
+            const serverConfig: MomentoServer = new MomentoServer(response.id, response.profilesChannelId, response.askProfileChannelId, response.uploaderChannelId, response.feedChannelId)
             return serverConfig
         }
         catch (err) {
@@ -41,11 +49,12 @@ export class MongoService {
         }
     }
 
-    async checkIfUsernameExists(username: String, userGuildId: String): Promise<Boolean> {
+    static async checkIfUsernameExists(username: String, userGuildId: String): Promise<Boolean> {
+        console.log(`MOMENTO - Verificando se o usuário ${username} já existe...`)
         const users = mongo.model('users')
         try {
-            const response = await users.findOne({ username: username, guildId: userGuildId })
-            if (response.length > 0) {
+            const response = await users.find({ username: username, guildId: userGuildId }).count()
+            if (response > 0) {
                 return true
             }
             return false
@@ -56,7 +65,7 @@ export class MongoService {
         }
     }
 
-    async getUserById(userId: String, userGuildId: String): Promise<MomentoUser> {
+    static async getUserById(userId: String, userGuildId: String): Promise<MomentoUser> {
         const users = mongo.model('users');
         try {
             const response = await users.findOne({ id: userId, guildId: userGuildId })
@@ -85,7 +94,7 @@ export class MongoService {
         }
     }
 
-    async registerUser(user: MomentoUser): Promise<MomentoUser> {
+    static async registerUser(user: MomentoUser): Promise<MomentoUser> {
         try {
             console.log(`MOMENTO - Cadastrando novo perfil para ${user.username}...`)
             const newUser = {
@@ -95,13 +104,37 @@ export class MongoService {
                 profileChannelId: '',
                 profileMessageId: '',
             }
-            await new User(newUser).save()
+            await new MomentoUserSchema(newUser).save()
             const createdUser: MomentoUser = await this.getUserById(user.id, user.guildId)
             return createdUser
         }
         catch (err) {
-            console.log(err)
             throw new Error("Ocorreu um erro ao registrar seu usuário!")
+        }
+    }
+
+    static async uploadServerConfig(
+        serverId: String,
+        uploaderChannelId: String, askProfileChannelId: String,
+        profilesChannelId: String,
+        feedChannelId: String
+    ) {
+        console.log(`MOMENTO - Cadastrando nova configuração...`)
+        const newServer = {
+            id: serverId,
+            uploaderChannelId: uploaderChannelId,
+            askProfileChannelId: askProfileChannelId,
+            profilesChannelId: profilesChannelId,
+            feedChannelId: feedChannelId
+        }
+        try {
+            await new MomentoServerSchema(newServer).save()
+            const createdServer = this.getServerConfigById(serverId)
+            console.log('MOMENTO - Servidor configurado com sucesso.')
+            return createdServer
+        }
+        catch (err) {
+            throw new Error(err.message)
         }
     }
 }

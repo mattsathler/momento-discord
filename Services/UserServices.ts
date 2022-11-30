@@ -1,18 +1,42 @@
+import { Client, Message } from "discord.js"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
 
 export class UserServices {
-    public async registerProfile(message: any, client: any): Promise<MomentoUser> {
+    static async checkIfUserAlreadyHasServer(client: Client, channelId: string): Promise<Boolean> {
+        const channel = await client.channels.fetch(channelId)
+        if (!channel) {
+            return false
+        }
+        return true
+    }
+
+    public async askProfile(message: Message): Promise<MomentoUser> {
+        try {
+            //CADASTRA SE NÃO EXISTIR
+            let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
+            if (!user) {
+                user = await this.registerProfile(message)
+            }
+
+
+
+            return user
+        }
+        catch (err) {
+            throw new Error(err.message)
+        }
+    }
+
+    public async registerProfile(message: Message): Promise<MomentoUser> {
         console.log('MOMENTO - Verificando perfil...')
-        let channel = message.channel
-        const mongoService: MongoService = new MongoService(client)
-        const isUserAlreadyTaken: Boolean = await mongoService.checkIfUsernameExists(message.username, message.guildId)
+        const isUserAlreadyTaken: Boolean = await MongoService.checkIfUsernameExists(message.author.username, message.guildId)
         if (isUserAlreadyTaken) {
-            throw new Error("Usuário já cadastrado!")
+            throw new Error('Usuário já cadastrado!')
         }
         let newMomentoUser: MomentoUser = new MomentoUser(
             message.id,
-            message.username,
+            message.author.username,
             "Momento",
             "User",
             message.guildId,
@@ -34,8 +58,7 @@ export class UserServices {
             0,
             true
         )
-
-        await mongoService.registerUser(newMomentoUser)
+        await MongoService.registerUser(newMomentoUser)
         return newMomentoUser
     }
 }
