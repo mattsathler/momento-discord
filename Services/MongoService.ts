@@ -39,7 +39,7 @@ export class MongoService {
         const servers = mongo.model('servers');
         try {
             const response: any = await servers.findOne({ id: serverId })
-            if(!response){return null}
+            if (!response) { return null }
             const serverConfig: MomentoServer = new MomentoServer(response.id, response.profilesChannelId, response.askProfileChannelId, response.uploaderChannelId, response.feedChannelId)
             return serverConfig
         }
@@ -69,24 +69,30 @@ export class MongoService {
         const users = mongo.model('users');
         try {
             const response = await users.findOne({ id: userId, guildId: userGuildId })
-            const momentoUser: MomentoUser = new MomentoUser(
-                response.id,
-                response.username,
-                response.name,
-                response.surname,
-                response.guildId,
-                response.profileChannelId,
-                response.profileMessageId,
-                response.profilePicture,
-                response.profileCover,
-                response.collage,
-                response.bio,
-                response.trends,
-                response.followers,
-                response.momentos,
-                response.notifications
-            )
-            return momentoUser;
+            if (response) {
+
+                const momentoUser: MomentoUser = new MomentoUser(
+                    response.id,
+                    response.username,
+                    response.name,
+                    response.surname,
+                    response.guildId,
+                    response.profileChannelId,
+                    response.profileMessageId,
+                    response.profilePicture,
+                    response.profileCover,
+                    response.collage,
+                    response.bio,
+                    response.trends,
+                    response.followers,
+                    response.momentos,
+                    response.notifications
+                )
+                return momentoUser;
+            }
+            else {
+                return null
+            }
         }
         catch (err) {
             console.error(err)
@@ -135,6 +141,22 @@ export class MongoService {
         }
         catch (err) {
             throw new Error(err.message)
+        }
+    }
+
+    static async updateProfileChannelsId(user: MomentoUser, profileChannelId: String, profileMessageId: String) {
+        const users = mongo.model('users');
+        console.log('MOMENTO - Finalizando criação do perfil')
+        try {
+            const newUser = await users.findOneAndUpdate({ id: user.id, guildId: user.guildId }, {
+                profileChannelId: profileChannelId,
+                profileMessageId: profileMessageId,
+            })
+            return newUser
+        }
+        catch (err) {
+            console.error(err)
+            return
         }
     }
 }

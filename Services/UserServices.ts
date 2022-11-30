@@ -1,26 +1,43 @@
-import { Client, Message } from "discord.js"
+import { Channel, Client, Message } from "discord.js"
+import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
+import { ServerServices } from "./ServerServices"
 
 export class UserServices {
-    static async checkIfUserAlreadyHasServer(client: Client, channelId: string): Promise<Boolean> {
-        const channel = await client.channels.fetch(channelId)
-        if (!channel) {
+    static async userAlreadyHasServer(client: Client, profileChannelId: String): Promise<Boolean> {
+        try {
+            const channel = await client.channels.fetch(String(profileChannelId))
+            if (!channel) {
+                return false
+            }
             return false
         }
-        return true
+        catch (err) {
+            return true
+        }
     }
 
-    public async askProfile(message: Message): Promise<MomentoUser> {
+    static async askProfile(client: Client, message: Message): Promise<MomentoUser> {
         try {
-            //CADASTRA SE NÃO EXISTIR
             let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
-            if (!user) {
-                user = await this.registerProfile(message)
+            //CADASTRA SE NÃO EXISTIR
+            if (!user) { user = await this.registerProfile(message) }
+            if (user.profileChannelId != "") {
+                if (this.userAlreadyHasServer(client, user.profileChannelId)) { throw new Error(`Usuário já cadastrado nesse servidor! Confira: <#${user.profileChannelId}>`) }
             }
 
+            console.log("MOMENTO - Usuário cadastrado, criando perfil...")
+            const userProfileChannel = await ServerServices.createProfileChannel(message, user)
+            
+            const profileCanvas: ProfileCanvas = new ProfileCanvas(user)
+            let userProfileImage = await profileCanvas.drawProfile()
 
+            const userProfileMessage = await userProfileChannel.send({
+                files: [userProfileImage]
+            })
 
+            MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id)
             return user
         }
         catch (err) {
@@ -28,12 +45,12 @@ export class UserServices {
         }
     }
 
-    public async registerProfile(message: Message): Promise<MomentoUser> {
+    static async registerProfile(message: Message): Promise<MomentoUser> {
         console.log('MOMENTO - Verificando perfil...')
-        const isUserAlreadyTaken: Boolean = await MongoService.checkIfUsernameExists(message.author.username, message.guildId)
-        if (isUserAlreadyTaken) {
-            throw new Error('Usuário já cadastrado!')
-        }
+        // const isUserAlreadyTaken: Boolean = await MongoService.checkIfUsernameExists(message.author.username, message.guildId)
+        // if (isUserAlreadyTaken) {
+        //     throw new Error('Usuário já cadastrado!')
+        // }
         let newMomentoUser: MomentoUser = new MomentoUser(
             message.id,
             message.author.username,

@@ -31,19 +31,19 @@ export class DiscordEvents {
         const isCommand = message.content.charAt(0) == config.prefix ? true : false;
         const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
-
-        const userServices: UserServices = new UserServices()
         
         if (isCommand) {
             try {
                 switch (command) {
                     case "configurar":
                         await ServerServices.createServerConfig(message)
-                        sendReplyMessage(message, "Seu perfil foi criado com sucesso!", 4000, true)
+                        sendReplyMessage(message, "Configurando servidor, aguarde...", null, false)
+                        sendReplyMessage(message, "Seu servidor foi configurado com sucesso!", 6000, true)
                         break
-                    case "pedirperfil":
-                        await userServices.registerProfile(message)
-                        sendReplyMessage(message, "Seu perfil foi criado com sucesso!", 4000, true)
+                        case "pedirperfil":
+                            await UserServices.askProfile(this.client, message)
+                            sendReplyMessage(message, "Criando seu perfil, aguarde...", null, false)
+                        sendReplyMessage(message, "Seu perfil foi criado com sucesso!", 6000, true)
                 }
             }
             catch (err) {
