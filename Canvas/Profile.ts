@@ -7,11 +7,9 @@ export class ProfileCanvas {
 
     constructor(user: MomentoUser) {
         this.momentoUser = user
-
-        console.log(this.momentoUser)
     }
 
-    public async drawProfile() {
+    public async drawProfile(): Promise<Buffer> {
         const canvas = createCanvas(1280, 720)
         const context = canvas.getContext('2d')
 
@@ -19,12 +17,9 @@ export class ProfileCanvas {
         registerFont('./Assets/Fonts/opensans-italic.ttf', { family: 'OpenSans-Italic' })
         registerFont('./Assets/Fonts/opensans-semibold.ttf', { family: 'OpenSans-Bold' })
         registerFont('./Assets/Fonts/opensans-regular.ttf', { family: 'OpenSans-Regular' })
-        // const profilePictureBorder: Image = await loadImage('./Assets/profile/pictureBorder.png')
-        // const profilePicture: Image = await loadImage(String(this.momentoUser.profilePicture))
-        const ProfilePicture: Canvas = await this.drawUserPicture(String(this.momentoUser.profilePicture))
-        const CroppedCover: Canvas = await ImageCropper.quickCrop(String(this.momentoUser.profileCover), canvas.width, canvas.height / 2.5)
-        const profileCover: Image = await loadImage(String(this.momentoUser.profileCover))
 
+        const ProfilePicture: Canvas = await this.drawUserPicture(String(this.momentoUser.profilePicture))
+        const CroppedCover: Canvas = await ImageCropper.quickCropWithURL(String(this.momentoUser.profileCover), canvas.width, canvas.height / 2.5)
         
         const profileBackground: Image = await loadImage('./Assets/background.png')
 
@@ -82,15 +77,16 @@ export class ProfileCanvas {
     }
 
 
-    public async drawUserPicture(imageUrl: string) {
+    public async drawUserPicture(imageUrl: string) : Promise<Canvas> {
         try {
             let loadedImage: Image = await loadImage(imageUrl)
             let treatedImage: Canvas
-            if (loadedImage.width < 800 || loadedImage.height < 800) {
-                treatedImage = await ImageCropper.quickCrop(imageUrl, 800, 800)
+
+            if (loadedImage.width <= 800 || loadedImage.height <= 800) {
+                treatedImage = await ImageCropper.quickCropWithURL(imageUrl, 800, 800)
             }
-            else if (loadedImage.width > 2240 || loadedImage.height > 2240) {
-                treatedImage = await ImageCropper.quickCrop(imageUrl, 2240, 2240)
+            else if (loadedImage.width >= 2240 || loadedImage.height >= 2240) {
+                treatedImage = await ImageCropper.quickCropWithURL(imageUrl, 2240, 2240)
             }
 
             const canvas = createCanvas(800, 800)

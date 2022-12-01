@@ -11,7 +11,13 @@ export class ServerServices {
         }
         const channelsId = await this.createDefaultChannels(message.guild)
         try {
-            const serverConfig: MomentoServer = await MongoService.uploadServerConfig(message.guild.id, channelsId.askprofileChannelId, channelsId.uploaderChannelId, channelsId.profilesCategoryId, channelsId.feedChannelId)
+            const serverConfig: MomentoServer =
+                await MongoService.uploadServerConfig(
+                    message.guild.id,
+                    channelsId.uploaderChannelId,
+                    channelsId.askprofileChannelId,
+                    channelsId.profilesCategoryId,
+                    channelsId.feedChannelId)
             return serverConfig
         }
         catch (err) {
@@ -69,8 +75,8 @@ export class ServerServices {
             SendMessagesInThreads: false
         })
 
-        let profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
-        userProfileChannel.setParent(profileCategoryChannel)
+        const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
+        await userProfileChannel.setParent(profileCategoryChannel)
         return userProfileChannel
     }
 }

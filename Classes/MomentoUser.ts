@@ -6,6 +6,8 @@ export class MomentoUser {
     public guildId: String;
     public profileChannelId: String;
     public profileMessageId: String;
+    public profileCollageId: String;
+    public profileCollageStyle: Number;
     public profilePicture: String;
     public profileCover: String;
     public collage: String[];
@@ -16,7 +18,7 @@ export class MomentoUser {
     public notifications: Boolean;
 
     constructor(id: String, username: String, name: String, surname: String, guildId: String, profileChannelId: String,
-        profileMessageId: String, profilePicture: String, profileCover: String, collage: String[],
+        profileMessageId: String, profileCollageId: String, profileCollageStyle: Number, profilePicture: String, profileCover: String, collage: String[],
         bio: String, trends: Number, followers: Number, momentos: Number, notifications: Boolean) {
         this.id = id
         this.username = username
@@ -25,6 +27,8 @@ export class MomentoUser {
         this.guildId = guildId
         this.profileChannelId = profileChannelId
         this.profileMessageId = profileMessageId
+        this.profileCollageId = profileCollageId
+        this.profileCollageStyle = profileCollageStyle
         this.profilePicture = profilePicture
         this.profileCover = profileCover
         this.collage = collage

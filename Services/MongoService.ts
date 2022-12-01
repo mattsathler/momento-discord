@@ -68,9 +68,7 @@ export class MongoService {
     static async getUserById(userId: String, userGuildId: String): Promise<MomentoUser> {
         const users = mongo.model('users');
         try {
-            console.log({ id: userId, guildId: userGuildId })
             const response: any[] = await users.find({ id: userId, guildId: userGuildId })
-            console.log(response)
             if (response.length > 0) {
 
                 const momentoUser: MomentoUser = new MomentoUser(
@@ -81,6 +79,8 @@ export class MongoService {
                     response[0].guildId,
                     response[0].profileChannelId,
                     response[0].profileMessageId,
+                    response[0].profileCollageId,
+                    response[0].profileCollageStyle,
                     response[0].profilePicture,
                     response[0].profileCover,
                     response[0].collage,
@@ -123,7 +123,8 @@ export class MongoService {
 
     static async uploadServerConfig(
         serverId: String,
-        uploaderChannelId: String, askProfileChannelId: String,
+        uploaderChannelId: String,
+        askProfileChannelId: String,
         profilesChannelId: String,
         feedChannelId: String
     ) {
@@ -146,13 +147,14 @@ export class MongoService {
         }
     }
 
-    static async updateProfileChannelsId(user: MomentoUser, profileChannelId: String, profileMessageId: String) {
+    static async updateProfileChannelsId(user: MomentoUser, profileChannelId: String, profileMessageId: String, profileCollageId: String) {
         const users = mongo.model('users');
         console.log('MOMENTO - Finalizando criação do perfil')
         try {
             const newUser = await users.findOneAndUpdate({ id: user.id, guildId: user.guildId }, {
                 profileChannelId: profileChannelId,
                 profileMessageId: profileMessageId,
+                profileCollageId: profileCollageId,
             })
             return newUser
         }
