@@ -68,25 +68,27 @@ export class MongoService {
     static async getUserById(userId: String, userGuildId: String): Promise<MomentoUser> {
         const users = mongo.model('users');
         try {
-            const response = await users.findOne({ id: userId, guildId: userGuildId })
-            if (response) {
+            console.log({ id: userId, guildId: userGuildId })
+            const response: any[] = await users.find({ id: userId, guildId: userGuildId })
+            console.log(response)
+            if (response.length > 0) {
 
                 const momentoUser: MomentoUser = new MomentoUser(
-                    response.id,
-                    response.username,
-                    response.name,
-                    response.surname,
-                    response.guildId,
-                    response.profileChannelId,
-                    response.profileMessageId,
-                    response.profilePicture,
-                    response.profileCover,
-                    response.collage,
-                    response.bio,
-                    response.trends,
-                    response.followers,
-                    response.momentos,
-                    response.notifications
+                    response[0].id,
+                    response[0].username,
+                    response[0].name,
+                    response[0].surname,
+                    response[0].guildId,
+                    response[0].profileChannelId,
+                    response[0].profileMessageId,
+                    response[0].profilePicture,
+                    response[0].profileCover,
+                    response[0].collage,
+                    response[0].bio,
+                    response[0].trends,
+                    response[0].followers,
+                    response[0].momentos,
+                    response[0].notifications
                 )
                 return momentoUser;
             }

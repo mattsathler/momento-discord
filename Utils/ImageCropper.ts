@@ -1,7 +1,7 @@
-import { createCanvas, loadImage, Image } from "canvas";
+import { createCanvas, loadImage, Canvas } from "canvas";
 
 export default class ImageCropper {
-    static async quickCrop(imgUrl: string, width: number, height: number): Promise<Image> {
+    static async quickCrop(imgUrl: string, width: number, height: number): Promise<Canvas> {
         const canvas = createCanvas(width, height)
         const context = canvas.getContext('2d')
     
@@ -20,8 +20,6 @@ export default class ImageCropper {
             context.drawImage(img, (canvas.width - w) / 2, 0, w, canvas.height)
         }
     
-        let treatedImage = new Image();
-        treatedImage.src = canvas.toDataURL();
-        return treatedImage
+        return canvas
     }
 }

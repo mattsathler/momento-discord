@@ -26,6 +26,8 @@ const schema = new mongo.Schema({
     'guildId': reqString,
     'profileChannelId': { type: String },
     'profileMessageId': { type: String },
+    'profileCollageId': { type: String },
+    'profileCollageStyle': { type: Number },
     'profilePicture': {
         type: String,
         required: true,
