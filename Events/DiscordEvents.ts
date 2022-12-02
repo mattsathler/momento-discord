@@ -4,6 +4,7 @@ import { Client, Message } from "discord.js";
 import { sendErrorMessage, sendReplyMessage } from "../Utils/MomentoMessages";
 import { ServerServices } from "../Services/ServerServices";
 import { MongoService } from "../Services/MongoService";
+import { MomentoPost } from "../Classes/MomentoPost";
 
 
 export class DiscordEvents {
@@ -44,6 +45,10 @@ export class DiscordEvents {
                         sendReplyMessage(message, "Criando seu perfil, aguarde...", null, false)
                         await UserServices.askProfile(this.client, message)
                         sendReplyMessage(message, "Seu perfil foi criado com sucesso!", 6000, true)
+                        break
+                    default:
+                        MomentoPost.createPost(message, "https://i.pinimg.com/originals/13/e3/70/13e37059902b0460fde9f698e18dffae.jpg")
+                        break
                 }
             }
             catch (err) {

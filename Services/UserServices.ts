@@ -58,6 +58,7 @@ export class UserServices {
             throw new Error(err.message)
         }
     }
+
     static async registerProfile(message: Message): Promise<MomentoUser> {
         console.log('MOMENTO - Verificando perfil...')
         // const isUserAlreadyTaken: Boolean = await MongoService.checkIfUsernameExists(message.author.username, message.guildId)
