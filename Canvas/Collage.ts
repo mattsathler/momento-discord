@@ -30,8 +30,6 @@ export class CollageCanvas {
 
             const y: Number = index > 2 ? collageHeight + spacement * 2 : spacement
             const x: Number = collageWidth * (rowIndex - 1) + individualSpacement
-            console.log('=== Collage' + index)
-
 
             const treatedImage = await ImageCropper.quickCropWithImage(img, collageWidth, collageHeight)
             context.drawImage(treatedImage, x, y)

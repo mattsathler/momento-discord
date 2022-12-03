@@ -1,35 +1,36 @@
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
 import { MomentoPost } from "../Classes/MomentoPost";
-import { UserServices } from "../Services/UserServices";
 import ImageCropper from "../Utils/ImageCropper";
 
 export class Post {
     public static async drawPost(post: MomentoPost): Promise<Buffer> {
-        registerFont('./assets/fonts/fortefont.ttf', { family: 'Forte' }
-        )
+        registerFont('./assets/fonts/fortefont.ttf', { family: 'Forte' })
+
         let image: Image = await loadImage(String(post.imageURL));
         let imageCanvas: Canvas
-        if (image.width < 1280 || image.height < 1280) {
-            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 1280, 1280)
+        if (image.width <= 800 || image.height <= 800) {
+            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 800, 800)
         }
         else if (image.width > 2240 || image.height > 2240) {
             imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 2240, 2240)
         }
+        else {
+            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), image.width, image.height);
+        }
 
 
+        const canvas = createCanvas(imageCanvas.width + post.postSafeAreaSize * 2, imageCanvas.height + post.postHeaderSize * 1.85)
 
-        const canvas = createCanvas(image.width + post.postSafeAreaSize * 2, image.height + post.postHeaderSize * 1.85)
         const context = canvas.getContext('2d')
         const background: Image = await loadImage("./assets/background.png")
         const authorRoundImage: Canvas = await ImageCropper.drawUserPicture(String(post.author.profilePicture));
         const postOrnament: Image = await loadImage("./assets/ornament.png")
-        const description = post.description ? post.description : ''
 
         context.drawImage(background, 0, 0, canvas.width, canvas.height)
-        context.drawImage(image, post.postSafeAreaSize, post.profilePictureSize + post.postSafeGap * 2, image.width, image.height)
+        context.drawImage(imageCanvas, post.postSafeAreaSize, post.profilePictureSize + post.postSafeGap * 2, imageCanvas.width, imageCanvas.height)
 
         context.drawImage(authorRoundImage, post.postSafeGap * 2, post.postSafeGap, post.profilePictureSize, post.profilePictureSize)
-        context.drawImage(postOrnament, canvas.width - post.postSafeGap * 4, 0, 30, post.postHeaderSize - post.postSafeGap * 2)
+        context.drawImage(postOrnament, canvas.width - post.postSafeGap * 4, 0, 40, post.postHeaderSize - post.postSafeGap * 2)
 
         context.font = '36px FORTE'
         context.fillStyle = `rgb(221, 36, 123)`

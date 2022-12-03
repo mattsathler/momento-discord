@@ -38,8 +38,6 @@ export class DiscordEvents {
                 switch (command) {
                     case "configurar":
                         await ServerServices.createServerConfig(message)
-                        sendReplyMessage(message, "Configurando servidor, aguarde...", null, false)
-                        sendReplyMessage(message, "Seu servidor foi configurado com sucesso!", 6000, true)
                         break
                     case "pedirperfil":
                         sendReplyMessage(message, "Criando seu perfil, aguarde...", null, false)
@@ -47,13 +45,20 @@ export class DiscordEvents {
                         sendReplyMessage(message, "Seu perfil foi criado com sucesso!", 6000, true)
                         break
                     default:
-                        MomentoPost.createPost(message, "https://i.pinimg.com/originals/13/e3/70/13e37059902b0460fde9f698e18dffae.jpg")
-                        break
+                        sendErrorMessage(message, "Comando não encontrado!")
                 }
             }
             catch (err) {
                 sendErrorMessage(message, err.message)
                 return
+            }
+        }
+        else {
+            try {
+                MomentoPost.createPost(this.client, message, null)
+            }
+            catch (err) {
+                sendErrorMessage(message, "Ocorreu um erro ao criar seu post!")
             }
         }
     }

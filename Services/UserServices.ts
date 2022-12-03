@@ -48,6 +48,11 @@ export class UserServices {
             const userProfileMessage: Message = await userProfileChannel.send(userProfileImageURL)
             const userCollageMessage: Message = await userProfileChannel.send(userCollageImageURL)
 
+            const notificationEmoji: string = !user.notifications ? "🔔" : "🔕"
+            userCollageMessage.react("🫂")
+            userCollageMessage.react(notificationEmoji)
+            userCollageMessage.react("🗑️")
+
             console.log("MOMENTO - Perfil criado, finalizando cadastro...")
             MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
 

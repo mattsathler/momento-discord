@@ -1,8 +1,20 @@
-import { Message } from "discord.js";
+import { Message, ReactionUserManager } from "discord.js";
+
+export async function tryDeleteMessage(message: Message) {
+    try {
+        await message.delete()
+        return
+    }
+    catch (err) {
+        console.error(err)
+        return
+    }
+}
 
 export async function sendReplyMessage(message: Message, text: string, timeout?: number, remove?: Boolean) {
     const time = timeout ? timeout : 4000
     const msg = await message.reply(text)
+    const doesRemove = remove == undefined && remove != false ? true : false 
     setTimeout(async () => {
         try {
             if (remove) {

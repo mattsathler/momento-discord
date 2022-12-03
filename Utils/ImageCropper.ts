@@ -14,12 +14,11 @@ export default class ImageCropper {
             const h = canvas.width * imgRatio
             context.drawImage(img, 0, (canvas.height - h) / 2, canvas.width, h)
         }
-        if (imgRatio <= canvasRatio) {
+        if (imgRatio < canvasRatio) {
             const w = canvas.width * canvasRatio / imgRatio
             context.drawImage(img, (canvas.width - w) / 2, 0, w, canvas.height)
         }
     
-        console.log(img)
         return canvas
     }
 

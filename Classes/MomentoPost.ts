@@ -1,7 +1,9 @@
 import { Image, loadImage } from "canvas";
-import { Message, TextChannel } from "discord.js";
+import { Client, Message, TextChannel, ThreadChannel } from "discord.js";
 import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
+import { LinkGenerator } from "../Utils/LinkGenerator";
+import { MomentoMentions } from "./MomentoMentions";
 import { MomentoServer } from "./MomentoServer";
 import { MomentoUser } from "./MomentoUser";
 
@@ -26,20 +28,41 @@ export class MomentoPost {
     }
 
 
-    public static async createPost(message: Message, url: String /*mudar*/) {
-        try {
+    public static async createPost(client: Client, message: Message, location?: String): Promise<Post> {
+        // try {
             const user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
-            const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId);
-            if (!user) { throw new Error(`Você não possui uma conta em MOMENTO! Crie uma usando ?pedirperfil no canal <#${serverConfig.askProfileChannelId}>!`) }
+            if (!user) { throw new Error(`Você não possui uma conta em MOMENTO! Crie uma enviando ?pedirperfil no canal pedir-perfil!`) }
 
-            const momentoPost: MomentoPost = new MomentoPost(user, url, "At the party on my apartment!", "Creekhills")
+            const postDescription: String = await MomentoMentions.parseUserPostMentions(message, client)
+            console.log(message)
+            const momentoPost: MomentoPost =
+                new MomentoPost(
+                    user,
+                    message.attachments.first().url,
+                    postDescription,
+                    "Creekhills"
+                )
+
             const post: Buffer = await Post.drawPost(momentoPost)
 
             const profileServer: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-            profileServer.send({ files: [post] })
-        }
-        catch (err) {
-            throw new Error(err)
-        }
+            const newPost: Message = await profileServer.send({ files: [post] })
+
+            await newPost.react('❤️')
+            await newPost.react('🔁')
+            await newPost.react('🗑️')
+
+            await newPost.startThread({
+                name: "Comentários",
+                autoArchiveDuration: 1440,
+                reason: `Comentários`,
+                rateLimitPerUser: 10
+            })
+
+            return newPost
+        // }
+        // catch (err) {
+        //     throw new Error(err)
+        // }
     }
 }

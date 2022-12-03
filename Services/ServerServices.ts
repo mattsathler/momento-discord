@@ -2,9 +2,11 @@ import { Guild, Message, ChannelType, TextChannel, CategoryChannel, Channel, Use
 import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
+import { sendErrorMessage, sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
 
 export class ServerServices {
     static async createServerConfig(message: Message) {
+        const startMessage: Message = await message.reply("Configurando servidor, aguarde...")
         const isServerConfigurated = await MongoService.getServerConfigById(message.guild.id)
         if (isServerConfigurated) {
             throw new Error("Esse servidor já foi configurado!")
@@ -18,10 +20,13 @@ export class ServerServices {
                     channelsId.askprofileChannelId,
                     channelsId.profilesCategoryId,
                     channelsId.feedChannelId)
+            tryDeleteMessage(startMessage)
+            sendReplyMessage(message, "Servidor configurado com sucesso!")
             return serverConfig
         }
         catch (err) {
             console.error(err)
+            tryDeleteMessage(startMessage)
             return null
         }
 
@@ -67,16 +72,19 @@ export class ServerServices {
             type: ChannelType.GuildText
         })
         userProfileChannel.setRateLimitPerUser(20)
-        userProfileChannel.permissionOverwrites.create(message.guild.roles.everyone, {
+        
+        const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
+        await userProfileChannel.setParent(profileCategoryChannel)
+
+        await userProfileChannel.permissionOverwrites.create(message.guild.roles.everyone, {
             SendMessages: false,
+            SendMessagesInThreads: true
         })
-        userProfileChannel.permissionOverwrites.create(discordUser, {
+        await userProfileChannel.permissionOverwrites.create(discordUser, {
             SendMessages: true,
             SendMessagesInThreads: false
         })
 
-        const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
-        await userProfileChannel.setParent(profileCategoryChannel)
         return userProfileChannel
     }
 }
