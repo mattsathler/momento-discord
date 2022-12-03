@@ -102,6 +102,37 @@ export class MongoService {
         }
     }
 
+    static async getUserByProfileChannel(profileChannelId, guildId) {
+        const users = mongo.model('users');
+        try {
+            const response = await users.find({ profileChannelId: profileChannelId, guildId: guildId })
+            const momentoUser: MomentoUser = new MomentoUser(
+                response[0].id,
+                response[0].username,
+                response[0].name,
+                response[0].surname,
+                response[0].guildId,
+                response[0].profileChannelId,
+                response[0].profileMessageId,
+                response[0].profileCollageId,
+                response[0].profileCollageStyle,
+                response[0].profilePicture,
+                response[0].profileCover,
+                response[0].collage,
+                response[0].bio,
+                response[0].trends,
+                response[0].followers,
+                response[0].momentos,
+                response[0].notifications
+            )
+            return momentoUser;
+        }
+        catch (err) {
+            console.error(err)
+        }
+        return
+    }
+
     static async registerUser(user: MomentoUser): Promise<MomentoUser> {
         try {
             console.log(`MOMENTO - Cadastrando novo perfil para ${user.username}...`)
@@ -156,6 +187,21 @@ export class MongoService {
                 profileMessageId: profileMessageId,
                 profileCollageId: profileCollageId,
             })
+            return newUser
+        }
+        catch (err) {
+            console.error(err)
+            return
+        }
+    }
+
+    static async updateProfile(user: MomentoUser, fields: {}) {
+        const users = mongo.model('users');
+        console.log('MOMENTO - Atualizando usuário: ' + user.username)
+        try {
+            await users.findOneAndUpdate({ id: user.id, guildId: user.guildId }, fields)
+            const newUser: MomentoUser = await users.findOne({ id: user.id, guildId: user.guildId })
+            console.log('MOMENTO - Usuário ' + user.username + ' atualizado!')
             return newUser
         }
         catch (err) {

@@ -3,6 +3,7 @@ import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
+import { tryDeleteMessage } from "../Utils/MomentoMessages"
 import { MongoService } from "./MongoService"
 import { ServerServices } from "./ServerServices"
 
@@ -98,4 +99,15 @@ export class UserServices {
         await MongoService.registerUser(newMomentoUser)
         return newMomentoUser
     }
+
+    static async addFollower(user: MomentoUser): Promise<MomentoUser> {
+        console.log(`Adicionando novo seguidor para ${user.username}`)
+        const newFollowers = Number(user.followers) + 1
+        await MongoService.updateProfile(user, {
+            followers: newFollowers
+        })
+        return user;
+    }
+
+
 }

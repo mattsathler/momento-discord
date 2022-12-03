@@ -1,17 +1,15 @@
-import { UserServices } from "../Services/UserServices";
-import * as config from "../config.json";
-import { Client, Message } from "discord.js";
-import { sendErrorMessage, sendReplyMessage } from "../Utils/MomentoMessages";
-import { ServerServices } from "../Services/ServerServices";
-import { MongoService } from "../Services/MongoService";
-import { MomentoPost } from "../Classes/MomentoPost";
+import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
+import { messageCreate } from "../Commands/messageCreate";
+import { ready } from "../Commands/ready";
+import { messageReactionAdd } from "../Commands/messageReactionAdd";
 
 
 export class DiscordEvents {
     public client: Client
     public eventsList = [
         'messageCreate',
-        'ready'
+        'ready',
+        'messageReactionAdd',
     ]
 
     constructor(client: Client) {
@@ -19,47 +17,24 @@ export class DiscordEvents {
     }
 
     public async ready() {
-        const didConnect = await MongoService.connect()
-        if (didConnect) {
-            console.log("MOMENTO - Banco de dados iniciado com sucesso!")
-            return
-        }
-        throw new Error("MOMENTO - Não foi possível acessar o banco de dados!")
+        await ready()
     }
 
     public async messageCreate(message: Message) {
-        if (message.author.bot) return;
-        const isCommand = message.content.charAt(0) == config.prefix ? true : false;
-        const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-        const command = args.shift().toLowerCase();
+        messageCreate(message, this.client)
+    }
 
-        if (isCommand) {
+    public async messageReactionAdd(reaction: MessageReaction, user: User) {
+        if (reaction.partial) {
             try {
-                switch (command) {
-                    case "configurar":
-                        await ServerServices.createServerConfig(message)
-                        break
-                    case "pedirperfil":
-                        sendReplyMessage(message, "Criando seu perfil, aguarde...", null, false)
-                        await UserServices.askProfile(this.client, message)
-                        sendReplyMessage(message, "Seu perfil foi criado com sucesso!", 6000, true)
-                        break
-                    default:
-                        sendErrorMessage(message, "Comando não encontrado!")
-                }
+                await reaction.fetch();
             }
-            catch (err) {
-                sendErrorMessage(message, err.message)
-                return
+            catch (error) {
+                console.error('Something went wrong when fetching the message: ', error);
+                return;
             }
         }
-        else {
-            try {
-                MomentoPost.createPost(this.client, message, null)
-            }
-            catch (err) {
-                sendErrorMessage(message, "Ocorreu um erro ao criar seu post!")
-            }
-        }
+
+        messageReactionAdd(user, reaction)
     }
 }

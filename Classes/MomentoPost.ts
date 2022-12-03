@@ -34,7 +34,6 @@ export class MomentoPost {
             if (!user) { throw new Error(`Você não possui uma conta em MOMENTO! Crie uma enviando ?pedirperfil no canal pedir-perfil!`) }
 
             const postDescription: String = await MomentoMentions.parseUserPostMentions(message, client)
-            console.log(message)
             const momentoPost: MomentoPost =
                 new MomentoPost(
                     user,
@@ -60,9 +59,9 @@ export class MomentoPost {
             })
 
             return newPost
-        // }
+        }
         // catch (err) {
         //     throw new Error(err)
         // }
     }
-}
+// }

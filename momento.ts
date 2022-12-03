@@ -15,14 +15,15 @@ const client = new Client({
 		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.GuildMessageReactions
 	],
 });
 
 const events: DiscordEvents = new DiscordEvents(client);
 for (let event of events.eventsList) {
 	console.log(`MOMENTO - Carregando o evento ${event}`);
-	client.on(event, async response => {
-		events[event](response)
+	client.on(event, async (...args) => {
+		events[event](...args)
 	})
 }
 

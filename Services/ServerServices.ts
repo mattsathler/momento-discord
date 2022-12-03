@@ -1,12 +1,11 @@
-import { Guild, Message, ChannelType, TextChannel, CategoryChannel, Channel, User, GuildMember, Client } from "discord.js"
+import { Guild, Message, ChannelType, TextChannel, CategoryChannel, User, } from "discord.js"
 import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
-import { sendErrorMessage, sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
+import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
 
 export class ServerServices {
     static async createServerConfig(message: Message) {
-        const startMessage: Message = await message.reply("Configurando servidor, aguarde...")
         const isServerConfigurated = await MongoService.getServerConfigById(message.guild.id)
         if (isServerConfigurated) {
             throw new Error("Esse servidor já foi configurado!")
@@ -20,16 +19,13 @@ export class ServerServices {
                     channelsId.askprofileChannelId,
                     channelsId.profilesCategoryId,
                     channelsId.feedChannelId)
-            tryDeleteMessage(startMessage)
             sendReplyMessage(message, "Servidor configurado com sucesso!")
             return serverConfig
         }
         catch (err) {
             console.error(err)
-            tryDeleteMessage(startMessage)
             return null
         }
-
     }
 
     static async createDefaultChannels(guild: Guild): Promise<any> {
@@ -72,7 +68,7 @@ export class ServerServices {
             type: ChannelType.GuildText
         })
         userProfileChannel.setRateLimitPerUser(20)
-        
+
         const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
         await userProfileChannel.setParent(profileCategoryChannel)
 
