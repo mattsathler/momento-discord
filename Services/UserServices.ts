@@ -51,7 +51,6 @@ export class UserServices {
             const notificationEmoji: string = !user.notifications ? "🔔" : "🔕"
             userCollageMessage.react("🫂")
             userCollageMessage.react(notificationEmoji)
-            userCollageMessage.react("🗑️")
 
             console.log("MOMENTO - Perfil criado, finalizando cadastro...")
             MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
