@@ -10,7 +10,7 @@ import { ServerServices } from "./ServerServices"
 export class UserServices {
     static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
         try {
-            const channel = await guild.channels.cache.get(String(user.profileChannelId))
+            const channel = guild.channels.cache.get(String(user.profileChannelId))
             if (!channel) {
                 return false
             }
@@ -21,7 +21,7 @@ export class UserServices {
         }
     }
 
-    static async askProfile(client: Client, message: Message): Promise<MomentoUser> {
+    static async askProfile(message: Message): Promise<MomentoUser> {
         try {
             let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
 
@@ -108,6 +108,4 @@ export class UserServices {
         })
         return user;
     }
-
-
 }

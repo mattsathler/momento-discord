@@ -46,8 +46,15 @@ export class ServerServices {
             type: ChannelType.GuildText,
         })
 
-        feedChannel.setParent(profilesCategory);
-        askProfileChannel.setParent(profilesCategory);
+        await feedChannel.setParent(profilesCategory);
+        await askProfileChannel.setParent(profilesCategory);
+
+        momentoUploaderChannel.permissionOverwrites.create(guild.roles.everyone, {
+            ViewChannel: false
+        })
+        feedChannel.permissionOverwrites.create(guild.roles.everyone, {
+            SendMessages: false
+        })
 
         const defaultChannelsIds = {
             uploaderChannelId: momentoUploaderChannel.id,

@@ -1,10 +1,8 @@
-import { Image, loadImage } from "canvas";
+import { Image } from "canvas";
 import { Client, Message, TextChannel, ThreadChannel } from "discord.js";
 import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
-import { LinkGenerator } from "../Utils/LinkGenerator";
 import { MomentoMentions } from "./MomentoMentions";
-import { MomentoServer } from "./MomentoServer";
 import { MomentoUser } from "./MomentoUser";
 
 export class MomentoPost {

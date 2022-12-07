@@ -1,6 +1,7 @@
 import { Client, Message, MessageReaction, ThreadChannel, User } from "discord.js";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
+import { ThreadService } from "../Services/ThreadsService";
 import { UserServices } from "../Services/UserServices";
 import { removeReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
 
@@ -60,14 +61,14 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                 try {
                     const reactedMessage = message.channel as ThreadChannel
                     if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
+                        await ThreadService.disablePostComment(message)
                         await tryDeleteMessage(message)
-                        // removeComments(message)
                         break
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))
                 }
-                catch {
-                    throw new Error("Ocorreu um erro ao excluir a mensagem!")
+                catch(err) {
+                    console.log(err)
                 }
                 break
             default:
