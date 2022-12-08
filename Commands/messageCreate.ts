@@ -95,20 +95,20 @@ export async function messageCreate(message: Message, client: Client) {
             tryDeleteMessage(message)
             return
         }
-        else {
-            if (isComment) {
-                await MomentoComment.createComment(message)
-                return
-            }
-
+        if (isComment) {
+            await MomentoComment.createComment(message.guild, message)
+            return
+        }
+        if (isProfileCommand) {
             reply = await message.reply("Criando seu post, aguarde...")
             await MomentoPost.createPost(client, message, null)
             if (reply) { tryDeleteMessage(reply) }
             tryDeleteMessage(message)
         }
+
     }
     catch (err) {
-        tryDeleteMessage(reply)
+        if (reply) { tryDeleteMessage(reply) }
         sendErrorMessage(message, err.message)
         console.log(err)
         return
