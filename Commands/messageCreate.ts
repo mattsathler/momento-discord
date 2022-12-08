@@ -46,13 +46,15 @@ export async function messageCreate(message: Message, client: Client) {
                     case "perfil":
                         reply = await message.reply("Alterando sua foto de perfil, aguarde...")
                         await UserServices.changeProfilePicture(message, momentoUser)
-                        tryDeleteMessage(reply)
                         break
                     case "capa":
-                        reply = await message.reply("Alterando sua foto de perfil, aguarde...")
+                        reply = await message.reply("Alterando sua foto de capa, aguarde...")
+                        await UserServices.changeProfileCover(message, momentoUser)
+                        break
                     //ALTERA O PERFIL
                 }
 
+                if (reply) { tryDeleteMessage(reply) }
                 tryDeleteMessage(message)
                 return
             }

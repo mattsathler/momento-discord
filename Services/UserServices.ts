@@ -111,19 +111,64 @@ export class UserServices {
 
     static async changeProfilePicture(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
-        console.log(`Alterando a foto de perfil de ${user.username}`)
+        console.log(`MOMENTO - Alterando a foto de perfil de ${user.username}`)
         if (message.attachments.first()) {
             const newProfilePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
-            // const newProfilePictureURL = await LinkGenerator.uploadLinkToMomento(guild, newProfilePicture)
             const newUser = await MongoService.updateProfile(user, {
                 profilePicture: newProfilePicture
             })
 
-            sendReplyMessage(message, "Imagem de perfil alterada com sucesso!", null, false)
+            await UserServices.updateProfileImages(guild, newUser, true, false)
+            await sendReplyMessage(message, "Imagem de perfil alterada com sucesso!", null, false)
             return newUser;
         }
         else {
             throw new Error("Você precisa anexar uma foto na mensagem para alterar seu perfil!")
         }
+    }
+
+    static async changeProfileCover(message: Message, user: MomentoUser) {
+        const guild: Guild = message.guild
+        console.log(`Alterando a foto de capa de ${user.username}`)
+        if (message.attachments.first()) {
+            const newProfileCover: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
+            const newUser = await MongoService.updateProfile(user, {
+                profileCover: newProfileCover
+            })
+
+            await UserServices.updateProfileImages(guild, newUser, true, false)
+            await sendReplyMessage(message, "Imagem de capa alterada com sucesso!", null, false)
+            return newUser;
+        }
+        else {
+            throw new Error("Você precisa anexar uma foto na mensagem para alterar seu perfil!")
+        }
+    }
+
+    static async updateProfileImages(guild: Guild, momentoUser: MomentoUser, updateProfile?: Boolean, updateCollage?: Boolean) {
+        if (updateProfile == undefined) { updateProfile = true }
+        if (updateCollage == undefined) { updateCollage = true }
+
+        const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
+
+        if (updateProfile) {
+            const profileCanvas: ProfileCanvas = new ProfileCanvas(momentoUser)
+
+            const userProfileImage: Buffer = await profileCanvas.drawProfile()
+            const userProfileImageURL: string = await LinkGenerator.uploadImageToMomento(guild, userProfileImage)
+
+            const profileMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileMessageId)) as Message
+            await profileMessage.edit(userProfileImageURL)
+        }
+        if (updateCollage) {
+            const collageCanvas: CollageCanvas = new CollageCanvas(momentoUser)
+
+            const userCollageImage: Buffer = await collageCanvas.drawCollage()
+            const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(guild, userCollageImage)
+
+            const collageMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileCollageId)) as Message
+            await collageMessage.edit(userCollageImageURL)
+        }
+        return
     }
 }

@@ -34,8 +34,6 @@ export class MongoService {
     }
 
     static async getServerConfigById(serverId: String): Promise<MomentoServer> {
-        console.log(`MOMENTO - Buscando configurações do servidor ${serverId}...`)
-
         const servers = mongo.model('servers');
         try {
             const response: any = await servers.findOne({ id: serverId })
