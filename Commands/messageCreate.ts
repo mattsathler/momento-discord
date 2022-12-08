@@ -32,13 +32,16 @@ export async function messageCreate(message: Message, client: Client) {
     const command = args.shift().toLowerCase();
 
     let reply: Message
-    if (isCommand) {
-        try {
+    try {
+        if (isCommand) {
             if (!serverConfig && command != "configurar") { throw new Error("Servidor não configurado! Use ?configurar para iniciarmos!") }
-
             if (isProfileCommand) {
                 if (command.slice(0, -1) == 'collage') {
-                    // await commandCreateCollage(command, message, user, attachment.url, message, client)
+                    reply = await message.reply("Alterando sua foto de collage, aguarde...")
+                    const collageNumber: Number = Number(command.charAt(7)) - 1
+                    await UserServices.changeProfileCollage(message, momentoUser, collageNumber)
+                    if (reply) { tryDeleteMessage(reply) }
+                    tryDeleteMessage(message)
                     return
                 }
 
@@ -50,11 +53,15 @@ export async function messageCreate(message: Message, client: Client) {
                     case "capa":
                         reply = await message.reply("Alterando sua foto de capa, aguarde...")
                         await UserServices.changeProfileCover(message, momentoUser)
+                        if (reply) { tryDeleteMessage(reply) }
                         break
-                    //ALTERA O PERFIL
+                    case "user":
+                        reply = await message.reply("Alterando seu nome de usuário, aguarde...")
+                        await UserServices.changeProfileUser(message, momentoUser, args)
+                        if (reply) { tryDeleteMessage(reply) }
+                        break
                 }
 
-                if (reply) { tryDeleteMessage(reply) }
                 tryDeleteMessage(message)
                 return
             }
@@ -63,12 +70,13 @@ export async function messageCreate(message: Message, client: Client) {
                 case "configurar":
                     reply = await message.reply("Configurando servidor, aguarde...")
                     await ServerServices.createServerConfig(message)
+                    if (reply) { tryDeleteMessage(reply) }
                     break
                 case "pedirperfil":
                     if (channel.id == serverConfig.askProfileChannelId) {
                         reply = await message.reply("Criando seu perfil, aguarde...")
                         await UserServices.askProfile(message)
-                        sendReplyMessage(message, "Seu perfil foi criado com sucesso!", 6000, true)
+                        if (reply) { tryDeleteMessage(reply) }
                         break
                     }
                     break
@@ -76,31 +84,25 @@ export async function messageCreate(message: Message, client: Client) {
                     sendErrorMessage(message, "Comando não encontrado!")
                     break
             }
-            if (reply) { tryDeleteMessage(reply) }
+            tryDeleteMessage(message)
             return
         }
-        catch (err) {
-            tryDeleteMessage(reply)
-            sendErrorMessage(message, err.message)
-            console.log(err)
-            return
-        }
-    }
-    else {
-        if (isComment) {
-            MomentoComment.createComment(message)
-            return
-        }
-        try {
+        else {
+            if (isComment) {
+                await MomentoComment.createComment(message)
+                if (reply) { tryDeleteMessage(reply) }
+                return
+            }
             reply = await message.reply("Criando seu post, aguarde...")
-            MomentoPost.createPost(client, message, null)
-            tryDeleteMessage(reply)
+            await MomentoPost.createPost(client, message, null)
+            if (reply) { tryDeleteMessage(reply) }
             tryDeleteMessage(message)
         }
-        catch (err) {
-            sendErrorMessage(message, "Ocorreu um erro ao criar seu post!")
-            console.log(err)
-            tryDeleteMessage(reply)
-        }
+    }
+    catch (err) {
+        tryDeleteMessage(reply)
+        sendErrorMessage(message, err.message)
+        console.log(err)
+        return
     }
 }

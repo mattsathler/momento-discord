@@ -4,6 +4,7 @@ import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
 import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages"
+import { StringFormater } from "../Utils/StringFormater"
 import { MongoService } from "./MongoService"
 import { ServerServices } from "./ServerServices"
 
@@ -57,6 +58,7 @@ export class UserServices {
             MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
 
             console.log("MOMENTO - Usuário cadastrado!")
+            sendReplyMessage(message, "Seu perfil foi criado com sucesso!")
             return user
         }
         catch (err) {
@@ -127,6 +129,33 @@ export class UserServices {
         }
     }
 
+    static async changeProfileUser(message: Message, user: MomentoUser, newUsername: String[]) {
+        const guild: Guild = message.guild
+        
+        console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newUsername}`)
+        if (newUsername.length == 0 || newUsername.length > 1 || newUsername[0].length > 15) { throw new Error('O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo 15 caracteres!') }
+        if (StringFormater.containsSpecialChars(newUsername[0])) { throw new Error('O nome de usuário não pode conter caracteres especiais') }
+
+        try {
+            const newUser = await MongoService.updateProfile(user, {
+                username: String(newUsername)
+            })
+            await UserServices.updateProfileImages(guild, newUser, true, false)
+            console.log('Nome de usuário alterado com sucesso!')
+        }
+        catch (err) {
+            console.log(`Não foi possível alterar o nickname deste usuário para ${newUsername[0]}!`)
+            console.log(err)
+        }
+        try{
+            const profileServer: TextChannel = guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
+            profileServer.setName(String(newUsername[0]))
+            await message.member.setNickname(String(newUsername[0]))
+        }
+        catch{}
+        return
+    }
+
     static async changeProfileCover(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
         console.log(`Alterando a foto de capa de ${user.username}`)
@@ -138,6 +167,33 @@ export class UserServices {
 
             await UserServices.updateProfileImages(guild, newUser, true, false)
             await sendReplyMessage(message, "Imagem de capa alterada com sucesso!", null, false)
+            return newUser;
+        }
+        else {
+            throw new Error("Você precisa anexar uma foto na mensagem para alterar seu perfil!")
+        }
+    }
+
+    static async changeProfileCollage(message: Message, user: MomentoUser, collageIndex: Number) {
+        const guild: Guild = message.guild
+        console.log(`MOMENTO - Alterando a foto de collage${collageIndex} de ${user.username}`)
+        if (collageIndex > 5 || collageIndex < 0) { throw new Error("Você só pode alterar collages entre 1 e 6!") }
+        if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para trocar a collage!") }
+        if (message.attachments.first()) {
+            const newCollagePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
+
+            let fields: {}
+            if (collageIndex == 0) { fields = { 'collage.0': newCollagePicture } }
+            if (collageIndex == 1) { fields = { 'collage.1': newCollagePicture } }
+            if (collageIndex == 2) { fields = { 'collage.2': newCollagePicture } }
+            if (collageIndex == 3) { fields = { 'collage.3': newCollagePicture } }
+            if (collageIndex == 4) { fields = { 'collage.4': newCollagePicture } }
+            if (collageIndex == 5) { fields = { 'collage.5': newCollagePicture } }
+
+            const newUser = await MongoService.updateProfile(user, fields)
+
+            await UserServices.updateProfileImages(guild, newUser, false, true)
+            await sendReplyMessage(message, "Imagem de collage alterada com sucesso!", null, false)
             return newUser;
         }
         else {

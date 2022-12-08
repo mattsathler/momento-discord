@@ -29,34 +29,41 @@ export class MomentoPost {
 
 
     public static async createPost(client: Client, message: Message, location?: String): Promise<Post> {
-        const user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
-        if (!user) { throw new Error(`Você não possui uma conta em MOMENTO! Crie uma enviando ?pedirperfil no canal pedir-perfil!`) }
+        try {
+            const user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
+            if (!user) { throw new Error(`Você não possui uma conta em MOMENTO! Crie uma enviando ?pedirperfil no canal pedir-perfil!`) }
+            if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para criar um post!") }
 
-        const postDescription: String = await MomentoMentions.parseUserPostMentions(message, client)
-        const momentoPost: MomentoPost =
-            new MomentoPost(
-                user,
-                message.attachments.first().url,
-                postDescription,
-                "Creekhills"
-            )
+            const postDescription: String = await MomentoMentions.parseUserPostMentions(message, client)
+            const momentoPost: MomentoPost =
+                new MomentoPost(
+                    user,
+                    message.attachments.first().url,
+                    postDescription,
+                    "Creekhills"
+                )
 
-        const post: Buffer = await Post.drawPost(momentoPost)
+            const post: Buffer = await Post.drawPost(momentoPost)
 
-        const profileServer: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-        const newPost: Message = await profileServer.send({ files: [post] })
+            const profileServer: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
+            const newPost: Message = await profileServer.send({ files: [post] })
 
-        await newPost.react('❤️')
-        await newPost.react('🔁')
-        await newPost.react('🗑️')
+            await newPost.react('❤️')
+            await newPost.react('🔁')
+            await newPost.react('🗑️')
 
-        await newPost.startThread({
-            name: "Comentários",
-            autoArchiveDuration: 1440,
-            reason: `Comentários`,
-            rateLimitPerUser: 10
-        })
+            await newPost.startThread({
+                name: "Comentários",
+                autoArchiveDuration: 1440,
+                reason: `Comentários`,
+                rateLimitPerUser: 10
+            })
 
-        return newPost
+            return newPost
+        }
+        catch (err) {
+            console.error(err)
+            throw new Error('O arquivo anexado não está em um formato válido! =(')
+        }
     }
 }
