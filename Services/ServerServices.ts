@@ -85,7 +85,7 @@ export class ServerServices {
         })
         await userProfileChannel.permissionOverwrites.create(discordUser, {
             SendMessages: true,
-            SendMessagesInThreads: false
+            SendMessagesInThreads: true
         })
 
         return userProfileChannel

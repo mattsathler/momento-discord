@@ -1,5 +1,5 @@
 import { Image } from "canvas";
-import { Client, Embed, EmbedBuilder, Message, TextChannel } from "discord.js";
+import { Client, Embed, EmbedBuilder, Message, TextChannel, ThreadChannel } from "discord.js";
 import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";

@@ -3,7 +3,7 @@ import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
-import { tryDeleteMessage } from "../Utils/MomentoMessages"
+import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages"
 import { MongoService } from "./MongoService"
 import { ServerServices } from "./ServerServices"
 
@@ -103,9 +103,27 @@ export class UserServices {
     static async addFollower(user: MomentoUser): Promise<MomentoUser> {
         console.log(`Adicionando novo seguidor para ${user.username}`)
         const newFollowers = Number(user.followers) + 1
-        await MongoService.updateProfile(user, {
+        const newUser = await MongoService.updateProfile(user, {
             followers: newFollowers
         })
-        return user;
+        return newUser;
+    }
+
+    static async changeProfilePicture(message: Message, user: MomentoUser) {
+        const guild: Guild = message.guild
+        console.log(`Alterando a foto de perfil de ${user.username}`)
+        if (message.attachments.first()) {
+            const newProfilePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
+            // const newProfilePictureURL = await LinkGenerator.uploadLinkToMomento(guild, newProfilePicture)
+            const newUser = await MongoService.updateProfile(user, {
+                profilePicture: newProfilePicture
+            })
+
+            sendReplyMessage(message, "Imagem de perfil alterada com sucesso!", null, false)
+            return newUser;
+        }
+        else {
+            throw new Error("Você precisa anexar uma foto na mensagem para alterar seu perfil!")
+        }
     }
 }

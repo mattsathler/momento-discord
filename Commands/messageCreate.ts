@@ -20,8 +20,10 @@ export async function messageCreate(message: Message, client: Client) {
         && momentoUser.guildId == channel.guildId ? true : false;
 
     const isSomeoneProfileChannel: Boolean = await MongoService.getUserByProfileChannel(String(message.channelId), message.guildId) ? true : false
+
     let isComment: Boolean = false;
-    if(!isSomeoneProfileChannel){
+
+    if (!isSomeoneProfileChannel) {
         const messageChannel = message.guild.channels.cache.get(message.channelId)
         isComment = await MongoService.getUserByProfileChannel(String(messageChannel.parentId), message.guildId) ? true : false
     }
@@ -33,6 +35,27 @@ export async function messageCreate(message: Message, client: Client) {
     if (isCommand) {
         try {
             if (!serverConfig && command != "configurar") { throw new Error("Servidor não configurado! Use ?configurar para iniciarmos!") }
+
+            if (isProfileCommand) {
+                if (command.slice(0, -1) == 'collage') {
+                    // await commandCreateCollage(command, message, user, attachment.url, message, client)
+                    return
+                }
+
+                switch (command) {
+                    case "perfil":
+                        reply = await message.reply("Alterando sua foto de perfil, aguarde...")
+                        await UserServices.changeProfilePicture(message, momentoUser)
+                        tryDeleteMessage(reply)
+                        break
+                    case "capa":
+                        reply = await message.reply("Alterando sua foto de perfil, aguarde...")
+                    //ALTERA O PERFIL
+                }
+
+                tryDeleteMessage(message)
+                return
+            }
 
             switch (command) {
                 case "configurar":
@@ -52,6 +75,7 @@ export async function messageCreate(message: Message, client: Client) {
                     break
             }
             if (reply) { tryDeleteMessage(reply) }
+            return
         }
         catch (err) {
             tryDeleteMessage(reply)
@@ -59,7 +83,6 @@ export async function messageCreate(message: Message, client: Client) {
             console.log(err)
             return
         }
-
     }
     else {
         if (isComment) {
