@@ -131,7 +131,7 @@ export class UserServices {
 
     static async changeProfileUser(message: Message, user: MomentoUser, newUsername: String[]) {
         const guild: Guild = message.guild
-        
+
         console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newUsername}`)
         if (newUsername.length == 0 || newUsername.length > 1 || newUsername[0].length > 15) { throw new Error('O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo 15 caracteres!') }
         if (StringFormater.containsSpecialChars(newUsername[0])) { throw new Error('O nome de usuário não pode conter caracteres especiais') }
@@ -147,12 +147,54 @@ export class UserServices {
             console.log(`Não foi possível alterar o nickname deste usuário para ${newUsername[0]}!`)
             console.log(err)
         }
-        try{
+        try {
             const profileServer: TextChannel = guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
             profileServer.setName(String(newUsername[0]))
             await message.member.setNickname(String(newUsername[0]))
         }
-        catch{}
+        catch { }
+        return
+    }
+
+    static async changeProfileName(message: Message, user: MomentoUser, newName: String[]) {
+        const guild: Guild = message.guild
+
+        console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newName}`)
+        if (!newName || !Array.isArray(newName)) { throw new Error('Você precisa definir um nome e sobrenome de usuário. Por exemplo: ?nome José Souza') }
+        if (newName.length != 2) { throw new Error('Você precisa definir um nome e sobrenome de usuário. Por exemplo: ?nome José Souza') }
+        if (newName[0].length > 12 || newName[1].length > 12) { throw new Error('Nome de usuário muito longo! O máximo é 12 caracteres.') }
+        if (StringFormater.containsSpecialChars(newName[0]) || StringFormater.containsSpecialChars(newName[1])) { throw new Error('O nome de usuário não pode conter caracteres especiais!') }
+
+        try {
+            const field = {
+                name: String(newName[0]),
+                surname: String(newName[1])
+            }
+            const newUser = await MongoService.updateProfile(user, field)
+            await UserServices.updateProfileImages(guild, newUser, true, false)
+            console.log('MOMENTO - Nome de usuário alterado com sucesso!')
+        }
+        catch (err) {
+            console.log(`Não foi possível alterar o nome deste usuário para ${newName[0]}!`)
+            console.log(err)
+        }
+        return
+    }
+
+    static async changeProfileBio(message: Message, user: MomentoUser, newBio: String[]) {
+        const guild: Guild = message.guild
+        let bio = ""
+        newBio.forEach(word => { bio += ` ${word.toString()}` });
+        let mentions = message.mentions.members.first();
+        if (mentions) { throw new Error("Ainda não habilitamos a opção de menções em bios... =(") }
+        if (!bio || bio.length > 40) { throw new Error('Bio inválida! Use ?bio <frase da bio> e no máximo 40 caracteres!') }
+
+        const newUser = await MongoService.updateProfile(user, {
+            bio: bio
+        })
+        await UserServices.updateProfileImages(guild, newUser, true, false)
+        console.log('MOMENTO - Bio alterada com sucesso!')
+        await sendReplyMessage(message, "Bio alterada com sucesso!", null, false)
         return
     }
 

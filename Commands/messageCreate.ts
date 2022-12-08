@@ -56,8 +56,18 @@ export async function messageCreate(message: Message, client: Client) {
                         if (reply) { tryDeleteMessage(reply) }
                         break
                     case "user":
-                        reply = await message.reply("Alterando seu nome de usuário, aguarde...")
+                        reply = await message.reply("Alterando seu usuário, aguarde...")
                         await UserServices.changeProfileUser(message, momentoUser, args)
+                        if (reply) { tryDeleteMessage(reply) }
+                        break
+                    case "nome":
+                        reply = await message.reply("Alterando seu nome, aguarde...")
+                        await UserServices.changeProfileName(message, momentoUser, args)
+                        if (reply) { tryDeleteMessage(reply) }
+                        break
+                    case "bio":
+                        reply = await message.reply("Alterando sua bio, aguarde...")
+                        await UserServices.changeProfileBio(message, momentoUser, args)
                         if (reply) { tryDeleteMessage(reply) }
                         break
                 }
