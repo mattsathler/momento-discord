@@ -1,4 +1,5 @@
 import { Client, Message, TextChannel } from "discord.js";
+import { MomentoComment } from "../Classes/MomentoComment";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoServer } from "../Classes/MomentoServer";
 import * as config from "../config.json";
@@ -18,6 +19,12 @@ export async function messageCreate(message: Message, client: Client) {
     const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
         && momentoUser.guildId == channel.guildId ? true : false;
 
+    const isSomeoneProfileChannel: Boolean = await MongoService.getUserByProfileChannel(String(message.channelId), message.guildId) ? true : false
+    let isComment: Boolean = false;
+    if(!isSomeoneProfileChannel){
+        const messageChannel = message.guild.channels.cache.get(message.channelId)
+        isComment = await MongoService.getUserByProfileChannel(String(messageChannel.parentId), message.guildId) ? true : false
+    }
 
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
@@ -26,6 +33,7 @@ export async function messageCreate(message: Message, client: Client) {
     if (isCommand) {
         try {
             if (!serverConfig && command != "configurar") { throw new Error("Servidor não configurado! Use ?configurar para iniciarmos!") }
+
             switch (command) {
                 case "configurar":
                     reply = await message.reply("Configurando servidor, aguarde...")
@@ -54,6 +62,10 @@ export async function messageCreate(message: Message, client: Client) {
 
     }
     else {
+        if (isComment) {
+            MomentoComment.createComment(message)
+            return
+        }
         try {
             reply = await message.reply("Criando seu post, aguarde...")
             MomentoPost.createPost(client, message, null)

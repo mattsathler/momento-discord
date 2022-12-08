@@ -106,6 +106,7 @@ export class MongoService {
         const users = mongo.model('users');
         try {
             const response = await users.find({ profileChannelId: profileChannelId, guildId: guildId })
+            if (response.length == 0) { return }
             const momentoUser: MomentoUser = new MomentoUser(
                 response[0].id,
                 response[0].username,

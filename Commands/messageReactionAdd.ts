@@ -6,19 +6,21 @@ import { UserServices } from "../Services/UserServices";
 import { removeReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
 
 export async function messageReactionAdd(user: User, reaction: MessageReaction) {
-    if(user.bot) { return }
+    if (user.bot) { return }
     const message: Message = reaction.message as Message;
 
     const reactUser: MomentoUser = await MongoService.getUserById(user.id, message.guildId)
-    let reactedUser: MomentoUser = await MongoService.getUserByProfileChannel(reaction.message.channel.id, message.guildId)
+    let reactedUser: MomentoUser = await MongoService.getUserByProfileChannel(reaction.message.channelId, message.guildId)
+    let isComment: Boolean = false;
 
     if (!reactedUser) {
-        // const parentChannel: ThreadChannel = await client.channels.fetch(reaction.message.channelId) as ThreadChannel
-        // reactedUser = await MongoService.getUserByProfileChannel(parentChannel.parentId, message.guildId)
-        if (!reactedUser) { throw new Error("Esse usuário não está registrado no Momento!") }
+        const messageChannel = message.guild.channels.cache.get(message.channelId)
+        reactedUser = await MongoService.getUserByProfileChannel(String(messageChannel.parentId), message.guildId)
+
+        isComment = reactedUser ? true : false
     }
 
-    if (reactedUser && reactUser) {
+    if (reactedUser && reactUser || isComment) {
         const messageId: String = reaction.message.id;
         const isProfile: Boolean = messageId == reactedUser.profileMessageId ? true : false;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;
@@ -59,6 +61,10 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                 }
             case '🗑️':
                 try {
+                    if (isComment && reactUser.id == reactedUser.id) {
+                        await tryDeleteMessage(message)
+                        break
+                    }
                     const reactedMessage = message.channel as ThreadChannel
                     if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
                         await ThreadService.disablePostComment(message)
@@ -67,7 +73,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))
                 }
-                catch(err) {
+                catch (err) {
                     console.log(err)
                 }
                 break
