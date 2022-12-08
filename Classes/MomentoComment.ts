@@ -39,14 +39,17 @@ export class MomentoComment {
 
         return comment
     }
-    
+
     public static createCommentEmbed(comment: MomentoComment): EmbedBuilder {
         const commentEmbed: EmbedBuilder = new EmbedBuilder()
             .setColor(0xdd247b)
             .setAuthor({
                 name: String(`@${comment.commentAuthor.username}`), iconURL: String(comment.commentAuthor.profilePicture), url: `https://discord.com/channels/${comment.post.guildId}/${comment.commentAuthor.profileChannelId}`
             })
-            .setDescription(String(comment.content))
+            .setDescription(`**${String(comment.content)}**`)
+            .setFooter({
+                text: 'momento for iPhone'
+            })
             .setTimestamp()
         return commentEmbed
     }

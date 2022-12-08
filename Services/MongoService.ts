@@ -137,7 +137,7 @@ export class MongoService {
             console.log(`MOMENTO - Cadastrando novo perfil para ${user.username}...`)
             const newUser = {
                 id: user.id,
-                username: user.username,
+                username: user.username.toLowerCase(),
                 guildId: user.guildId,
                 profileChannelId: '',
                 profileMessageId: '',
