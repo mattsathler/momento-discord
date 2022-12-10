@@ -3,8 +3,6 @@ import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
 import { MentionsParser } from "../Utils/MentionsParser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
-import { MomentoMentions } from "./MomentoMentions";
-import { MomentoPost } from "./MomentoPost";
 import { MomentoUser } from "./MomentoUser";
 
 export class MomentoComment {
@@ -31,17 +29,16 @@ export class MomentoComment {
         const postAuthorProfileChannel: TextChannel = await guild.channels.cache.get(String(postAuthor.profileChannelId)) as TextChannel
         const postMessage = await postAuthorProfileChannel.messages.fetch(ThreadChannel.id)
 
+        const parsedCommentText = await MentionsParser.parseUserMentions(message)
 
         const comment: MomentoComment = new MomentoComment(
             postAuthor,
             commentAuthor,
-            message.content,
+            parsedCommentText.join(' '),
             new Date,
             postMessage
         )
 
-        const parsedCommentText = await MentionsParser.parseUserMentions(commentAuthor, message, comment, true)
-        comment.content = parsedCommentText.join(' ')
         const commentEmbed = MomentoComment.createCommentEmbed(comment)
         tryDeleteMessage(message)
 
@@ -54,7 +51,9 @@ export class MomentoComment {
             commentAuthor,
             message.guild,
             postMessage.attachments.first().url,
-            `https://discord.com/channels/${comment.post.guildId}/${comment.post.id}`)
+            `https://discord.com/channels/${comment.post.guildId}/${comment.post.channelId}/${commentMessage.id}`)
+
+        NotificationsService.notifyMentions(message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
         return comment
     }
 
@@ -62,9 +61,9 @@ export class MomentoComment {
         const commentEmbed: EmbedBuilder = new EmbedBuilder()
             .setColor(0xdd247b)
             .setAuthor({
-                name: String(`@${comment.commentAuthor.username}`), iconURL: String(comment.commentAuthor.profilePicture), url: `https://discord.com/channels/${comment.post.guildId}/${comment.post.id}`
+                name: String(`@${comment.commentAuthor.username}`), iconURL: String(comment.commentAuthor.profilePicture)
             })
-            .setDescription(`**${String(comment.content)}**`)
+            .setDescription(`${String(comment.content)}`)
             .setFooter({
                 text: 'momento for iPhone'
             })

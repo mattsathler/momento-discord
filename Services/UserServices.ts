@@ -6,6 +6,7 @@ import { LinkGenerator } from "../Utils/LinkGenerator"
 import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages"
 import { StringFormater } from "../Utils/StringFormater"
 import { MongoService } from "./MongoService"
+import { NotificationsService } from "./NotificationsService"
 import { ServerServices } from "./ServerServices"
 
 export class UserServices {
@@ -23,47 +24,42 @@ export class UserServices {
     }
 
     static async askProfile(message: Message): Promise<MomentoUser> {
-        try {
-            let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
+        let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
 
-            //CADASTRA SE NÃO EXISTIR
-            if (!user) { user = await this.registerProfile(message) }
-            if (user.profileChannelId != "") {
-                const userHaveProfile = await this.userAlreadyHaveProfileChannel(message.guild, user)
-                if (userHaveProfile) {
-                    throw new Error(`Usuário já cadastrado nesse servidor! Confira: <#${user.profileChannelId}>`)
-                }
+        //CADASTRA SE NÃO EXISTIR
+        if (!user) { user = await this.registerProfile(message) }
+        if (user.profileChannelId != "") {
+            const userHaveProfile = await this.userAlreadyHaveProfileChannel(message.guild, user)
+            if (userHaveProfile) {
+                throw new Error(`Usuário já cadastrado nesse servidor! Confira: <#${user.profileChannelId}>`)
             }
-
-            console.log("MOMENTO - Usuário cadastrado, criando perfil...")
-            const profileCanvas: ProfileCanvas = new ProfileCanvas(user)
-            const collageCanvas: CollageCanvas = new CollageCanvas(user)
-
-            const userProfileImage: Buffer = await profileCanvas.drawProfile()
-            const userProfileImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userProfileImage)
-
-            const userCollageImage: Buffer = await collageCanvas.drawCollage()
-            const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userCollageImage)
-
-
-            const userProfileChannel = await ServerServices.createProfileChannel(message, user)
-            const userProfileMessage: Message = await userProfileChannel.send(userProfileImageURL)
-            const userCollageMessage: Message = await userProfileChannel.send(userCollageImageURL)
-
-            const notificationEmoji: string = !user.notifications ? "🔔" : "🔕"
-            userCollageMessage.react("🫂")
-            userCollageMessage.react(notificationEmoji)
-
-            console.log("MOMENTO - Perfil criado, finalizando cadastro...")
-            MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
-
-            console.log("MOMENTO - Usuário cadastrado!")
-            sendReplyMessage(message, "Seu perfil foi criado com sucesso!")
-            return user
         }
-        catch (err) {
-            throw new Error(err.message)
-        }
+
+        console.log("MOMENTO - Usuário cadastrado, criando perfil...")
+        const profileCanvas: ProfileCanvas = new ProfileCanvas(user)
+        const collageCanvas: CollageCanvas = new CollageCanvas(user)
+
+        const userProfileImage: Buffer = await profileCanvas.drawProfile()
+        const userProfileImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userProfileImage)
+
+        const userCollageImage: Buffer = await collageCanvas.drawCollage()
+        const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userCollageImage)
+
+
+        const userProfileChannel = await ServerServices.createProfileChannel(message, user)
+        const userProfileMessage: Message = await userProfileChannel.send(userProfileImageURL)
+        const userCollageMessage: Message = await userProfileChannel.send(userCollageImageURL)
+
+        const notificationEmoji: string = !user.notifications ? "🔔" : "🔕"
+        userCollageMessage.react("🫂")
+        userCollageMessage.react(notificationEmoji)
+
+        console.log("MOMENTO - Perfil criado, finalizando cadastro...")
+        MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
+
+        console.log("MOMENTO - Usuário cadastrado!")
+        sendReplyMessage(message, "Seu perfil foi criado com sucesso!", null, false)
+        return user
     }
 
     static async registerProfile(message: Message): Promise<MomentoUser> {
@@ -102,12 +98,14 @@ export class UserServices {
         return newMomentoUser
     }
 
-    static async addFollower(user: MomentoUser): Promise<MomentoUser> {
-        console.log(`Adicionando novo seguidor para ${user.username}`)
-        const newFollowers = Number(user.followers) + 1
+    static async changeFollowers(guild: Guild, user: MomentoUser, isAdding: Boolean): Promise<MomentoUser> {
+        console.log(`Alterando seguidores de ${user.username}`)
+        const newFollowers = isAdding ? Number(user.followers) + 1 : Number(user.followers) - 1
         const newUser = await MongoService.updateProfile(user, {
             followers: newFollowers
         })
+
+        await UserServices.updateProfileImages(guild, newUser, true, false)
         return newUser;
     }
 
@@ -138,7 +136,7 @@ export class UserServices {
 
         try {
             const newUser = await MongoService.updateProfile(user, {
-                username: String(newUsername)
+                username: String(newUsername[0]).toLowerCase()
             })
             await UserServices.updateProfileImages(guild, newUser, true, false)
             console.log('Nome de usuário alterado com sucesso!')
@@ -149,7 +147,7 @@ export class UserServices {
         }
         try {
             const profileServer: TextChannel = guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-            profileServer.setName(String(newUsername[0]))
+            profileServer.setName(String(newUsername[0]).toLowerCase())
             await message.member.setNickname(String(newUsername[0]))
         }
         catch { }

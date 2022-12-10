@@ -2,6 +2,7 @@ import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, 
 import { messageCreate } from "../Commands/messageCreate";
 import { ready } from "../Commands/ready";
 import { messageReactionAdd } from "../Commands/messageReactionAdd";
+import { messageReactionRemove } from "../Commands/messageReactionRemove";
 
 
 export class DiscordEvents {
@@ -10,6 +11,7 @@ export class DiscordEvents {
         'messageCreate',
         'ready',
         'messageReactionAdd',
+        'messageReactionRemove'
     ]
 
     constructor(client: Client) {
@@ -36,5 +38,19 @@ export class DiscordEvents {
         }
 
         messageReactionAdd(user, reaction)
+    }
+
+    public async messageReactionRemove(reaction: MessageReaction, user: User) {
+        if (reaction.partial) {
+            try {
+                await reaction.fetch();
+            }
+            catch (error) {
+                console.error('Something went wrong when fetching the message: ', error);
+                return;
+            }
+        }
+
+        messageReactionRemove(user, reaction)
     }
 }

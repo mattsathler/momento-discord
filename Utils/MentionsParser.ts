@@ -1,11 +1,8 @@
-import { Client, Guild, Message } from "discord.js";
-import { MomentoComment } from "../Classes/MomentoComment";
-import { MomentoUser } from "../Classes/MomentoUser";
+import { Message } from "discord.js";
 import { MongoService } from "../Services/MongoService";
-import { NotificationsService } from "../Services/NotificationsService";
 
 export class MentionsParser {
-    public static async parseUserMentions(user: MomentoUser, message: Message, comment: MomentoComment, notificate: boolean) {
+    public static async parseUserMentions(message: Message) {
         let content = message.content.split(' ')
 
         const mentionsContent = content.map(async word => {
@@ -14,24 +11,13 @@ export class MentionsParser {
                 if (word.startsWith('!')) {
                     word = word.slice(1);
                 }
-                
+
                 const userMentioned = await MongoService.getUserById(word, message.guildId)
-                if(userMentioned){
+                if (userMentioned) {
                     word = `@${userMentioned.username}`
                 }
-                else{
-                    word = `<@${word}>`
-                }
-                if (notificate) {
-                    if (userMentioned && userMentioned.id != user.id) {
-                        NotificationsService.sendNotification(
-                            `Mencionou você em um comentário!`,
-                            userMentioned,
-                            user,
-                            message.guild,
-                            comment.post.attachments.first().url,
-                            `https://discord.com/channels/${comment.post.guildId}/${comment.post.channel.id}/${comment.post.id}/`)
-                    }
+                else {
+                    throw new Error("A pessoa que você marcou não possui uma conta em nossa rede!")
                 }
             }
             return word
@@ -40,3 +26,15 @@ export class MentionsParser {
         return Promise.all(mentionsContent)
     }
 }
+
+// if (notificate) {
+//     if (userMentioned && userMentioned.id != user.id) {
+//         NotificationsService.sendNotification(
+//             `Mencionou você em um comentário!`,
+//             userMentioned,
+//             user,
+//             message.guild,
+//             comment.post.attachments.first().url,
+//             `https://discord.com/channels/${comment.post.guildId}/${comment.post.channel.id}/${comment.post.id}/`)
+//     }
+// }

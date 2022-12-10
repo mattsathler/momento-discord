@@ -1,12 +1,15 @@
-import { EmbedBuilder, Guild, Message, MessageType, TextChannel, ThreadChannel } from "discord.js";
-import { MomentoComment } from "../Classes/MomentoComment";
+import { Collection, EmbedBuilder, Guild, Message, MessageType, TextChannel, ThreadChannel, User } from "discord.js";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import { MomentoNotification } from "../Classes/MomentoNotification";
+import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
 
 export class NotificationsService {
     public static async sendNotification(text: String, targetUser: MomentoUser, notificatorUser: MomentoUser, guild: Guild, thumbURL?: String, url?: String): Promise<Message> {
+        console.log(targetUser.notifications)
+        if (!targetUser.notifications) { return }
         const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(targetUser.profileChannelId)) as TextChannel
         let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
         const notification: MomentoNotification = new MomentoNotification(
@@ -18,7 +21,7 @@ export class NotificationsService {
             url
         )
 
-        const notificationEmbed: EmbedBuilder = this.createSimpleNotificationEmbed(notification)
+        const notificationEmbed: EmbedBuilder = MomentoNotification.createSimpleNotificationEmbed(notification)
         if (thumbURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }
 
         const notificationMessage = await userNotificationChannel.send({
@@ -51,48 +54,20 @@ export class NotificationsService {
         return notifiedUserNotificationsChannel;
     }
 
-    public static createSimpleNotificationEmbed(notification: MomentoNotification): EmbedBuilder {
-        const url = notification.url ? notification.url : `https://discord.com/channels/${notification.notificatorUser.guildId}/${notification.notificatorUser.profileChannelId}`
-        const commentEmbed: EmbedBuilder = new EmbedBuilder()
-            .setColor(0xdd247b)
-            .setAuthor({
-                name: `@${notification.notificatorUser.username}`, iconURL: String(notification.notificatorUser.profilePicture),
-            })
-            .setDescription(`${String(notification.text)}`)
-            .setFooter({
-                text: 'momento for iPhone'
-            })
-            .addFields({
-                name: '-', value: `[Confira!](${String(url)})`
-            })
-            .setTimestamp()
-        return commentEmbed
+    public static async notifyMentions(guild: Guild, users: Collection<string, User>, userAuthor: MomentoUser, text: String) {
+
+        users.map(async user => {
+            const mentionedUser: MomentoUser = await MongoService.getUserById(user.id, guild.id)
+            if (!mentionedUser) { return }
+
+            const notification: MomentoNotification = new MomentoNotification(
+                mentionedUser,
+                userAuthor,
+                new Date,
+                text
+            )
+
+            await this.sendNotification(notification.text, notification.notifiedUser, notification.notificatorUser, guild, notification.thumbnailURL, notification.url);
+        })
     }
-
-    // public static async parseMentions(user: MomentoUser, mentions: String[], message: Message, comment: MomentoComment, notificate: Boolean): Promise<String> {
-    //     const mentionsContent = mentions.map(async word => {
-    //         if (word.startsWith('<@') && word.endsWith('>')) {
-    //             word = word.slice(2, -1);
-    //             if (word.startsWith('!')) {
-    //                 word = word.slice(1);
-    //             }
-
-    //             if (notificate) {
-    //                 const userMentioned = await MongoService.getUserById(word, message.guildId)
-    //                 if (userMentioned && userMentioned.id != user.id) {
-    //                     NotificationsService.sendNotification(
-    //                         `Mencionou você em um comentário!`,
-    //                         userMentioned,
-    //                         user,
-    //                         message.guild,
-    //                         comment.post.attachments.first().url,
-    //                         `https://discord.com/channels/${comment.post.guildId}/${comment.post.channel.id}/${comment.post.id}/`)
-    //                 }
-    //             }
-    //         }
-    //         return word
-    //     })
-
-    //     return Promise.all(mentionsContent)
-    // }
 }

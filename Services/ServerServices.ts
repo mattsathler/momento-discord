@@ -11,21 +11,15 @@ export class ServerServices {
             throw new Error("Esse servidor já foi configurado!")
         }
         const channelsId = await this.createDefaultChannels(message.guild)
-        try {
-            const serverConfig: MomentoServer =
-                await MongoService.uploadServerConfig(
-                    message.guild.id,
-                    channelsId.uploaderChannelId,
-                    channelsId.askprofileChannelId,
-                    channelsId.profilesCategoryId,
-                    channelsId.feedChannelId)
-            sendReplyMessage(message, "Servidor configurado com sucesso!")
-            return serverConfig
-        }
-        catch (err) {
-            console.error(err)
-            return null
-        }
+        const serverConfig: MomentoServer =
+            await MongoService.uploadServerConfig(
+                message.guild.id,
+                channelsId.uploaderChannelId,
+                channelsId.askprofileChannelId,
+                channelsId.profilesCategoryId,
+                channelsId.feedChannelId)
+        sendReplyMessage(message, "Servidor configurado com sucesso!", null, false)
+        return serverConfig
     }
 
     static async createDefaultChannels(guild: Guild): Promise<any> {
