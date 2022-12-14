@@ -92,7 +92,6 @@ export async function messageCreate(message: Message, client: Client) {
             }
 
             if (reply) { tryDeleteMessage(reply) }
-            tryDeleteMessage(message)
             return
         }
         if (isComment) {

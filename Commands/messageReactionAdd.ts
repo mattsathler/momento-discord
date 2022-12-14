@@ -25,7 +25,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         const messageId: String = reaction.message.id;
         const isProfile: Boolean = messageId == reactedUser.profileMessageId ? true : false;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;
-        const isPost: Boolean = !isProfile && !isCollage ? true : false;
+        const isPost: Boolean = !isProfile && !isCollage && !isComment ? true : false;
 
         const reactEmoji: String = reaction.emoji.name;
         try {
