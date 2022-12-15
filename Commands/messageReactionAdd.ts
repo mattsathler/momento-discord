@@ -1,4 +1,5 @@
 import { Client, Message, MessageReaction, ThreadChannel, User } from "discord.js";
+import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
@@ -54,6 +55,13 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             null,
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
+                        break
+                    }
+                    await removeReaction(reactUser, message, String(reactEmoji))
+                    break
+                case "🔁":
+                    if (isPost) {
+                        await MomentoPost.sharePost(message.client, message, reactUser)
                         break
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))

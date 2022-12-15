@@ -8,7 +8,6 @@ import { MongoService } from "./MongoService";
 
 export class NotificationsService {
     public static async sendNotification(text: String, targetUser: MomentoUser, notificatorUser: MomentoUser, guild: Guild, thumbURL?: String, url?: String): Promise<Message> {
-        console.log(targetUser.notifications)
         if (!targetUser.notifications) { return }
         const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(targetUser.profileChannelId)) as TextChannel
         let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
