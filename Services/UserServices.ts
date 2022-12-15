@@ -37,12 +37,11 @@ export class UserServices {
 
         console.log("MOMENTO - Usuário cadastrado, criando perfil...")
         const profileCanvas: ProfileCanvas = new ProfileCanvas(user)
-        const collageCanvas: CollageCanvas = new CollageCanvas(user)
 
         const userProfileImage: Buffer = await profileCanvas.drawProfile()
         const userProfileImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userProfileImage)
 
-        const userCollageImage: Buffer = await collageCanvas.drawCollage()
+        const userCollageImage: Buffer = await CollageCanvas.drawCollage(user)
         const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userCollageImage)
 
 
@@ -257,9 +256,7 @@ export class UserServices {
             await profileMessage.edit(userProfileImageURL)
         }
         if (updateCollage) {
-            const collageCanvas: CollageCanvas = new CollageCanvas(momentoUser)
-
-            const userCollageImage: Buffer = await collageCanvas.drawCollage()
+            const userCollageImage: Buffer = await CollageCanvas.drawCollage(momentoUser)
             const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(guild, userCollageImage)
 
             const collageMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileCollageId)) as Message
