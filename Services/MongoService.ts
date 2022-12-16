@@ -1,7 +1,7 @@
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MomentoServer } from "../Classes/MomentoServer";
 import mongo from "mongoose"
-import * as config from "../config.json";
+require("dotenv").config();
 
 const MomentoUserSchema = require("../Schemas/MomentoUserSchema");
 const MomentoServerSchema = require("../Schemas/MomentoServerSchema");
@@ -10,7 +10,7 @@ export class MongoService {
     static async connect(): Promise<Boolean> {
         try {
             await mongo.connect(
-                config.mongoURI || '', {
+                process.env.MONGO_URI || '', {
                 keepAlive: true,
             }
             )

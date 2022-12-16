@@ -1,5 +1,6 @@
-import { Client, GatewayIntentBits, IntentsBitField, Partials } from "discord.js";
-import * as config from "./config.json";
+import { Client, GatewayIntentBits, Partials } from "discord.js";
+// import * as config from "./config.json";
+require("dotenv").config();
 
 import { DiscordEvents } from './Events/DiscordEvents';
 
@@ -28,4 +29,4 @@ for (let event of events.eventsList) {
 }
 
 console.log(`MOMENTO - Esse é o seu momento!`);
-client.login(config.token);
+client.login(process.env.TOKEN);
