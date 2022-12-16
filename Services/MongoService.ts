@@ -1,10 +1,12 @@
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MomentoServer } from "../Classes/MomentoServer";
 import mongo from "mongoose"
+import { MomentoPost } from "../Classes/MomentoPost";
 require("dotenv").config();
 
 const MomentoUserSchema = require("../Schemas/MomentoUserSchema");
 const MomentoServerSchema = require("../Schemas/MomentoServerSchema");
+const MomentoPostSchema = require("../Schemas/MomentoPostSchema");
 
 export class MongoService {
     static async connect(): Promise<Boolean> {
@@ -63,6 +65,29 @@ export class MongoService {
         }
     }
 
+    static async getPostById(postMessageId: String, postGuildId: String): Promise<MomentoPost> {
+        const posts = mongo.model('posts');
+        try {
+            const response: any[] = await posts.find({ messageId: postMessageId, guildId: postGuildId })
+            if (response.length > 0) {
+                const user: MomentoUser = await this.getUserById(response[0].author, postGuildId)
+                const momentoPost: MomentoPost = new MomentoPost(
+                    user,
+                    response[0].postImageUrl,
+                    response[0].postDescription,
+                    null
+                )
+                return momentoPost;
+            }
+            else {
+                return null
+            }
+        }
+        catch (err) {
+            console.error(err)
+            throw new Error(err)
+        }
+    }
     static async getUserById(userId: String, userGuildId: String): Promise<MomentoUser> {
         const users = mongo.model('users');
         try {
@@ -148,6 +173,29 @@ export class MongoService {
         }
         catch (err) {
             throw new Error("Ocorreu um erro ao registrar seu usuário!")
+        }
+    }
+
+    static async uploadPost(post: MomentoPost): Promise<MomentoPost> {
+        try {
+            console.log(`MOMENTO - Cadastrando novo post de ${post.author.username}...`)
+            post.description = post.description ? post.description : ""
+            const newPost = {
+                id: post.postMessage.id,
+                messageId: post.postMessage.id,
+                channelId: post.postMessage.channelId,
+                guildId: post.postMessage.guildId,
+                authorProfileChannelId: post.author.profileChannelId,
+                postDescription: post.description,
+                postImageUrl: post.imageURL,
+            }
+            await new MomentoPostSchema(newPost).save()
+            const createdPost: MomentoPost = await this.getPostById(newPost.messageId, post.postMessage.guildId)
+            return createdPost
+        }
+        catch (err) {
+            console.log(err)
+            throw new Error("Ocorreu um erro ao salvar seu post!")
         }
     }
 

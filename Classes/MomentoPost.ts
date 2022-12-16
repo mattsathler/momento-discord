@@ -3,6 +3,7 @@ import { Client, Message, TextChannel } from "discord.js";
 import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
+import { PostService } from "../Services/PostService";
 import { MentionsParser } from "../Utils/MentionsParser";
 import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
@@ -12,6 +13,7 @@ export class MomentoPost {
     public imageURL: String;
     public description: String;
     public location: String;
+    public postMessage: Message;
 
     public postSafeAreaSize: number = 10
     public postHeaderSize: number = 160
@@ -41,11 +43,11 @@ export class MomentoPost {
                 postDescription.join(' '),
                 "Creekhills"
             )
-
+            
             try {
                 const post: Buffer = await Post.drawPost(momentoPost)
-                const profileServer: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-                const newPost: Message = await profileServer.send({ files: [post] })
+                const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
+                const newPost: Message = await profileChannel.send({ files: [post] })
                 
                 await newPost.react('❤️')
                 await newPost.react('🔁')
@@ -58,6 +60,8 @@ export class MomentoPost {
                 rateLimitPerUser: 10
             })
 
+            momentoPost.postMessage = newPost
+            await PostService.savePostInDatabase(momentoPost)
             NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
             return newPost
         }
