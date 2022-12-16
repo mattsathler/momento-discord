@@ -98,7 +98,7 @@ export class UserServices {
     }
 
     static async changeFollowers(guild: Guild, user: MomentoUser, isAdding: Boolean): Promise<MomentoUser> {
-        console.log(`Alterando seguidores de ${user.username}`)
+        console.log(`MOMENTO - Alterando seguidores de ${user.username}`)
         const newFollowers = isAdding ? Number(user.followers) + 1 : Number(user.followers) - 1
         const newUser = await MongoService.updateProfile(user, {
             followers: newFollowers
@@ -106,6 +106,24 @@ export class UserServices {
 
         await UserServices.updateProfileImages(guild, newUser, true, false)
         return newUser;
+    }
+
+    static async changeCollageStyle(message: Message, user: MomentoUser, newCollageStyle: Number) {
+        const guild: Guild = message.guild
+        const collage = Number(newCollageStyle)-1
+        console.log(`MOMENTO - Alterando o estilo de collage de ${user.username}`)
+        if (newCollageStyle && collage <= 4 && collage >= 0) {
+            const newUser = await MongoService.updateProfile(user, {
+                profileCollageStyle: collage
+            })
+
+            await UserServices.updateProfileImages(guild, newUser, false, true) 
+            await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
+            return newUser;
+        }
+        else {
+            throw new Error("Você precisa definir um estilo entre 1 e 5! Use ?estilo <1-5> para alterar.")
+        }
     }
 
     static async changeProfilePicture(message: Message, user: MomentoUser) {
@@ -138,10 +156,10 @@ export class UserServices {
                 username: String(newUsername[0]).toLowerCase()
             })
             await UserServices.updateProfileImages(guild, newUser, true, false)
-            console.log('Nome de usuário alterado com sucesso!')
+            console.log('MOMENTO - Nome de usuário alterado com sucesso!')
         }
         catch (err) {
-            console.log(`Não foi possível alterar o nickname deste usuário para ${newUsername[0]}!`)
+            console.log(`MOMENTO - Não foi possível alterar o nickname deste usuário para ${newUsername[0]}!`)
             console.log(err)
         }
         try {
@@ -172,7 +190,7 @@ export class UserServices {
             console.log('MOMENTO - Nome de usuário alterado com sucesso!')
         }
         catch (err) {
-            console.log(`Não foi possível alterar o nome deste usuário para ${newName[0]}!`)
+            console.log(`MOMENTO - Não foi possível alterar o nome deste usuário para ${newName[0]}!`)
             console.log(err)
         }
         return
@@ -197,7 +215,7 @@ export class UserServices {
 
     static async changeProfileCover(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
-        console.log(`Alterando a foto de capa de ${user.username}`)
+        console.log(`MOMENTO - Alterando a foto de capa de ${user.username}`)
         if (message.attachments.first()) {
             const newProfileCover: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
             const newUser = await MongoService.updateProfile(user, {

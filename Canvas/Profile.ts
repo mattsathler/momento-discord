@@ -1,6 +1,7 @@
 import { createCanvas, loadImage, Image, registerFont, Canvas } from "canvas";
 import { MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
+import { StringFormater } from "../Utils/StringFormater";
 
 export class ProfileCanvas {
     private momentoUser: MomentoUser
@@ -49,7 +50,7 @@ export class ProfileCanvas {
 
         context.font = '42px FORTE'
         context.fillStyle = `rgb(221, 36, 123)`
-        context.fillText(String(this.momentoUser.momentos), canvas.width / 2 - 250, canvas.height - 110)
+        context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.momentos), 1)), canvas.width / 2 - 250, canvas.height - 110)
 
         context.font = '38px FORTE'
         context.fillStyle = `rgb(179, 179, 179)`
@@ -58,16 +59,15 @@ export class ProfileCanvas {
 
         context.font = '42px FORTE'
         context.fillStyle = `rgb(221, 36, 123)`
-        context.fillText(String(this.momentoUser.trends), canvas.width / 2, canvas.height - 110)
+        context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.trends), 1)), canvas.width / 2, canvas.height - 110)
 
         context.font = '38px FORTE'
         context.fillStyle = `rgb(179, 179, 179)`
         context.fillText("trends", canvas.width / 2, canvas.height - 70)
 
-
         context.font = '42px FORTE'
         context.fillStyle = `rgb(221, 36, 123)`
-        context.fillText(String(this.momentoUser.followers), canvas.width / 2 + 250, canvas.height - 110)
+        context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.followers), 1)), canvas.width / 2 + 250, canvas.height - 110)
 
         context.font = '38px FORTE'
         context.fillStyle = `rgb(179, 179, 179)`

@@ -2,6 +2,7 @@ import { createCanvas, loadImage, Image, registerFont, Canvas } from "canvas";
 import { MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
 import * as CollageStyles from "../styles.json";
+import { MongoService } from "../Services/MongoService";
 
 export class CollageCanvas {
     public static async drawCollage(momentoUser: MomentoUser): Promise<Buffer> {
@@ -16,6 +17,11 @@ export class CollageCanvas {
         let rowIndex: number = 1
         const spacement: number = 8;
 
+        // if (typeof (momentoUser.profileCollageStyle) != 'number') {
+        //     momentoUser = await MongoService.updateProfile(momentoUser, {
+        //         profileCollageStyle: 0
+        //     })
+        // }
         for (let [index, image] of collage.entries()) {
             const style = CollageStyles[Number(momentoUser.profileCollageStyle)][index]
 

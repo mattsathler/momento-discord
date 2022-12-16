@@ -150,5 +150,43 @@
             "width": 416,
             "height": 348
         }
+    },
+    "4":{
+        "0": {
+            "posx": 8,
+            "posy": 8,
+            "width": 416,
+            "height": 704
+        },
+        "1": {
+            "posx": 432,
+            "posy": 8,
+            "width": 416,
+            "height": 348
+        },
+        "2": {
+            "posx": 856,
+            "posy": 8,
+            "width": 416,
+            "height": 348
+        },
+        "3": {
+            "posx": 8,
+            "posy": 364,
+            "width": 0,
+            "height": 0
+        },
+        "4": {
+            "posx": 432,
+            "posy": 364,
+            "width": 840,
+            "height": 348
+        },
+        "5": {
+            "posx": 856,
+            "posy": 364,
+            "width": 0,
+            "height": 0
+        }
     }
 }

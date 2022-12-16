@@ -1,5 +1,5 @@
 export class StringFormater {
-    static async formatForProfile(num: number, digits: number) {
+    static formatForProfile(num: number, digits: number) {
         const lookup = [
             { value: 1, symbol: "" },
             { value: 1e3, symbol: "k" },

@@ -67,6 +67,10 @@ export async function messageCreate(message: Message, client: Client) {
                         reply = await message.reply("Alterando sua bio, aguarde...")
                         await UserServices.changeProfileBio(message, momentoUser, args)
                         break
+                    case "estilo":
+                        reply = await message.reply("Alterando o estilo da collage, aguarde...")
+                        await UserServices.changeCollageStyle(message, momentoUser, Number(args[0]))
+                        break
                 }
 
                 if (reply) { tryDeleteMessage(reply) }

@@ -7,12 +7,6 @@ const reqString = {
     required: true
 }
 
-const reqNumber = {
-    type: Number,
-    required: true,
-    default: 0
-}
-
 const schema = new mongo.Schema({
     'id': {
         type: String,
@@ -33,7 +27,11 @@ const schema = new mongo.Schema({
     'profileChannelId': { type: String },
     'profileMessageId': { type: String },
     'profileCollageId': { type: String },
-    'profileCollageStyle': { type: reqNumber, },
+    'profileCollageStyle': {
+        type: Number,
+        required: true,
+        default: 0
+    },
     'profilePicture': {
         type: String,
         required: true,
