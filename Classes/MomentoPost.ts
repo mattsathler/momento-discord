@@ -50,7 +50,7 @@ export class MomentoPost {
                 const newPost: Message = await profileChannel.send({ files: [post] })
                 
                 await newPost.react('❤️')
-                await newPost.react('🔁')
+                // await newPost.react('🔁')
                 await newPost.react('🗑️')
                 
                 await newPost.startThread({

@@ -4,7 +4,7 @@ import ImageCropper from "../Utils/ImageCropper";
 
 export class Post {
     public static async drawPost(post: MomentoPost): Promise<Buffer> {
-        registerFont('./assets/fonts/fortefont.ttf', { family: 'Forte' })
+        registerFont('./Assets/Fonts/fortefont.ttf', { family: 'Forte' })
 
         let image: Image = await loadImage(String(post.imageURL));
         let imageCanvas: Canvas

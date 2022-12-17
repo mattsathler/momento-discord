@@ -32,11 +32,11 @@ export class ServerServices {
             type: ChannelType.GuildText,
         })
         const profilesCategory = await guild.channels.create({
-            name: "perfis",
+            name: "🫂perfis",
             type: ChannelType.GuildCategory,
         })
         const feedChannel = await guild.channels.create({
-            name: "feed",
+            name: "trendings",
             type: ChannelType.GuildText,
         })
 
