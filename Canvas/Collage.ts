@@ -9,7 +9,7 @@ export class CollageCanvas {
         const canvas = createCanvas(1280, 720)
         const context = canvas.getContext('2d')
 
-        const profileBackground = await loadImage('./assets/background.png')
+        const profileBackground = await loadImage('./Assets/background.png')
         context.drawImage(profileBackground, 0, 0, canvas.width, canvas.height)
 
         const collage: String[] = momentoUser.collage

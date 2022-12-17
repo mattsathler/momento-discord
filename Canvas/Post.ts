@@ -22,9 +22,9 @@ export class Post {
         const canvas = createCanvas(imageCanvas.width + post.postSafeAreaSize * 2, imageCanvas.height + post.postHeaderSize * 1.85)
 
         const context = canvas.getContext('2d')
-        const background: Image = await loadImage("./assets/background.png")
+        const background: Image = await loadImage("./Assets/background.png")
         const authorRoundImage: Canvas = await ImageCropper.drawUserPicture(String(post.author.profilePicture));
-        const postOrnament: Image = await loadImage("./assets/ornament.png")
+        const postOrnament: Image = await loadImage("./Assets/ornament.png")
 
         context.drawImage(background, 0, 0, canvas.width, canvas.height)
         context.drawImage(imageCanvas, post.postSafeAreaSize, post.profilePictureSize + post.postSafeGap * 2, imageCanvas.width, imageCanvas.height)
