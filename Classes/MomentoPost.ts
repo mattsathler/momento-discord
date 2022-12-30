@@ -22,11 +22,12 @@ export class MomentoPost {
 
     public authorRoundImage: Image
 
-    constructor(author: MomentoUser, imageURL: String, description: String, location?: String) {
+    constructor(author: MomentoUser, imageURL: String, description: String, location?: String, postMessage?: Message) {
         this.author = author;
         this.imageURL = imageURL;
         this.description = description;
         if (location) { this.location = location; }
+        if (postMessage) { this.postMessage = postMessage; }
     }
 
 
@@ -62,7 +63,7 @@ export class MomentoPost {
 
             momentoPost.postMessage = newPost
             await PostService.savePostInDatabase(momentoPost)
-            NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
+            await NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
             return newPost
         }
         catch (err) {

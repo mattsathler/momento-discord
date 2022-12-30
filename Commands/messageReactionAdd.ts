@@ -1,7 +1,9 @@
 import { Client, Message, MessageReaction, ThreadChannel, User } from "discord.js";
+import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
+import { PostService } from "../Services/PostService";
 import { ThreadService } from "../Services/ThreadsService";
 import { UserServices } from "../Services/UserServices";
 import { removeReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
@@ -30,6 +32,10 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         const reactEmoji: String = reaction.emoji.name;
         try {
             switch (reactEmoji) {
+                case "🔧":
+                    const post: MomentoPost = await PostService.getPostFromMessage(message)
+                    console.log(post)
+
                 case "❤️":
                     if (isPost) {
                         await NotificationsService.sendNotification(
@@ -43,6 +49,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         break
                     }
                     break
+
                 case "🫂":
                     if (isCollage /*&& reactUser.id != reactedUser.id*/) {
                         await UserServices.changeFollowers(message.guild, reactedUser, true)
@@ -58,6 +65,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))
                     break
+
                 case "🔔": case "🔕":
                     if (reactUser.id == reactedUser.id && isCollage) {
                         const notificationToggle: Boolean = reaction.emoji.name == '🔔' ? true : false
@@ -67,11 +75,11 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         await MongoService.updateProfile(reactedUser, { notifications: notificationToggle })
                         await message.react(notificationEmoji)
 
-
                         const notificationMsg = notificationToggle ? 'Você ativou as notificações de perfil!' : 'Você desativou as notificações de perfil!'
                         NotificationsService.sendNotification(notificationMsg, reactedUser, reactUser, message.guild, null, null)
                         break
                     }
+
                 case '🗑️':
                     try {
                         if (isComment && reactUser.id == reactedUser.id) {
