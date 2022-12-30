@@ -2,6 +2,7 @@ import { MomentoUser } from "../Classes/MomentoUser";
 import { MomentoServer } from "../Classes/MomentoServer";
 import mongo from "mongoose"
 import { MomentoPost } from "../Classes/MomentoPost";
+import { Client, Guild, Message, TextChannel } from "discord.js";
 require("dotenv").config();
 
 const MomentoUserSchema = require("../Schemas/MomentoUserSchema");
@@ -197,6 +198,29 @@ export class MongoService {
             console.log(err)
             throw new Error("Ocorreu um erro ao salvar seu post!")
         }
+    }
+
+    static async getPostFromMessage(message: Message): Promise<MomentoPost> {
+        const posts = mongo.model('posts');
+        try {
+            const response = await posts.findOne({ id: message.id, channelId: message.channelId, guildId: message.guildId })
+            if (response.length == 0) { return null }
+            const postAuthor: MomentoUser = await this.getUserByProfileChannel(response.authorProfileChannelId, message.guildId)
+            const postMessage: Message = await message.channel.messages.fetch(message.id)
+
+            const post: MomentoPost = new MomentoPost(
+                postAuthor,
+                response.postImageUrl,
+                response.postDescription,
+                "",
+                postMessage
+            )
+            return post;
+        }
+        catch (err) {
+            console.error(err)
+        }
+        return
     }
 
     static async uploadServerConfig(
