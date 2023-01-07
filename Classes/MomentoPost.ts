@@ -1,12 +1,12 @@
 import { Image } from "canvas";
-import { Client, Message, TextChannel } from "discord.js";
+import { Client, Message, TextChannel, User } from "discord.js";
 import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
 import { PostService } from "../Services/PostService";
 import { MentionsParser } from "../Utils/MentionsParser";
-import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
+import ImageCropper from "../Utils/ImageCropper";
 
 export class MomentoPost {
     public author: MomentoUser;
@@ -31,9 +31,7 @@ export class MomentoPost {
     }
 
 
-    public static async createPost(client: Client, message: Message, location?: String): Promise<Post> {
-        const user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
-        if (!user) { throw new Error(`Você não possui uma conta em MOMENTO! Crie uma enviando ?pedirperfil no canal pedir-perfil!`) }
+    public static async createPost(client: Client, message: Message, user: MomentoUser, repostUrl?: String): Promise<Post> {
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para criar um post!") }
 
         const postDescription: String[] = await MentionsParser.parseUserMentions(message)
@@ -44,14 +42,13 @@ export class MomentoPost {
                 postDescription.join(' '),
                 "Creekhills"
             )
-            
             try {
                 const post: Buffer = await Post.drawPost(momentoPost)
                 const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
                 const newPost: Message = await profileChannel.send({ files: [post] })
                 
                 await newPost.react('❤️')
-                // await newPost.react('🔁')
+                await newPost.react('🔁')
                 await newPost.react('🗑️')
                 
                 await newPost.startThread({
@@ -70,5 +67,13 @@ export class MomentoPost {
             console.error(err)
             throw new Error('O arquivo anexado não está em um formato válido! =(')
         }
+    }
+
+    public static async sharePost(client: Client, message: Message, user: MomentoUser): Promise<Post> {
+        const postImgUrl: string = message.attachments.first().url;
+        const postAuthor: MomentoUser = await MongoService.getUserByProfileChannel(message.channelId, message.guildId)
+        const sharedPost = await this.createPost(client, message, user, message.attachments.first().url)
+        await NotificationsService.sendNotification("Repostou seu momento!", postAuthor, user, message.guild, postImgUrl, `https://discord.com/channels/${message.guildId}/${user.profileChannelId}`)
+        return sharedPost
     }
 }

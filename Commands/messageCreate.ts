@@ -1,4 +1,4 @@
-import { Client, Message, TextChannel } from "discord.js";
+import { Client, Message, MessageType, TextChannel } from "discord.js";
 import { MomentoComment } from "../Classes/MomentoComment";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoServer } from "../Classes/MomentoServer";
@@ -6,10 +6,13 @@ import * as config from "../config.json";
 import { MongoService } from "../Services/MongoService";
 import { ServerServices } from "../Services/ServerServices";
 import { UserServices } from "../Services/UserServices";
-import { sendErrorMessage, sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
+import { sendErrorMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
 
 export async function messageCreate(message: Message, client: Client) {
     if (message.author.bot) return;
+    if (message.type == MessageType.ThreadCreated) return;
+    if (message.type == MessageType.ThreadStarterMessage) return;
+
     const momentoUser = await MongoService.getUserById(message.author.id, message.guild.id);
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
@@ -104,7 +107,7 @@ export async function messageCreate(message: Message, client: Client) {
         }
         if (isProfileCommand) {
             reply = await message.reply("Criando seu post, aguarde...")
-            await MomentoPost.createPost(client, message, null)
+            await MomentoPost.createPost(client, message, momentoUser)
             if (reply) { tryDeleteMessage(reply) }
             tryDeleteMessage(message)
         }

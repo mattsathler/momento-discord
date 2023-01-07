@@ -65,7 +65,13 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))
                     break
-
+                case "🔁":
+                    if (isPost) {
+                        await MomentoPost.sharePost(message.client, message, reactUser)
+                        break
+                    }
+                    await removeReaction(reactUser, message, String(reactEmoji))
+                    break
                 case "🔔": case "🔕":
                     if (reactUser.id == reactedUser.id && isCollage) {
                         const notificationToggle: Boolean = reaction.emoji.name == '🔔' ? true : false
