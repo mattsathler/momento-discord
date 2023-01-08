@@ -1,5 +1,10 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 3.2 | REWORK/POST - 08/01/2023
+- Altera o momentoOwner após um repost
+- Remove as listras dos momentos postados
+- Pequena alteração no design do post
+
 ## 3.1 | REWORK/POST - 08/01/2023
 - Disabilita a possibilidade de repostar o próprio momento;
 

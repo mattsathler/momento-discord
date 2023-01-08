@@ -38,6 +38,7 @@ export class MomentoPost {
         let momentoPost: MomentoPost;
         if (isRepost) {
             momentoPost = await MongoService.getPostById(message.id, message.guildId)
+            momentoPost.author = user
         }
         else {
             momentoPost =

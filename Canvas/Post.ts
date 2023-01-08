@@ -18,19 +18,18 @@ export class Post {
             imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), image.width, image.height);
         }
 
-
         const canvas = createCanvas(imageCanvas.width + post.postSafeAreaSize * 2, imageCanvas.height + post.postHeaderSize * 1.85)
 
         const context = canvas.getContext('2d')
         const background: Image = await loadImage("./Assets/background.png")
         const authorRoundImage: Canvas = await ImageCropper.drawUserPicture(String(post.author.profilePicture));
-        const postOrnament: Image = await loadImage("./Assets/ornament.png")
+        // const postOrnament: Image = await loadImage("./Assets/ornament.png")
 
         context.drawImage(background, 0, 0, canvas.width, canvas.height)
         context.drawImage(imageCanvas, post.postSafeAreaSize, post.profilePictureSize + post.postSafeGap * 2, imageCanvas.width, imageCanvas.height)
 
         context.drawImage(authorRoundImage, post.postSafeGap * 2, post.postSafeGap, post.profilePictureSize, post.profilePictureSize)
-        context.drawImage(postOrnament, canvas.width - post.postSafeGap * 4, 0, 40, post.postHeaderSize - post.postSafeGap * 2)
+        // context.drawImage(postOrnament, canvas.width - post.postSafeGap * 4, 0, 40, post.postHeaderSize - post.postSafeGap * 2)
 
         context.font = '36px FORTE'
         context.fillStyle = `rgb(221, 36, 123)`
