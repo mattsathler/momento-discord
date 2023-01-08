@@ -1,0 +1,9 @@
+### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
+
+## 3.0 | REWORK/POST - 08/01/2023
+- Altera a forma que o bot lida com posts salvos no banco de dados. Agora, ele salva a foto originária do post para usar futuramente;
+- MOMENTO agora disponibiliza o repost de outros momentos de usuários;
+- Alguns ajustes e bugfixes;
+
+## 2.0 | ??? | ???
+## 1.0 | ??? | ???
