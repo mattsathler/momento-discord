@@ -31,18 +31,23 @@ export class MomentoPost {
     }
 
 
-    public static async createPost(client: Client, message: Message, user: MomentoUser, repostUrl?: String): Promise<Post> {
+    public static async createPost(client: Client, message: Message, user: MomentoUser, isRepost?: Boolean): Promise<Post> {
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para criar um post!") }
 
         const postDescription: String[] = await MentionsParser.parseUserMentions(message)
-        const postImageUrl: String = repostUrl ? repostUrl : message.attachments.first().url
-        const momentoPost: MomentoPost =
-            new MomentoPost(
-                user,
-                postImageUrl,
-                postDescription.join(' '),
-                "Creekhills"
-            )
+        let momentoPost: MomentoPost;
+        if (isRepost) {
+            momentoPost = await MongoService.getPostById(message.id, message.guildId)
+        }
+        else {
+            momentoPost =
+                new MomentoPost(
+                    user,
+                    message.attachments.first().url,
+                    postDescription.join(' '),
+                    "Creekhills"
+                )
+        }
         try {
             const post: Buffer = await Post.drawPost(momentoPost)
             const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
@@ -76,12 +81,8 @@ export class MomentoPost {
 
         const post: MomentoPost = await MongoService.getPostById(message.id, message.guild.id) ?? undefined
         if (!post) throw new Error("Post não encontrado!")
-        // if (post.author.id == user.id) throw new Error("Você não pode repostar seu próprio momento!")
 
-        // const postImgUrl: string = message.attachments.first().url
-        // const postAuthor: MomentoUser = await MongoService.getUserByProfileChannel(message.channelId, message.guildId)
-
-        const sharedPost = await this.createPost(client, message, user, post.imageURL)
+        const sharedPost = await this.createPost(client, message, user, true)
 
         await NotificationsService.sendNotification("Repostou seu momento!", post.author, user, message.guild, post.imageURL, `https://discord.com/channels/${message.guildId}/${user.profileChannelId}`)
         return sharedPost
