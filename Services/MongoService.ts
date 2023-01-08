@@ -71,7 +71,8 @@ export class MongoService {
         try {
             const response: any[] = await posts.find({ messageId: postMessageId, guildId: postGuildId })
             if (response.length > 0) {
-                const user: MomentoUser = await this.getUserById(response[0].author, postGuildId)
+                const user: MomentoUser = await MongoService.getUserByProfileChannel(response[0].authorProfileChannelId, postGuildId)
+                // const user: MomentoUser = await MongoService.getUserByProfileChannel
                 const momentoPost: MomentoPost = new MomentoPost(
                     user,
                     response[0].postImageUrl,
@@ -94,7 +95,6 @@ export class MongoService {
         try {
             const response: any[] = await users.find({ id: userId, guildId: userGuildId })
             if (response.length > 0) {
-
                 const momentoUser: MomentoUser = new MomentoUser(
                     response[0].id,
                     response[0].username,
@@ -177,7 +177,7 @@ export class MongoService {
         }
     }
 
-    static async uploadPost(post: MomentoPost): Promise<MomentoPost> {
+    static async uploadPost(post: MomentoPost, postOriginalImageURL: String): Promise<MomentoPost> {
         try {
             console.log(`MOMENTO - Cadastrando novo post de ${post.author.username}...`)
             post.description = post.description ? post.description : ""
@@ -188,7 +188,7 @@ export class MongoService {
                 guildId: post.postMessage.guildId,
                 authorProfileChannelId: post.author.profileChannelId,
                 postDescription: post.description,
-                postImageUrl: post.imageURL,
+                postImageUrl: postOriginalImageURL
             }
             await new MomentoPostSchema(newPost).save()
             const createdPost: MomentoPost = await this.getPostById(newPost.messageId, post.postMessage.guildId)

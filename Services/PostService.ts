@@ -3,8 +3,8 @@ import { MomentoPost } from "../Classes/MomentoPost";
 import { MongoService } from "./MongoService";
 
 export class PostService {
-    public static async savePostInDatabase(post: MomentoPost): Promise<void> {
-        await MongoService.uploadPost(post)
+    public static async savePostInDatabase(post: MomentoPost, postOriginalImageURL: String): Promise<void> {
+        await MongoService.uploadPost(post, postOriginalImageURL)
     }
 
     public static async getPostFromMessage(message: Message): Promise<MomentoPost> {

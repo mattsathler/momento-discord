@@ -30,6 +30,8 @@ export class LinkGenerator {
             const msg: Message = await uploaderChannel.send({ files: [uploadedImage] })
             const attachment: Attachment = msg.attachments.first()
             const url: string = attachment.url
+
+            console.log(url)
             return url
         }
         catch (err) {

@@ -27,6 +27,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         const messageId: String = reaction.message.id;
         const isProfile: Boolean = messageId == reactedUser.profileMessageId ? true : false;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;
+        // const isPost: Boolean = await MongoService.getPostById(message.id, message.guildId) ? true : false
         const isPost: Boolean = !isProfile && !isCollage && !isComment ? true : false;
 
         const reactEmoji: String = reaction.emoji.name;
@@ -34,8 +35,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
             switch (reactEmoji) {
                 case "🔧":
                     const post: MomentoPost = await PostService.getPostFromMessage(message)
-                    console.log(post)
-
+                    break
                 case "❤️":
                     if (isPost) {
                         await NotificationsService.sendNotification(
