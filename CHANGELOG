@@ -1,5 +1,8 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 3.1 | REWORK/POST - 08/01/2023
+- Disabilita a possibilidade de repostar o próprio momento;
+
 ## 3.0 | REWORK/POST - 08/01/2023
 - Altera a forma que o bot lida com posts salvos no banco de dados. Agora, ele salva a foto originária do post para usar futuramente;
 - MOMENTO agora disponibiliza o repost de outros momentos de usuários;
