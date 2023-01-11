@@ -4,6 +4,7 @@ import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
 import { PostService } from "../Services/PostService";
+import { UserServices } from "../Services/UserServices";
 import { LinkGenerator } from "../Utils/LinkGenerator";
 import { MentionsParser } from "../Utils/MentionsParser";
 import { MomentoUser } from "./MomentoUser";
@@ -69,6 +70,7 @@ export class MomentoPost {
             const postOriginalImageURL: String = await LinkGenerator.uploadLinkToMomento(message.guild, momentoPost.imageURL)
             await PostService.savePostInDatabase(momentoPost, postOriginalImageURL)
             await NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
+            await UserServices.addNewMomento(momentoPost.postMessage.guild, user)
             return newPost
         }
         catch (err) {

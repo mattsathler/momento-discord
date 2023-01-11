@@ -110,14 +110,14 @@ export class UserServices {
 
     static async changeCollageStyle(message: Message, user: MomentoUser, newCollageStyle: Number) {
         const guild: Guild = message.guild
-        const collage = Number(newCollageStyle)-1
+        const collage = Number(newCollageStyle) - 1
         console.log(`MOMENTO - Alterando o estilo de collage de ${user.username}`)
         if (newCollageStyle && collage <= 4 && collage >= 0) {
             const newUser = await MongoService.updateProfile(user, {
                 profileCollageStyle: collage
             })
 
-            await UserServices.updateProfileImages(guild, newUser, false, true) 
+            await UserServices.updateProfileImages(guild, newUser, false, true)
             await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
             return newUser;
         }
@@ -169,6 +169,16 @@ export class UserServices {
         }
         catch { }
         return
+    }
+
+    static async addNewMomento(guild: Guild, user: MomentoUser) {
+        const newMomentos = Number(user.momentos) + 1
+        const newUser = await MongoService.updateProfile(user, {
+            momentos: newMomentos
+        })
+
+        UserServices.updateProfileImages(guild, newUser, true, false)
+        return newUser
     }
 
     static async changeProfileName(message: Message, user: MomentoUser, newName: String[]) {
