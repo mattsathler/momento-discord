@@ -18,6 +18,11 @@ const schema = new mongo.Schema({
     'authorProfileChannelId': reqString,
     'postDescription': { type: String },
     'postImageUrl': reqString,
+    'isTrending': {
+        type: Boolean,
+        required: true,
+        default: false
+    }
 })
 
 module.exports = mongo.model('posts', schema)

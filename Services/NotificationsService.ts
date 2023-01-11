@@ -7,28 +7,41 @@ import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
 
 export class NotificationsService {
-    public static async sendNotification(text: String, targetUser: MomentoUser, notificatorUser: MomentoUser, guild: Guild, thumbURL?: String, url?: String): Promise<Message> {
-        if (!targetUser.notifications) { return }
-        const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(targetUser.profileChannelId)) as TextChannel
+    public static async sendNotificationEmbed(guild: Guild, embed: EmbedBuilder, momentoUser: MomentoUser) {
+        const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
         let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
-        const notification: MomentoNotification = new MomentoNotification(
-            targetUser,
-            notificatorUser,
-            new Date,
-            text,
-            thumbURL,
-            url
-        )
+
+        const notificationMessage = await userNotificationChannel.send({
+            embeds: [embed]
+        })
+
+        await notificationMessage.react('🗑️')
+        const mentionMsg = await userNotificationChannel.send(`<@${momentoUser.id}>`)
+        await tryDeleteMessage(mentionMsg)
+    }
+
+    public static async sendNotification(guild: Guild, notification: MomentoNotification): Promise<Message> {
+        if (!notification.notifiedUser.notifications) { return }
+        const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(notification.notifiedUser.profileChannelId)) as TextChannel
+        let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
+        // const notification: MomentoNotification = new MomentoNotification(
+        //     targetUser,
+        //     notificatorUser,
+        //     new Date,
+        //     text,
+        //     thumbURL,
+        //     url
+        // )
 
         const notificationEmbed: EmbedBuilder = MomentoNotification.createSimpleNotificationEmbed(notification)
-        if (thumbURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }
+        if (notification.thumbnailURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }
 
         const notificationMessage = await userNotificationChannel.send({
             embeds: [notificationEmbed]
         })
 
         await notificationMessage.react('🗑️')
-        const mentionMsg = await userNotificationChannel.send(`<@${targetUser.id}>`)
+        const mentionMsg = await userNotificationChannel.send(`<@${notification.notifiedUser.id}>`)
         await tryDeleteMessage(mentionMsg)
 
         return notificationMessage
@@ -54,7 +67,6 @@ export class NotificationsService {
     }
 
     public static async notifyMentions(guild: Guild, users: Collection<string, User>, userAuthor: MomentoUser, text: String) {
-
         users.map(async user => {
             const mentionedUser: MomentoUser = await MongoService.getUserById(user.id, guild.id)
             if (!mentionedUser) { return }
@@ -66,7 +78,19 @@ export class NotificationsService {
                 text
             )
 
-            await this.sendNotification(notification.text, notification.notifiedUser, notification.notificatorUser, guild, notification.thumbnailURL, notification.url);
+            await this.sendNotification(guild, notification);
         })
+    }
+
+    public static async notifyTrend(guild: Guild, post: MomentoPost) {
+        const notification = new MomentoNotification(
+            post.author,
+            post.author,
+            new Date,
+            "",
+            post.imageURL,
+        )
+        const notificationEmbed: EmbedBuilder = MomentoNotification.createTrendNotificationEmbed(notification)
+
     }
 }

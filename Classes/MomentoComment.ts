@@ -3,6 +3,7 @@ import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
 import { MentionsParser } from "../Utils/MentionsParser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
+import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
 
 export class MomentoComment {
@@ -46,12 +47,15 @@ export class MomentoComment {
         await commentMessage.react('❤️')
         await commentMessage.react('🗑️')
 
-        await NotificationsService.sendNotification(`Comentou em seu post!`,
+        const notification = new MomentoNotification(
             postAuthor,
             commentAuthor,
-            message.guild,
+            new Date,
+            `Comentou em seu post!`,
             postMessage.attachments.first().url,
-            `https://discord.com/channels/${comment.post.guildId}/${comment.post.channelId}/${commentMessage.id}`)
+            `https://discord.com/channels/${comment.post.guildId}/${comment.post.channelId}/${commentMessage.id}`
+        )
+        await NotificationsService.sendNotification(message.guild, notification)
 
         NotificationsService.notifyMentions(message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
         return comment

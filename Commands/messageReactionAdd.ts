@@ -7,6 +7,8 @@ import { PostService } from "../Services/PostService";
 import { ThreadService } from "../Services/ThreadsService";
 import { UserServices } from "../Services/UserServices";
 import { removeReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
+import * as Config from '../config.json';
+import { MomentoNotification } from "../Classes/MomentoNotification";
 
 export async function messageReactionAdd(user: User, reaction: MessageReaction) {
     if (user.bot) { return }
@@ -34,18 +36,26 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         try {
             switch (reactEmoji) {
                 case "🔧":
-                    const post: MomentoPost = await PostService.getPostFromMessage(message)
                     break
                 case "❤️":
                     if (isPost) {
-                        await NotificationsService.sendNotification(
-                            `Curtiu sua foto!`,
+                        const notification: MomentoNotification = new MomentoNotification(
                             reactedUser,
                             reactUser,
-                            message.guild,
+                            new Date,
+                            `Curtiu sua foto!`,
                             message.attachments.first().url,
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
+                        await NotificationsService.sendNotification(message.guild, notification)
+                        const likesCount: Number = message.reactions.cache.get("❤️").count - 1
+                        const post: MomentoPost = await PostService.getPostFromMessage(message)
+
+                        if (!post.isTrending) {
+                            if (likesCount >= Config.likesToTrend) {
+
+                            }
+                        }
                         break
                     }
                     break
@@ -53,14 +63,15 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                 case "🫂":
                     if (isCollage /*&& reactUser.id != reactedUser.id*/) {
                         await UserServices.changeFollowers(message.guild, reactedUser, true)
-                        await NotificationsService.sendNotification(
-                            `Começou a te seguir!`,
+                        const notification: MomentoNotification = new MomentoNotification(
                             reactedUser,
                             reactUser,
-                            message.guild,
+                            new Date,
+                            `Começou a te seguir!`,
                             null,
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
+                        await NotificationsService.sendNotification(message.guild, notification)
                         break
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))
@@ -82,7 +93,15 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         await message.react(notificationEmoji)
 
                         const notificationMsg = notificationToggle ? 'Você ativou as notificações de perfil!' : 'Você desativou as notificações de perfil!'
-                        NotificationsService.sendNotification(notificationMsg, reactedUser, reactUser, message.guild, null, null)
+
+                        const notification = new MomentoNotification(
+                            reactedUser,
+                            reactUser,
+                            new Date,
+                            notificationMsg
+                        )
+                        
+                        NotificationsService.sendNotification(message.guild, notification)
                         break
                     }
 

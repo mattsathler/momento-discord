@@ -13,4 +13,10 @@ export class PostService {
         if (post) return post
         else throw new Error("Post não encontrado!")
     }
+
+    public static async trendPost(post: MomentoPost) {
+        MongoService.updatePost(post, {
+            isTrending: true
+        })
+    }
 }

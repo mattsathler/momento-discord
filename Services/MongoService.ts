@@ -188,7 +188,8 @@ export class MongoService {
                 guildId: post.postMessage.guildId,
                 authorProfileChannelId: post.author.profileChannelId,
                 postDescription: post.description,
-                postImageUrl: postOriginalImageURL
+                postImageUrl: postOriginalImageURL,
+                isTrending: false
             }
             await new MomentoPostSchema(newPost).save()
             const createdPost: MomentoPost = await this.getPostById(newPost.messageId, post.postMessage.guildId)
@@ -198,6 +199,14 @@ export class MongoService {
             console.log(err)
             throw new Error("Ocorreu um erro ao salvar seu post!")
         }
+    }
+
+    static async updatePost(post: MomentoPost, fields: {}) {
+        const posts = mongo.model('posts');
+
+        await posts.findOneAndUpdate({ messageId: post.postMessage.id, guildId: post.postMessage.guildId }, fields)
+        const newPost: MomentoPost = await posts.findOne({ id: post.postMessage.id, guildId: post.postMessage.guildId })
+        return newPost
     }
 
     static async getPostFromMessage(message: Message): Promise<MomentoPost> {

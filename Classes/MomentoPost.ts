@@ -7,6 +7,7 @@ import { PostService } from "../Services/PostService";
 import { UserServices } from "../Services/UserServices";
 import { LinkGenerator } from "../Utils/LinkGenerator";
 import { MentionsParser } from "../Utils/MentionsParser";
+import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
 
 export class MomentoPost {
@@ -15,6 +16,7 @@ export class MomentoPost {
     public description: String;
     public location: String;
     public postMessage: Message;
+    public isTrending: Boolean = false;
 
     public postSafeAreaSize: number = 10
     public postHeaderSize: number = 160
@@ -88,7 +90,14 @@ export class MomentoPost {
 
         const sharedPost = await this.createPost(client, message, user, true)
 
-        await NotificationsService.sendNotification("Repostou seu momento!", post.author, user, message.guild, post.imageURL, `https://discord.com/channels/${message.guildId}/${user.profileChannelId}`)
+        const notification = new MomentoNotification(
+            post.author,
+            user,
+            new Date,
+            "Repostou seu momento!",
+            `https://discord.com/channels/${message.guildId}/${user.profileChannelId}`
+        )
+        await NotificationsService.sendNotification(message.guild, notification)
         return sharedPost
     }
 }

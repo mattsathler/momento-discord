@@ -38,4 +38,18 @@ export class MomentoNotification {
         }
         return commentEmbed
     }
+
+    public static createTrendNotificationEmbed(notification: MomentoNotification): EmbedBuilder {
+        const commentEmbed: EmbedBuilder = new EmbedBuilder()
+            .setColor(0xdd247b)
+            .setAuthor({
+                name: `@${notification.notificatorUser.username}`, iconURL: String(notification.notificatorUser.profilePicture),
+            })
+            .setDescription(`${String(notification.text)}`)
+            .setFooter({
+                text: 'momento for iPhone'
+            })
+            .setTimestamp()
+        return commentEmbed
+    }
 }

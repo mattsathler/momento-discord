@@ -1,11 +1,14 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
-## 4.0 | FEATURE/ANALYTICS | ??
+## 4.0 | FEATURE/ANALYTICS | 10/01/2023
+- Adiciona a atualização de momentos no perfil a cada post;
+- Refatora a criação de notificações;
+
 
 ## 3.2 | REWORK/POST - 08/01/2023
-- Altera o momentoOwner após um repost
-- Remove as listras dos momentos postados
-- Pequena alteração no design do post
+- Altera o momentoOwner após um repost;
+- Remove as listras dos momentos postados;
+- Pequena alteração no design do post;
 
 ## 3.1 | REWORK/POST - 08/01/2023
 - Disabilita a possibilidade de repostar o próprio momento;
