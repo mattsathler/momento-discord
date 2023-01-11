@@ -119,6 +119,18 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         console.log(err)
                     }
                     break
+
+                case '📊':
+                    if (isCollage && reactUser.id == reactedUser.id) {
+                        try {
+
+                            await UserServices.analyticProfile(message.guild, reactedUser)
+                            await removeReaction(reactUser, message, reaction.emoji.name)
+                        }
+                        catch (err) {
+                            console.log(err)
+                        }
+                    }
                 default:
                     await removeReaction(reactUser, message, reaction.emoji.name)
                     break

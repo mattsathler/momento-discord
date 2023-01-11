@@ -292,4 +292,25 @@ export class MongoService {
             return
         }
     }
+
+    static async fetchProfilePosts(guild: Guild, user: MomentoUser): Promise<Message[]> {
+        try {
+            const posts = mongo.model('posts')
+            const response = await posts.find({
+                authorProfileChannelId: user.profileChannelId,
+                guildId: user.guildId
+            })
+            const profileChannel: TextChannel = guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
+            let postList: Message[] = []
+            await profileChannel.messages.fetch()
+            response.map(message => {
+                const msg: Message = profileChannel.messages.cache.get(message.messageId)
+                if (msg) { postList.push(msg) }
+            })
+            return postList
+        }
+        catch (err) {
+            console.error(err)
+        }
+    }
 }

@@ -1,4 +1,6 @@
-import { Channel, Client, Guild, Message, TextChannel } from "discord.js"
+const ms = require('ms');
+
+import { Guild, Message, TextChannel } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
@@ -6,8 +8,10 @@ import { LinkGenerator } from "../Utils/LinkGenerator"
 import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages"
 import { StringFormater } from "../Utils/StringFormater"
 import { MongoService } from "./MongoService"
-import { NotificationsService } from "./NotificationsService"
 import { ServerServices } from "./ServerServices"
+import { AnalyticsService } from "./AnalyticsService"
+import * as Config from "../config.json"
+import { PostService } from "./PostService";
 
 export class UserServices {
     static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
@@ -52,6 +56,7 @@ export class UserServices {
         const notificationEmoji: string = !user.notifications ? "🔔" : "🔕"
         userCollageMessage.react("🫂")
         userCollageMessage.react(notificationEmoji)
+        userCollageMessage.react("📊")
 
         console.log("MOMENTO - Perfil criado, finalizando cadastro...")
         MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
@@ -291,5 +296,28 @@ export class UserServices {
             await collageMessage.edit(userCollageImageURL)
         }
         return
+    }
+
+    static async analyticProfile(guild: Guild, momentoUser: MomentoUser) {
+        const profilePosts = await this.fetchProfilePosts(guild, momentoUser)
+        profilePosts.map(async post => {
+            const timestamp = ms(Date.now() - post.createdTimestamp, { long: true })
+            // if (ms(timestamp) >= Config.momentosTimeout) {
+                console.log(ms(timestamp) <= Config.momentosTimeout)
+                const momentoPost = await PostService.getPostFromMessage(post)
+                console.log(ms(timestamp) <= Config.momentosTimeout)
+                console.log(momentoPost)
+                if (momentoPost) {
+                    AnalyticsService.generateAnalytics(guild, momentoPost)
+                }
+                tryDeleteMessage(post)
+            // }
+        })
+        return
+    }
+
+    static async fetchProfilePosts(guild: Guild, momentoUser: MomentoUser) {
+        const postList = await MongoService.fetchProfilePosts(guild, momentoUser)
+        return postList
     }
 }
