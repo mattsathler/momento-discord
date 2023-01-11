@@ -50,12 +50,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         await NotificationsService.sendNotification(message.guild, notification)
                         const likesCount: Number = message.reactions.cache.get("❤️").count - 1
                         const post: MomentoPost = await PostService.getPostFromMessage(message)
-
-                        if (!post.isTrending) {
-                            if (likesCount >= Config.likesToTrend) {
-
-                            }
-                        }
+                        if (!post.isTrending && likesCount >= Config.likesToTrend) { PostService.trendPost(message.guild, post, notification) }
                         break
                     }
                     break
@@ -100,7 +95,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             new Date,
                             notificationMsg
                         )
-                        
+
                         NotificationsService.sendNotification(message.guild, notification)
                         break
                     }

@@ -42,13 +42,16 @@ export class MomentoNotification {
     public static createTrendNotificationEmbed(notification: MomentoNotification): EmbedBuilder {
         const commentEmbed: EmbedBuilder = new EmbedBuilder()
             .setColor(0xdd247b)
+            .setTitle('Momento Trending')
+            .setThumbnail('https://imgur.com/15GWIXQ.png')
             .setAuthor({
                 name: `@${notification.notificatorUser.username}`, iconURL: String(notification.notificatorUser.profilePicture),
             })
-            .setDescription(`${String(notification.text)}`)
+            .setDescription(`**Parabéns!** Seu post alcançou pessoas o suficiente e agora está entre os *Trending Topics* do Momento!`)
             .setFooter({
-                text: 'momento for iPhone'
+                text: 'Este é o Seu Momento!'
             })
+            .setImage(String(notification.thumbnailURL))
             .setTimestamp()
         return commentEmbed
     }
