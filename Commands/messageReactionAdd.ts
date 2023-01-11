@@ -49,7 +49,8 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         )
                         await NotificationsService.sendNotification(message.guild, notification)
                         const likesCount: Number = message.reactions.cache.get("❤️").count - 1
-                        const post: MomentoPost = await PostService.getPostFromMessage(message)
+                        let post: MomentoPost = await PostService.getPostFromMessage(message)
+                        post.imageURL = message.attachments.first().url
                         if (!post.isTrending && likesCount >= Config.likesToTrend) { PostService.trendPost(message.guild, post, notification) }
                         break
                     }

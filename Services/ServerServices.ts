@@ -17,7 +17,7 @@ export class ServerServices {
                 channelsId.uploaderChannelId,
                 channelsId.askprofileChannelId,
                 channelsId.profilesCategoryId,
-                channelsId.feedChannelId)
+                channelsId.trendsChannelId)
         sendReplyMessage(message, "Servidor configurado com sucesso!", null, false)
         return serverConfig
     }
@@ -35,26 +35,27 @@ export class ServerServices {
             name: "🫂perfis",
             type: ChannelType.GuildCategory,
         })
-        const feedChannel = await guild.channels.create({
+        const trendsChannel = await guild.channels.create({
             name: "trendings",
             type: ChannelType.GuildText,
         })
 
-        await feedChannel.setParent(profilesCategory);
+        await trendsChannel.setParent(profilesCategory);
         await askProfileChannel.setParent(profilesCategory);
 
         momentoUploaderChannel.permissionOverwrites.create(guild.roles.everyone, {
             ViewChannel: false
         })
-        feedChannel.permissionOverwrites.create(guild.roles.everyone, {
-            SendMessages: false
+        trendsChannel.permissionOverwrites.create(guild.roles.everyone, {
+            SendMessages: false,
+            AddReactions: false
         })
 
         const defaultChannelsIds = {
             uploaderChannelId: momentoUploaderChannel.id,
             profilesCategoryId: profilesCategory.id,
             askprofileChannelId: askProfileChannel.id,
-            feedChannelId: feedChannel.id
+            trendsChannelId: trendsChannel.id
         }
 
         return defaultChannelsIds

@@ -41,7 +41,7 @@ export class MongoService {
         try {
             const response: any = await servers.findOne({ id: serverId })
             if (!response) { return null }
-            const serverConfig: MomentoServer = new MomentoServer(response.id, response.profilesChannelId, response.askProfileChannelId, response.uploaderChannelId, response.feedChannelId)
+            const serverConfig: MomentoServer = new MomentoServer(response.id, response.profilesChannelId, response.askProfileChannelId, response.uploaderChannelId, response.trendsChannelId)
             return serverConfig
         }
         catch (err) {
@@ -77,7 +77,9 @@ export class MongoService {
                     user,
                     response[0].postImageUrl,
                     response[0].postDescription,
-                    null
+                    null,
+                    response[0].postDescription,
+                    response[0].isTrending
                 )
                 return momentoPost;
             }
@@ -213,7 +215,7 @@ export class MongoService {
         const posts = mongo.model('posts');
         try {
             const response = await posts.findOne({ id: message.id, channelId: message.channelId, guildId: message.guildId })
-            if (response.length == 0) { return null }
+            if (!response) { return null }
             const postAuthor: MomentoUser = await this.getUserByProfileChannel(response.authorProfileChannelId, message.guildId)
             const postMessage: Message = await message.channel.messages.fetch(message.id)
 
@@ -222,7 +224,8 @@ export class MongoService {
                 response.postImageUrl,
                 response.postDescription,
                 "",
-                postMessage
+                postMessage,
+                response.isTrending
             )
             return post;
         }
@@ -237,7 +240,7 @@ export class MongoService {
         uploaderChannelId: String,
         askProfileChannelId: String,
         profilesChannelId: String,
-        feedChannelId: String
+        trendsChannelId: String
     ) {
         console.log(`MOMENTO - Cadastrando nova configuração...`)
         const newServer = {
@@ -245,7 +248,7 @@ export class MongoService {
             uploaderChannelId: uploaderChannelId,
             askProfileChannelId: askProfileChannelId,
             profilesChannelId: profilesChannelId,
-            feedChannelId: feedChannelId
+            trendsChannelId: trendsChannelId
         }
         try {
             await new MomentoServerSchema(newServer).save()

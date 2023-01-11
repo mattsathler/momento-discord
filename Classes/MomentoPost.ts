@@ -25,12 +25,13 @@ export class MomentoPost {
 
     public authorRoundImage: Image
 
-    constructor(author: MomentoUser, imageURL: String, description: String, location?: String, postMessage?: Message) {
+    constructor(author: MomentoUser, imageURL: String, description: String, location?: String, postMessage?: Message, isTrending?: Boolean) {
         this.author = author;
         this.imageURL = imageURL;
         this.description = description;
         if (location) { this.location = location; }
         if (postMessage) { this.postMessage = postMessage; }
+        if (isTrending) { this.isTrending = isTrending }
     }
 
 

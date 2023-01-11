@@ -3,7 +3,7 @@
 ## 4.0 | FEATURE/ANALYTICS | 10/01/2023
 - Adiciona a atualização de momentos no perfil a cada post;
 - Refatora a criação de notificações;
-
+- Adiciona o envio do post para o canal de trendings;
 
 ## 3.2 | REWORK/POST - 08/01/2023
 - Altera o momentoOwner após um repost;
