@@ -9,11 +9,12 @@ import { UserServices } from "../Services/UserServices";
 import { sendErrorMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
 
 export async function messageCreate(message: Message, client: Client) {
-    if (message.author.bot) return;
+    if (!message)
+        if (message.author.bot) return;
     if (message.type == MessageType.ThreadCreated) return;
     if (message.type == MessageType.ThreadStarterMessage) return;
 
-    const momentoUser = await MongoService.getUserById(message.author.id, message.guild.id);
+    const momentoUser = await MongoService.getUserById(message.author.id, message.guildId);
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
 
@@ -51,26 +52,32 @@ export async function messageCreate(message: Message, client: Client) {
 
                 switch (command) {
                     case "perfil":
+                        console.log(`Alterando foto de perfil de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua foto de perfil, aguarde...")
                         await UserServices.changeProfilePicture(message, momentoUser)
                         break
                     case "capa":
+                        console.log(`Alterando foto de capa de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua foto de capa, aguarde...")
                         await UserServices.changeProfileCover(message, momentoUser)
                         break
                     case "user":
+                        console.log(`Alterando usuário de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando seu usuário, aguarde...")
                         await UserServices.changeProfileUser(message, momentoUser, args)
                         break
                     case "nome":
+                        console.log(`Alterando nome de perfil de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando seu nome, aguarde...")
                         await UserServices.changeProfileName(message, momentoUser, args)
                         break
                     case "bio":
+                        console.log(`Alterando bio de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua bio, aguarde...")
                         await UserServices.changeProfileBio(message, momentoUser, args)
                         break
                     case "estilo":
+                        console.log(`Alterando o estilo da collage de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando o estilo da collage, aguarde...")
                         await UserServices.changeCollageStyle(message, momentoUser, Number(args[0]))
                         break

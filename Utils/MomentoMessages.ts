@@ -14,29 +14,33 @@ export async function tryDeleteMessage(message: Message) {
 
 export async function sendReplyMessage(message: Message, text: string, timeout?: number, remove?: Boolean) {
     const time = timeout ? timeout : 4000
-    const msg = await message.reply(text)
-    const doesRemove = remove == undefined && remove != false ? true : false
-    setTimeout(async () => {
-        try {
+    try {
+        setTimeout(async () => {
+            const msg = await message.reply(text)
             if (remove) {
                 await message.delete()
             }
             await msg.delete()
-        }
-        catch (err) {
-            console.log(err)
-        }
-    }, time);
+        }, time);
+    }
+    catch (err) {
+        console.log(err)
+    }
 }
 
 export async function sendErrorMessage(message: Message, text?: string, timeout?: number) {
     const time = timeout ? timeout : 4000
     const msgTxt = text ? text : "**ERRO!** - Ocorreu um erro inesperado!";
-    const msg = await message.reply(`**ERRO!** - ${msgTxt}`)
-    setTimeout(async () => {
-        tryDeleteMessage(message)
-        tryDeleteMessage(msg)
-    }, time);
+    try {
+        const msg = await message.reply(`**ERRO!** - ${msgTxt}`)
+        setTimeout(async () => {
+            tryDeleteMessage(message)
+            tryDeleteMessage(msg)
+        }, time);
+    }
+    catch (err) {
+        console.log(err)
+    }
 }
 
 export async function removeReaction(user: MomentoUser, message: Message, react: string) {

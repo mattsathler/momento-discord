@@ -1,4 +1,4 @@
-import { Client, Message, MessageReaction, ThreadChannel, User } from "discord.js";
+import { Client, Guild, Message, MessageReaction, ThreadChannel, User } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
@@ -29,13 +29,14 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         const messageId: String = reaction.message.id;
         const isProfile: Boolean = messageId == reactedUser.profileMessageId ? true : false;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;
-        // const isPost: Boolean = await MongoService.getPostById(message.id, message.guildId) ? true : false
-        const isPost: Boolean = !isProfile && !isCollage && !isComment ? true : false;
+        const isPost: Boolean = await MongoService.getPostById(message.id, message.guildId) ? true : false
+        // const isPost: Boolean = !isProfile && !isCollage && !isComment ? true : false;
 
         const reactEmoji: String = reaction.emoji.name;
         try {
             switch (reactEmoji) {
                 case "🔧":
+                    UserServices.updateProfileImages(message.guild, reactedUser, true, true);
                     break
                 case "❤️":
                     if (isPost) {
@@ -57,7 +58,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
 
                 case "🫂":
-                    if (isCollage /*&& reactUser.id != reactedUser.id*/) {
+                    if (isCollage && reactUser.id != reactedUser.id) {
                         await UserServices.changeFollowers(message.guild, reactedUser, true)
                         const notification: MomentoNotification = new MomentoNotification(
                             reactedUser,

@@ -1,5 +1,8 @@
 export class StringFormater {
     static formatForProfile(num: number, digits: number) {
+        if(num < 9999){
+            return String(num)
+        }
         const lookup = [
             { value: 1, symbol: "" },
             { value: 1e3, symbol: "k" },

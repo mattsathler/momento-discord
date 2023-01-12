@@ -218,7 +218,7 @@ export class UserServices {
         newBio.forEach(word => { bio += ` ${word.toString()}` });
         let mentions = message.mentions.members.first();
         if (mentions) { throw new Error("Ainda não habilitamos a opção de menções em bios... =(") }
-        if (!bio || bio.length > 40) { throw new Error('Bio inválida! Use ?bio <frase da bio> e no máximo 40 caracteres!') }
+        if (!bio || bio.length > 60) { throw new Error('Bio inválida! Use ?bio <frase da bio> e no máximo 60 caracteres!') }
 
         const newUser = await MongoService.updateProfile(user, {
             bio: bio

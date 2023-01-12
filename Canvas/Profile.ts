@@ -67,7 +67,7 @@ export class ProfileCanvas {
 
         context.font = '42px FORTE'
         context.fillStyle = `rgb(221, 36, 123)`
-        context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.followers), 1)), canvas.width / 2 + 250, canvas.height - 110)
+        context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.followers), 2)), canvas.width / 2 + 250, canvas.height - 110)
 
         context.font = '38px FORTE'
         context.fillStyle = `rgb(179, 179, 179)`

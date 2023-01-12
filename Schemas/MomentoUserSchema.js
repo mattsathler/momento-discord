@@ -68,7 +68,7 @@ const schema = new mongo.Schema({
     'followers': {
         type: Long,
         required: true,
-        default: 1
+        default: 1   
     },
     'momentos': {
         type: Long,

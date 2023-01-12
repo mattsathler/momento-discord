@@ -1,5 +1,10 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 4.1 | master | 12/01/2023
+- Hotfixes no módulo de Analytics;
+- Aumenta Likes to Trend de 20 para 35;
+- Ajustes no módulo de Repost;
+
 ## 4.0 | FEATURE/ANALYTICS | 11/01/2023
 - ANALYTICS & Estatísticas Finais do Post;
 - Adiciona a atualização de momentos no perfil a cada post;
