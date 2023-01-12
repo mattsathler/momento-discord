@@ -124,7 +124,7 @@ export class UserServices {
             })
 
             await UserServices.updateProfileImages(guild, newUser, false, true)
-            await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
+            // await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
             return newUser;
         }
         else {
@@ -142,7 +142,7 @@ export class UserServices {
             })
 
             await UserServices.updateProfileImages(guild, newUser, true, false)
-            await sendReplyMessage(message, "Imagem de perfil alterada com sucesso!", null, false)
+            // await sendReplyMessage(message, "Imagem de perfil alterada com sucesso!", null, false)
             return newUser;
         }
         else {
@@ -225,7 +225,7 @@ export class UserServices {
         })
         await UserServices.updateProfileImages(guild, newUser, true, false)
         console.log('MOMENTO - Bio alterada com sucesso!')
-        await sendReplyMessage(message, "Bio alterada com sucesso!", null, false)
+        // await sendReplyMessage(message, "Bio alterada com sucesso!", null, false)
         return
     }
 
@@ -239,7 +239,7 @@ export class UserServices {
             })
 
             await UserServices.updateProfileImages(guild, newUser, true, false)
-            await sendReplyMessage(message, "Imagem de capa alterada com sucesso!", null, false)
+            // await sendReplyMessage(message, "Imagem de capa alterada com sucesso!", null, false)
             return newUser;
         }
         else {
@@ -266,7 +266,7 @@ export class UserServices {
             const newUser = await MongoService.updateProfile(user, fields)
 
             await UserServices.updateProfileImages(guild, newUser, false, true)
-            await sendReplyMessage(message, "Imagem de collage alterada com sucesso!", null, false)
+            // await sendReplyMessage(message, "Imagem de collage alterada com sucesso!", null, false)
             return newUser;
         }
         else {

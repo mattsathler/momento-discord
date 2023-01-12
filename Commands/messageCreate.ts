@@ -9,8 +9,8 @@ import { UserServices } from "../Services/UserServices";
 import { sendErrorMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
 
 export async function messageCreate(message: Message, client: Client) {
-    if (!message)
-        if (message.author.bot) return;
+    if (!message) return
+    if (message.author.bot) return;
     if (message.type == MessageType.ThreadCreated) return;
     if (message.type == MessageType.ThreadStarterMessage) return;
 
@@ -45,7 +45,7 @@ export async function messageCreate(message: Message, client: Client) {
                     reply = await message.reply("Alterando sua foto de collage, aguarde...")
                     const collageNumber: Number = Number(command.charAt(7)) - 1
                     await UserServices.changeProfileCollage(message, momentoUser, collageNumber)
-                    if (reply) { tryDeleteMessage(reply) }
+                    if (reply) { await tryDeleteMessage(reply) }
                     tryDeleteMessage(message)
                     return
                 }
@@ -83,8 +83,8 @@ export async function messageCreate(message: Message, client: Client) {
                         break
                 }
 
-                if (reply) { tryDeleteMessage(reply) }
-                tryDeleteMessage(message)
+                if (reply) { await tryDeleteMessage(reply) }
+                await tryDeleteMessage(message)
                 return
             }
 
@@ -121,7 +121,7 @@ export async function messageCreate(message: Message, client: Client) {
 
     }
     catch (err) {
-        if (reply) { tryDeleteMessage(reply) }
+        if (reply) { await tryDeleteMessage(reply) }
         sendErrorMessage(message, err.message)
         console.log(err)
         return
