@@ -12,6 +12,7 @@ import { ServerServices } from "./ServerServices"
 import { AnalyticsService } from "./AnalyticsService"
 import * as Config from "../config.json"
 import { PostService } from "./PostService";
+import { ThreadService } from "./ThreadsService";
 
 export class UserServices {
     static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
@@ -302,7 +303,7 @@ export class UserServices {
         const profilePosts = await this.fetchProfilePosts(guild, momentoUser)
         profilePosts.map(async post => {
             const timestamp = ms(Date.now() - post.createdTimestamp, { long: true })
-            // if (ms(timestamp) >= Config.momentosTimeout) {
+            if (ms(timestamp) >= Config.momentosTimeout) {
                 console.log(ms(timestamp) <= Config.momentosTimeout)
                 const momentoPost = await PostService.getPostFromMessage(post)
                 console.log(ms(timestamp) <= Config.momentosTimeout)
@@ -310,8 +311,9 @@ export class UserServices {
                 if (momentoPost) {
                     AnalyticsService.generateAnalytics(guild, momentoPost)
                 }
+                ThreadService.disablePostComment(momentoPost.postMessage)
                 tryDeleteMessage(post)
-            // }
+            }
         })
         return
     }

@@ -1,6 +1,7 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
-## 4.0 | FEATURE/ANALYTICS | 10/01/2023
+## 4.0 | FEATURE/ANALYTICS | 11/01/2023
+- ANALYTICS & Estatísticas Finais do Post;
 - Adiciona a atualização de momentos no perfil a cada post;
 - Refatora a criação de notificações;
 - Adiciona o envio do post para o canal de trendings;

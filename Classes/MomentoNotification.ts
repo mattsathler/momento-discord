@@ -45,7 +45,7 @@ export class MomentoNotification {
             .setTitle('Momento Trending')
             .setThumbnail('https://imgur.com/15GWIXQ.png')
             .setAuthor({
-                name: `@${notification.notificatorUser.username}`, iconURL: String(notification.notificatorUser.profilePicture),
+                name: `@${notification.notifiedUser.username}`, iconURL: String(notification.notifiedUser.profilePicture),
             })
             .setDescription(`**Parabéns!** Seu post alcançou pessoas o suficiente e agora está entre os *Trending Topics* do Momento!`)
             .setFooter({

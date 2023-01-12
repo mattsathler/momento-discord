@@ -45,6 +45,10 @@ export class PostService {
         trendPost.react('❤️‍🔥')
         const mentionMsg = await trendChannel.send(`<@${post.author.id}>`)
         await tryDeleteMessage(mentionMsg)
+        const newUser = await MongoService.updateProfile(post.author, {
+            trends: Number(post.author.trends) + 1
+        })
+        await UserServices.updateProfileImages(guild, newUser, true, false)
         return
     }
 
