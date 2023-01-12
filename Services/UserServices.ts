@@ -95,7 +95,7 @@ export class UserServices {
             ],
             "O seu momento",
             0,
-            1,
+            null,
             0,
             true
         )
