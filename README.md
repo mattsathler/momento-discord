@@ -13,6 +13,7 @@ desenvolver um RPG com o auxílio do Discord e gostaria de implementar sistemas 
 Atualmente o bot está Open Source, mas em breve exigiremos um contato prévio para disponibilizar o seu uso em outros servidores.
 
 ▁ ▂ ▄ ▅ ▆ ▇ █ **CONFIGURAÇÃO DO SERVIDOR** █ ▇ ▆ ▅ ▄ ▂ ▁
+
 Para iniciar o uso do bot, basta adicioná-lo ao seu servidor e rodar o comando `?configurar`. O bot fará todo o resto!
 
 
