@@ -15,7 +15,8 @@ const schema = new mongo.Schema({
     'uploaderChannelId': reqString,
     'askProfileChannelId': reqString,
     'profilesChannelId': reqString,
-    'trendsChannelId': reqString
+    'trendsChannelId': reqString,
+    'chatChannelId': reqString
 })
 
 module.exports = mongo.model('servers', schema)

@@ -240,7 +240,8 @@ export class MongoService {
         uploaderChannelId: String,
         askProfileChannelId: String,
         profilesChannelId: String,
-        trendsChannelId: String
+        trendsChannelId: String,
+        chatChannelId: String
     ) {
         console.log(`MOMENTO - Cadastrando nova configuração...`)
         const newServer = {
@@ -248,7 +249,8 @@ export class MongoService {
             uploaderChannelId: uploaderChannelId,
             askProfileChannelId: askProfileChannelId,
             profilesChannelId: profilesChannelId,
-            trendsChannelId: trendsChannelId
+            trendsChannelId: trendsChannelId,
+            chatChannelId: chatChannelId
         }
         try {
             await new MomentoServerSchema(newServer).save()

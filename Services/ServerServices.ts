@@ -17,7 +17,9 @@ export class ServerServices {
                 channelsId.uploaderChannelId,
                 channelsId.askprofileChannelId,
                 channelsId.profilesCategoryId,
-                channelsId.trendsChannelId)
+                channelsId.trendsChannelId,
+                channelsId.chatChannelId,
+                )
         sendReplyMessage(message, "Servidor configurado com sucesso!", null, false)
         return serverConfig
     }
@@ -31,8 +33,16 @@ export class ServerServices {
             name: "pedir-perfil",
             type: ChannelType.GuildText,
         })
+        const chatChannelId = await guild.channels.create({
+            name: "💭momentochat",
+            type: ChannelType.GuildText,
+        })
         const profilesCategory = await guild.channels.create({
             name: "🫂perfis",
+            type: ChannelType.GuildCategory,
+        })
+        const momentoCategory = await guild.channels.create({
+            name: "momento",
             type: ChannelType.GuildCategory,
         })
         const trendsChannel = await guild.channels.create({
@@ -40,9 +50,10 @@ export class ServerServices {
             type: ChannelType.GuildText,
         })
 
-        await trendsChannel.setParent(profilesCategory);
-        await askProfileChannel.setParent(profilesCategory);
-
+        await askProfileChannel.setParent(momentoCategory);
+        await trendsChannel.setParent(momentoCategory);
+        await chatChannelId.setParent(momentoCategory);
+        
         momentoUploaderChannel.permissionOverwrites.create(guild.roles.everyone, {
             ViewChannel: false
         })
@@ -55,7 +66,8 @@ export class ServerServices {
             uploaderChannelId: momentoUploaderChannel.id,
             profilesCategoryId: profilesCategory.id,
             askprofileChannelId: askProfileChannel.id,
-            trendsChannelId: trendsChannel.id
+            trendsChannelId: trendsChannel.id,
+            chatChannelId: chatChannelId.id
         }
 
         return defaultChannelsIds
