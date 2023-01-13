@@ -1,5 +1,8 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 5.0 | FEATURE/MOMENTO-CHAT | 13/01/2023
+- Adiciona um Chat em ON para o Momento;
+
 ## 4.2 | master | 12/01/2023
 - HOTFIX do evento createMessage;
 

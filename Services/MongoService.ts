@@ -41,7 +41,14 @@ export class MongoService {
         try {
             const response: any = await servers.findOne({ id: serverId })
             if (!response) { return null }
-            const serverConfig: MomentoServer = new MomentoServer(response.id, response.profilesChannelId, response.askProfileChannelId, response.uploaderChannelId, response.trendsChannelId)
+            const serverConfig: MomentoServer = new MomentoServer(
+                response.id,
+                response.profilesChannelId,
+                response.askProfileChannelId,
+                response.uploaderChannelId,
+                response.trendsChannelId,
+                response.chatChannelId
+            )
             return serverConfig
         }
         catch (err) {

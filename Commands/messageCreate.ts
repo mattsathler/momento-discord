@@ -1,5 +1,6 @@
 import { Client, Message, MessageType, TextChannel } from "discord.js";
 import { MomentoComment } from "../Classes/MomentoComment";
+import { MomentoMessage } from "../Classes/MomentoMessage";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoServer } from "../Classes/MomentoServer";
 import * as config from "../config.json";
@@ -18,7 +19,7 @@ export async function messageCreate(message: Message, client: Client) {
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
 
-
+    const isChatMessage = message.channelId == serverConfig.chatChannelId;
     const isCommand = message.content.charAt(0) == config.prefix ? true : false;
     const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
         && momentoUser.guildId == channel.guildId ? true : false;
@@ -119,6 +120,13 @@ export async function messageCreate(message: Message, client: Client) {
             tryDeleteMessage(message)
         }
 
+        if (isChatMessage) {
+            if (!momentoUser) {
+                tryDeleteMessage(message)
+                return
+            }
+            await MomentoMessage.sendMomentoMessageEmbed(momentoUser, message)
+        }
     }
     catch (err) {
         if (reply) { await tryDeleteMessage(reply) }
