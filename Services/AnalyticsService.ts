@@ -59,39 +59,6 @@ export class AnalyticsService {
             })
         console.log()
         console.log(StringFormater.formatForProfile(followersFromPost, 1))
-        await NotificationsService.sendNotificationEmbed(guild, embed, post.author)
-
-        // const analyticsEmbed = {
-        //     title: '**Estatísticas do seu Post!**',
-        //     author: {
-        //         name: 'MOMENTO ANALYTICS',
-        //         iconURL: 'https://i.imgur.com/jIfboOP.png',
-        //     },
-        //     color: 0xDD247B,
-        //     description: 'Confira aqui a análise de estatísticas do seu post!',
-        //     fields: [
-        //         {
-        //             name: 'Descrição do post',
-        //             value: description
-        //         },
-        //         {
-        //             name: 'Likes Adquiridos',
-        //             value: `${formatForProfile(likesFromPost, 2)}`,
-        //             inline: true
-        //         },
-        //         {
-        //             name: 'Novos Seguidores',
-        //             value: `${formatForProfile(followersFromPost, 1)}`,
-        //             inline: true
-        //         }
-        //     ],
-        //     image: {
-        //         url: imgUrl
-        //     },
-        //     footar: {
-        //         text: 'Some footer text here',
-        //         iconURL: 'https://i.imgur.com/jIfboOP.png'
-        //     }
-        // }
+        await NotificationsService.sendNotificationEmbed(guild, embed, post.author, true)
     }
 }

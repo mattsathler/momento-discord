@@ -1,5 +1,8 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 5.3 | RELEASE/5.0 | 15/01/2023
+- Adiciona a possibilidade de forced notifications;
+
 ## 5.2 | RELEASE/5.0 | 14/01/2023
 - Conserta o bug de imagem sumindo no momento-chat;
 

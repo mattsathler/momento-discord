@@ -48,7 +48,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             message.attachments.first().url,
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
-                        await NotificationsService.sendNotification(message.guild, notification)
+                        await NotificationsService.sendNotification(message.guild, notification, false)
                         const likesCount: Number = message.reactions.cache.get("❤️").count - 1
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
@@ -68,7 +68,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             null,
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
-                        await NotificationsService.sendNotification(message.guild, notification)
+                        await NotificationsService.sendNotification(message.guild, notification, false)
                         break
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))
@@ -98,7 +98,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             notificationMsg
                         )
 
-                        NotificationsService.sendNotification(message.guild, notification)
+                        NotificationsService.sendNotification(message.guild, notification, true)
                         break
                     }
 

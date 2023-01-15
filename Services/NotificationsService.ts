@@ -7,7 +7,8 @@ import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
 
 export class NotificationsService {
-    public static async sendNotificationEmbed(guild: Guild, embed: EmbedBuilder, momentoUser: MomentoUser) {
+    public static async sendNotificationEmbed(guild: Guild, embed: EmbedBuilder, momentoUser: MomentoUser, force?: Boolean) {
+        if (!momentoUser.notifications && !force) { return }
         const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
         let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
 
@@ -20,18 +21,10 @@ export class NotificationsService {
         await tryDeleteMessage(mentionMsg)
     }
 
-    public static async sendNotification(guild: Guild, notification: MomentoNotification): Promise<Message> {
-        if (!notification.notifiedUser.notifications) { return }
+    public static async sendNotification(guild: Guild, notification: MomentoNotification, force?: Boolean): Promise<Message> {
+        if (!notification.notifiedUser.notifications && !force) { return }
         const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(notification.notifiedUser.profileChannelId)) as TextChannel
         let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
-        // const notification: MomentoNotification = new MomentoNotification(
-        //     targetUser,
-        //     notificatorUser,
-        //     new Date,
-        //     text,
-        //     thumbURL,
-        //     url
-        // )
 
         const notificationEmbed: EmbedBuilder = MomentoNotification.createSimpleNotificationEmbed(notification)
         if (notification.thumbnailURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }
@@ -78,7 +71,7 @@ export class NotificationsService {
                 text
             )
 
-            await this.sendNotification(guild, notification);
+            await this.sendNotification(guild, notification, true);
         })
     }
 

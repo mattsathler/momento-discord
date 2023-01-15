@@ -98,7 +98,7 @@ export class MomentoPost {
             "Repostou seu momento!",
             `https://discord.com/channels/${message.guildId}/${user.profileChannelId}`
         )
-        await NotificationsService.sendNotification(message.guild, notification)
+        await NotificationsService.sendNotification(message.guild, notification, false)
         return sharedPost
     }
 }

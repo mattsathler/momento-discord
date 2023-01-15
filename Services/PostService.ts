@@ -28,7 +28,7 @@ export class PostService {
         const trendChannel: TextChannel = guild.channels.cache.get(String(serverConfig.trendsChannelId)) as TextChannel;
         const trendImageURL: String = await LinkGenerator.uploadLinkToMomento(guild, post.imageURL)
         const embed = MomentoNotification.createTrendNotificationEmbed(notification)
-        await NotificationsService.sendNotificationEmbed(guild, embed, post.author)
+        await NotificationsService.sendNotificationEmbed(guild, embed, post.author, true)
         const trendEmbed = new EmbedBuilder()
             .setImage(String(trendImageURL))
             .setColor(0xdd247b)
@@ -81,43 +81,5 @@ export class PostService {
         const newUser = await MongoService.updateProfile(user, {
             followers: newFollowers,
         })
-
-        // await UserServices.updateProfileImages(client, newUser, message)
-        // const description = !message.content ? 'Post sem descrição' : message.content
-        // const analyticsEmbed = {
-        //     title: '**Estatísticas do seu Post!**',
-        //     author: {
-        //         name: 'MOMENTO ANALYTICS',
-        //         iconURL: 'https://i.imgur.com/jIfboOP.png',
-        //     },
-        //     color: 0xDD247B,
-        //     description: 'Confira aqui a análise de estatísticas do seu post!',
-        //     fields: [
-        //         {
-        //             name: 'Descrição do post',
-        //             value: description
-        //         },
-        //         {
-        //             name: 'Likes Adquiridos',
-        //             value: `${formatForProfile(likesFromPost, 2)}`,
-        //             inline: true
-        //         },
-        //         {
-        //             name: 'Novos Seguidores',
-        //             value: `${formatForProfile(followersFromPost, 1)}`,
-        //             inline: true
-        //         }
-        //     ],
-        //     image: {
-        //         url: imgUrl
-        //     },
-        //     footar: {
-        //         text: 'Some footer text here',
-        //         iconURL: 'https://i.imgur.com/jIfboOP.png'
-        //     }
-        // }
-
-        // sendNotificationEmbed(user, client, analyticsEmbed)
-        // return newUser
     }
 }

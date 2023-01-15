@@ -55,7 +55,7 @@ export class MomentoComment {
             postMessage.attachments.first().url,
             `https://discord.com/channels/${comment.post.guildId}/${comment.post.channelId}/${commentMessage.id}`
         )
-        await NotificationsService.sendNotification(message.guild, notification)
+        await NotificationsService.sendNotification(message.guild, notification, false)
 
         NotificationsService.notifyMentions(message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
         return comment
