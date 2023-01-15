@@ -36,7 +36,8 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         try {
             switch (reactEmoji) {
                 case "🔧":
-                    UserServices.updateProfileImages(message.guild, reactedUser, true, true);
+                    await UserServices.updateProfileImages(message.guild, reactedUser, true, true);
+                    await removeReaction(reactUser, message, reaction.emoji.name)
                     break
                 case "❤️":
                     if (isPost) {
