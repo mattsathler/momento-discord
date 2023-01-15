@@ -19,7 +19,6 @@ export async function messageCreate(message: Message, client: Client) {
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
 
-    const isChatMessage = message.channelId == serverConfig.chatChannelId;
     const isCommand = message.content.charAt(0) == config.prefix ? true : false;
     const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
         && momentoUser.guildId == channel.guildId ? true : false;
@@ -32,6 +31,7 @@ export async function messageCreate(message: Message, client: Client) {
         const messageChannel = message.guild.channels.cache.get(message.channelId)
         isComment = await MongoService.getUserByProfileChannel(String(messageChannel.parentId), message.guildId) ? true : false
     }
+
 
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
@@ -119,7 +119,7 @@ export async function messageCreate(message: Message, client: Client) {
             if (reply) { tryDeleteMessage(reply) }
             tryDeleteMessage(message)
         }
-
+        const isChatMessage = message.channelId == serverConfig.chatChannelId;
         if (isChatMessage) {
             if (!momentoUser) {
                 tryDeleteMessage(message)

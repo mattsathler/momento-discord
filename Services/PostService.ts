@@ -2,6 +2,7 @@ import { EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
+import { LinkGenerator } from "../Utils/LinkGenerator";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
@@ -25,11 +26,11 @@ export class PostService {
         })
         const serverConfig = await MongoService.getServerConfigById(guild.id)
         const trendChannel: TextChannel = guild.channels.cache.get(String(serverConfig.trendsChannelId)) as TextChannel;
-
+        const trendImageURL: String = await LinkGenerator.uploadLinkToMomento(guild, post.imageURL)
         const embed = MomentoNotification.createTrendNotificationEmbed(notification)
         await NotificationsService.sendNotificationEmbed(guild, embed, post.author)
         const trendEmbed = new EmbedBuilder()
-            .setImage(String(post.imageURL))
+            .setImage(String(trendImageURL))
             .setColor(0xdd247b)
             .setAuthor({
                 name: String(`@${post.author.username}`),

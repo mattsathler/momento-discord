@@ -1,5 +1,11 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 5.2 | RELEASE/5.0 | 14/01/2023
+- Conserta o bug de imagem sumindo no momento-chat;
+
+## 5.1 | RELEASE/5.0 | 14/01/2023
+- Conserta bug de imagem sumindo no trending-topics;
+
 ## 5.0 | FEATURE/MOMENTO-CHAT | 13/01/2023
 - Adiciona um Chat em ON para o Momento;
 

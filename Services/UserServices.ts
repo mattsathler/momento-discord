@@ -307,11 +307,10 @@ export class UserServices {
                 console.log(ms(timestamp) <= Config.momentosTimeout)
                 const momentoPost = await PostService.getPostFromMessage(post)
                 console.log(ms(timestamp) <= Config.momentosTimeout)
-                console.log(momentoPost)
                 if (momentoPost) {
-                    AnalyticsService.generateAnalytics(guild, momentoPost)
+                    await AnalyticsService.generateAnalytics(guild, momentoPost)
                 }
-                ThreadService.disablePostComment(momentoPost.postMessage)
+                await ThreadService.disablePostComment(momentoPost.postMessage)
                 tryDeleteMessage(post)
             }
         })
