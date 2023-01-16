@@ -53,37 +53,37 @@ export async function messageCreate(message: Message, client: Client) {
 
                 switch (command) {
                     case "perfil":
-                        console.log(`Alterando foto de perfil de ${momentoUser.username}...`)
+                        console.log(`MOMENTO - Alterando foto de perfil de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua foto de perfil, aguarde...")
                         await UserServices.changeProfilePicture(message, momentoUser)
                         break
                     case "capa":
-                        console.log(`Alterando foto de capa de ${momentoUser.username}...`)
+                        console.log(`MOMENTO - Alterando foto de capa de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua foto de capa, aguarde...")
                         await UserServices.changeProfileCover(message, momentoUser)
                         break
                     case "user":
-                        console.log(`Alterando usuário de ${momentoUser.username}...`)
+                        console.log(`MOMENTO - Alterando usuário de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando seu usuário, aguarde...")
                         await UserServices.changeProfileUser(message, momentoUser, args)
                         break
                     case "nome":
-                        console.log(`Alterando nome de perfil de ${momentoUser.username}...`)
+                        console.log(`MOMENTO - Alterando nome de perfil de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando seu nome, aguarde...")
                         await UserServices.changeProfileName(message, momentoUser, args)
                         break
                     case "bio":
-                        console.log(`Alterando bio de ${momentoUser.username}...`)
+                        console.log(`MOMENTO - Alterando bio de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua bio, aguarde...")
                         await UserServices.changeProfileBio(message, momentoUser, args)
                         break
                     case "estilo":
-                        console.log(`Alterando o estilo da collage de ${momentoUser.username}...`)
+                        console.log(`MOMENTO - Alterando o estilo da collage de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando o estilo da collage, aguarde...")
                         await UserServices.changeCollageStyle(message, momentoUser, Number(args[0]))
                         break
                     case "modo":
-                        console.log(`Alterando o darkmode de ${momentoUser.username}...`)
+                        console.log(`MOMENTO - Alterando o darkmode de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando o darkmode, aguarde...")
                         await UserServices.toggleDarkmode(message, momentoUser)
                         break

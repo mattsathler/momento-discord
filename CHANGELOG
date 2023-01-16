@@ -1,5 +1,8 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 6.1 | FEATURE/DARK-MODE | 15/01/2023
+- Conserta o trending para não aceitar mais de 24 horas;
+
 ## 6.0 | FEATURE/DARK-MODE | 15/01/2023
 - Adiciona o comando ?modo que alterna entre dark e light mode;
 - Adapta os posts de acordo com o modo de seu perfil;

@@ -31,7 +31,6 @@ export class LinkGenerator {
             const attachment: Attachment = msg.attachments.first()
             const url: string = attachment.url
 
-            console.log(url)
             return url
         }
         catch (err) {

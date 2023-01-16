@@ -57,8 +57,6 @@ export class AnalyticsService {
                 text: 'Este é o Seu Momento!',
                 iconURL: 'https://imgur.com/nFwo2PT.png'
             })
-        console.log()
-        console.log(StringFormater.formatForProfile(followersFromPost, 1))
         await NotificationsService.sendNotificationEmbed(guild, embed, post.author, true)
     }
 }

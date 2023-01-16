@@ -1,4 +1,4 @@
-import { Client, Guild, Message, MessageReaction, ThreadChannel, User } from "discord.js";
+import { Message, MessageReaction, ThreadChannel, User } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
@@ -9,6 +9,7 @@ import { UserServices } from "../Services/UserServices";
 import { removeReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
 import * as Config from '../config.json';
 import { MomentoNotification } from "../Classes/MomentoNotification";
+const ms = require('ms');
 
 export async function messageReactionAdd(user: User, reaction: MessageReaction) {
     if (user.bot) { return }
@@ -53,7 +54,13 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         const likesCount: Number = message.reactions.cache.get("❤️").count - 1
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
-                        if (!post.isTrending && likesCount >= Config.likesToTrend) { PostService.trendPost(message.guild, post, notification) }
+                        if (
+                            !post.isTrending &&
+                            likesCount >= Config.likesToTrend &&
+                            ms(Date.now() - post.postMessage.createdTimestamp, { long: true }) <= Config.momentosTimeout
+                        ) {
+                            PostService.trendPost(message.guild, post, notification)
+                        }
                         break
                     }
                     break
