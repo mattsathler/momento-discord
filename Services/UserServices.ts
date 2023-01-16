@@ -97,7 +97,8 @@ export class UserServices {
             0,
             null,
             0,
-            true
+            true,
+            false
         )
         await MongoService.registerUser(newMomentoUser)
         return newMomentoUser

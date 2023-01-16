@@ -121,7 +121,8 @@ export class MongoService {
                     response[0].trends,
                     response[0].followers,
                     response[0].momentos,
-                    response[0].notifications
+                    response[0].notifications,
+                    response[0].darkmode
                 )
                 return momentoUser;
             }
@@ -157,7 +158,8 @@ export class MongoService {
                 response[0].trends,
                 response[0].followers,
                 response[0].momentos,
-                response[0].notifications
+                response[0].notifications,
+                response[0].darkmode
             )
             return momentoUser;
         }

@@ -79,6 +79,10 @@ const schema = new mongo.Schema({
         type: Boolean,
         default: true
     },
+    'darkmode': {
+        type: Boolean,
+        default: false
+    },
 })
 
 module.exports = mongo.model('users', schema)
