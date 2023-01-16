@@ -55,11 +55,10 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
                         const timestamp = ms(ms(Date.now() - post.postMessage.createdTimestamp, { long: true }))
-
                         if (
                             !post.isTrending &&
                             likesCount >= Config.likesToTrend &&
-                            timestamp < Config.momentosTimeout
+                            timestamp <= Config.momentosTimeout
                         ) {
                             PostService.trendPost(message.guild, post, notification)
                         }
