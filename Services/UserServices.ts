@@ -319,9 +319,7 @@ export class UserServices {
         profilePosts.map(async post => {
             const timestamp = ms(Date.now() - post.createdTimestamp, { long: true })
             if (ms(timestamp) >= Config.momentosTimeout) {
-                console.log(ms(timestamp) <= Config.momentosTimeout)
                 const momentoPost = await PostService.getPostFromMessage(post)
-                console.log(ms(timestamp) <= Config.momentosTimeout)
                 if (momentoPost) {
                     await AnalyticsService.generateAnalytics(guild, momentoPost)
                 }
