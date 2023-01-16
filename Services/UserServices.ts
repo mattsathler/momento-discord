@@ -133,6 +133,20 @@ export class UserServices {
         }
     }
 
+    static async toggleDarkmode(message: Message, user: MomentoUser) {
+        const guild: Guild = message.guild
+        const newDarkmode = !user.darkmode
+        console.log(`MOMENTO - Alterando o darkmode de ${user.username}`)
+        const newUser = await MongoService.updateProfile(user, {
+            darkmode: newDarkmode
+        })
+
+        await UserServices.updateProfileImages(guild, newUser, true, true)
+        // await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
+        return newUser;
+    }
+
+
     static async changeProfilePicture(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
         console.log(`MOMENTO - Alterando a foto de perfil de ${user.username}`)

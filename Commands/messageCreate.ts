@@ -82,6 +82,11 @@ export async function messageCreate(message: Message, client: Client) {
                         reply = await message.reply("Alterando o estilo da collage, aguarde...")
                         await UserServices.changeCollageStyle(message, momentoUser, Number(args[0]))
                         break
+                    case "modo":
+                        console.log(`Alterando o darkmode de ${momentoUser.username}...`)
+                        reply = await message.reply("Alterando o darkmode, aguarde...")
+                        await UserServices.toggleDarkmode(message, momentoUser)
+                        break
                 }
 
                 if (reply) { await tryDeleteMessage(reply) }

@@ -1,5 +1,9 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 6.0 | FEATURE/DARK-MODE | 15/01/2023
+- Adiciona o comando ?modo que alterna entre dark e light mode;
+- Adapta os posts de acordo com o modo de seu perfil;
+
 ## 5.3 | RELEASE/5.0 | 15/01/2023
 - Adiciona a possibilidade de forced notifications;
 
