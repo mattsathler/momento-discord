@@ -274,11 +274,11 @@ export class MongoService {
     }
 
     static async updateServerSettings(user: MomentoUser, setting: {}) {
-        const users = mongo.model('users');
+        const servers = mongo.model('servers');
         console.log('MOMENTO - Atualizando configuração do servidor...')
         try {
-            const newUser = await users.findOneAndUpdate({ id: user.guildId }, setting)
-            return newUser
+            const newServerConfig = await servers.findOneAndUpdate({ id: user.guildId }, setting)
+            return newServerConfig
         }
         catch (err) {
             console.error(err)

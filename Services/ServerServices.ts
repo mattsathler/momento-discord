@@ -101,7 +101,7 @@ export class ServerServices {
     }
 
     static async createGroupChannel(message: Message, owner: MomentoUser): Promise<TextChannel> {
-        const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
+        let serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
 
         const groupChannel = await message.guild.channels.create({
             name: String(`Grupo de ${owner.username}`),
@@ -120,9 +120,10 @@ export class ServerServices {
             AddReactions: false
         })
 
-        const newChatsChannelsId = serverConfig.chatsChannelsId.push(groupChannel.id)
+        serverConfig.chatsChannelsId.push(groupChannel.id)
+        console.log(serverConfig.chatsChannelsId)
         await MongoService.updateServerSettings(owner, {
-            chatsChannelsId: newChatsChannelsId
+            chatsChannelsId: serverConfig.chatsChannelsId
         })
         return groupChannel
     }

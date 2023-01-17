@@ -4,6 +4,7 @@ import { MomentoMessage } from "../Classes/MomentoMessage";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoServer } from "../Classes/MomentoServer";
 import * as config from "../config.json";
+import { GroupServices } from "../Services/GroupServices";
 import { MongoService } from "../Services/MongoService";
 import { ServerServices } from "../Services/ServerServices";
 import { UserServices } from "../Services/UserServices";
@@ -101,10 +102,21 @@ export async function messageCreate(message: Message, client: Client) {
             }
 
             if (isGroupChat) {
-                switch(command){
+                switch (command) {
                     case "add":
-                        
+                        console.log(`MOMENTO - Adicionando usuário ao grupo...`)
+                        reply = await message.reply(`Convidando usuário para grupo...`)
+                        await GroupServices.addUserToGroupChannel(client, message)
+                        break
+                    case "remove":
+                        console.log(`MOMENTO - Removendo usuário do grupo...`)
+                        reply = await message.reply(`Removendo usuário do grupo...`)
+                        await GroupServices.removeUserToGroupChannel(client, message)
+                        break
                 }
+                if (message) { tryDeleteMessage(message) }
+                if (reply) { tryDeleteMessage(reply) }
+                return
             }
 
             switch (command) {
