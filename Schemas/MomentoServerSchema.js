@@ -16,7 +16,12 @@ const schema = new mongo.Schema({
     'askProfileChannelId': reqString,
     'profilesChannelId': reqString,
     'trendsChannelId': reqString,
-    'chatChannelId': reqString
+    'groupsCategoryId': reqString,
+    'chatsChannelsId': {
+        type: [String],
+        blackbox: true,
+        default: []
+    }
 })
 
 module.exports = mongo.model('servers', schema)

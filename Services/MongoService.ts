@@ -47,7 +47,8 @@ export class MongoService {
                 response.askProfileChannelId,
                 response.uploaderChannelId,
                 response.trendsChannelId,
-                response.chatChannelId
+                response.chatsChannelsId,
+                response.groupsCategoryId,
             )
             return serverConfig
         }
@@ -269,6 +270,19 @@ export class MongoService {
         }
         catch (err) {
             throw new Error(err.message)
+        }
+    }
+
+    static async updateServerSettings(user: MomentoUser, setting: {}) {
+        const users = mongo.model('users');
+        console.log('MOMENTO - Atualizando configuração do servidor...')
+        try {
+            const newUser = await users.findOneAndUpdate({ id: user.guildId }, setting)
+            return newUser
+        }
+        catch (err) {
+            console.error(err)
+            return
         }
     }
 

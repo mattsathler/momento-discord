@@ -22,6 +22,7 @@ export async function messageCreate(message: Message, client: Client) {
     const isCommand = message.content.charAt(0) == config.prefix ? true : false;
     const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
         && momentoUser.guildId == channel.guildId ? true : false;
+    const isGroupChat = serverConfig.chatsChannelsId.includes(message.channelId);
 
     const isSomeoneProfileChannel: Boolean = await MongoService.getUserByProfileChannel(String(message.channelId), message.guildId) ? true : false
 
@@ -87,11 +88,23 @@ export async function messageCreate(message: Message, client: Client) {
                         reply = await message.reply("Alterando o darkmode, aguarde...")
                         await UserServices.toggleDarkmode(message, momentoUser)
                         break
+                    case "grupo":
+                        console.log(`MOMENTO - Criando o grupo de ${momentoUser.username}...`)
+                        reply = await message.reply("Criando seu grupo, aguarde...")
+                        await ServerServices.createGroupChannel(message, momentoUser)
+                        break
                 }
 
                 if (reply) { await tryDeleteMessage(reply) }
                 await tryDeleteMessage(message)
                 return
+            }
+
+            if (isGroupChat) {
+                switch(command){
+                    case "add":
+                        
+                }
             }
 
             switch (command) {
@@ -124,8 +137,8 @@ export async function messageCreate(message: Message, client: Client) {
             if (reply) { tryDeleteMessage(reply) }
             tryDeleteMessage(message)
         }
-        const isChatMessage = message.channelId == serverConfig.chatChannelId;
-        if (isChatMessage) {
+
+        if (isGroupChat) {
             if (!momentoUser) {
                 tryDeleteMessage(message)
                 return

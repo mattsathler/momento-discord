@@ -19,7 +19,7 @@ export class ServerServices {
                 channelsId.profilesCategoryId,
                 channelsId.trendsChannelId,
                 channelsId.chatChannelId,
-                )
+            )
         sendReplyMessage(message, "Servidor configurado com sucesso!", null, false)
         return serverConfig
     }
@@ -53,7 +53,7 @@ export class ServerServices {
         await askProfileChannel.setParent(momentoCategory);
         await trendsChannel.setParent(momentoCategory);
         await chatChannelId.setParent(momentoCategory);
-        
+
         momentoUploaderChannel.permissionOverwrites.create(guild.roles.everyone, {
             ViewChannel: false
         })
@@ -98,5 +98,32 @@ export class ServerServices {
         })
 
         return userProfileChannel
+    }
+
+    static async createGroupChannel(message: Message, owner: MomentoUser): Promise<TextChannel> {
+        const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
+
+        const groupChannel = await message.guild.channels.create({
+            name: String(`Grupo de ${owner.username}`),
+            type: ChannelType.GuildText
+        })
+
+        const groupsCategoryId: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.groupsCategoryId)) as CategoryChannel
+        await groupChannel.setParent(groupsCategoryId)
+
+        await groupChannel.permissionOverwrites.create(message.guild.roles.everyone, {
+            ViewChannel: false
+        })
+        await groupChannel.permissionOverwrites.create(String(owner.id), {
+            ViewChannel: true,
+            SendMessages: true,
+            AddReactions: false
+        })
+
+        const newChatsChannelsId = serverConfig.chatsChannelsId.push(groupChannel.id)
+        await MongoService.updateServerSettings(owner, {
+            chatsChannelsId: newChatsChannelsId
+        })
+        return groupChannel
     }
 }

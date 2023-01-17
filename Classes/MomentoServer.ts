@@ -4,14 +4,17 @@ export class MomentoServer {
     public askProfileChannelId: String;
     public uploaderChannelId: String;
     public trendsChannelId: String;
-    public chatChannelId: String;
+    public groupsCategoryId: String;
+    public chatsChannelsId: [String];
 
-    constructor(id: String, profilesChannelId: String, askProfileChannelId: String, uploaderChannelId: String, trendsChannelId: String, chatChannelId: String) {
+    constructor(id: String, profilesChannelId: String, askProfileChannelId: String, uploaderChannelId: String,
+        trendsChannelId: String, chatsChannelsId: [String], groupsCategoryId: String) {
         this.id = id
         this.profilesChannelId = profilesChannelId
         this.askProfileChannelId = askProfileChannelId
         this.uploaderChannelId = uploaderChannelId
         this.trendsChannelId = trendsChannelId
-        this.chatChannelId = chatChannelId
+        this.chatsChannelsId = chatsChannelsId
+        this.groupsCategoryId = groupsCategoryId
     }
 }
