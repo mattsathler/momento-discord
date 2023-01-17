@@ -1,5 +1,5 @@
 import { Image } from "canvas";
-import { Client, Message, TextChannel, User } from "discord.js";
+import { Client, EmbedBuilder, Message, TextChannel, User } from "discord.js";
 import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
@@ -40,9 +40,10 @@ export class MomentoPost {
 
         const postDescription: String[] = await MentionsParser.parseUserMentions(message)
         let momentoPost: MomentoPost;
+        let originalUser: MomentoUser;
         if (isRepost) {
             momentoPost = await MongoService.getPostById(message.id, message.guildId)
-            momentoPost.author = user
+            // momentoPost.author = user
         }
         else {
             momentoPost =
@@ -56,18 +57,41 @@ export class MomentoPost {
         try {
             const post: Buffer = await Post.drawPost(momentoPost)
             const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-            const newPost: Message = await profileChannel.send({ files: [post] })
+
+            let newPost: Message
+            if (!isRepost) {
+                newPost = await profileChannel.send({ files: [post] })
+            }
+            else {
+                const postImageUrl = await LinkGenerator.uploadImageToMomento(message.guild, post)
+                const sharedPostEmber =
+                    new EmbedBuilder()
+                        .setDescription("Compartilhou um Momento!")
+                        .setURL(message.url)
+                        .setColor(0xdd247b)
+                        .setAuthor({
+                            name: String(`@${user.username}`),
+                            iconURL: String(user.profilePicture),
+                            url: String(`https://discord.com/channels/${message.guildId}/${user.profileChannelId}`)
+                        })
+                        .setImage(postImageUrl)
+                newPost = await profileChannel.send({ embeds: [sharedPostEmber] })
+            }
 
             await newPost.react('❤️')
-            await newPost.react('🔁')
+            if (!isRepost) {
+                await newPost.react('🔁')
+            }
             await newPost.react('🗑️')
 
-            await newPost.startThread({
-                name: "Comentários",
-                autoArchiveDuration: 1440,
-                reason: `Comentários`,
-                rateLimitPerUser: 10
-            })
+            if (!isRepost) {
+                await newPost.startThread({
+                    name: "Comentários",
+                    autoArchiveDuration: 1440,
+                    reason: `Comentários`,
+                    rateLimitPerUser: 10
+                })
+            }
 
             momentoPost.postMessage = newPost
             const postOriginalImageURL: String = await LinkGenerator.uploadLinkToMomento(message.guild, momentoPost.imageURL)
@@ -87,7 +111,7 @@ export class MomentoPost {
 
         const post: MomentoPost = await MongoService.getPostById(message.id, message.guild.id) ?? undefined
         if (!post) throw new Error("Post não encontrado!")
-        if (post.author.id == user.id) throw new Error("Você não pode repostar seu próprio momento!")
+        // if (post.author.id == user.id) throw new Error("Você não pode repostar seu próprio momento!")
 
         const sharedPost = await this.createPost(client, message, user, true)
 
