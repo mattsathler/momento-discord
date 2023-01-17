@@ -21,7 +21,7 @@ export async function messageReactionRemove(user: User, reaction: MessageReactio
 
         switch (reactEmoji) {
             case "🫂":
-                if (isCollage) {
+                if (isCollage && reactUser.id != reactedUser.id) {
                     await UserServices.changeFollowers(message.guild, reactedUser, false)
                     break
                 }

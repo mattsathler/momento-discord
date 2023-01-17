@@ -111,7 +111,7 @@ export class MomentoPost {
 
         const post: MomentoPost = await MongoService.getPostById(message.id, message.guild.id) ?? undefined
         if (!post) throw new Error("Post não encontrado!")
-        // if (post.author.id == user.id) throw new Error("Você não pode repostar seu próprio momento!")
+        if (post.author.id == user.id) throw new Error("Você não pode repostar seu próprio momento!")
 
         const sharedPost = await this.createPost(client, message, user, true)
 

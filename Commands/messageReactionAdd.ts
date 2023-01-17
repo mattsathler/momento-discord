@@ -85,6 +85,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                 case "🔁":
                     if (isPost) {
                         await MomentoPost.sharePost(message.client, message, reactUser)
+                        await removeReaction(reactUser, message, String(reactEmoji))
                         break
                     }
                     await removeReaction(reactUser, message, String(reactEmoji))
