@@ -30,12 +30,15 @@ export class GroupServices {
             if (!message.mentions.channels.first()) { throw new Error("Você precisa mencionar o # do perfil de algum usuário!") }
             const profileChannel = message.mentions.channels.first() as TextChannel
             const momentoUser = await MongoService.getUserByProfileChannel(profileChannel.id, message.guildId)
+            if (momentoUser.groupChatId == message.channelId) {
+                throw new Error("Você não pode remover o dono de seu próprio Talks!")
+            }
             const discordUser = await client.users.fetch(String(momentoUser.id))
-
+            
             const groupChannel = message.channel as TextChannel
             await groupChannel.permissionOverwrites.delete(discordUser)
             await groupChannel.send(`*<#${momentoUser.profileChannelId}> foi removido do grupo!*`)
-
+            
             return message
         }
         catch (err) {
