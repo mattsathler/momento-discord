@@ -1,5 +1,5 @@
 import { Client, Message, TextChannel, User } from "discord.js";
-import { MomentoUser } from "../Classes/MomentoUser";
+import { MomentoServer } from "../Classes/MomentoServer";
 import { MongoService } from "./MongoService";
 
 export class GroupServices {
@@ -40,6 +40,33 @@ export class GroupServices {
         }
         catch (err) {
             console.log(err)
+        }
+    }
+
+    public static async deleteGroupChat(serverConfig: MomentoServer, message: Message) {
+        try {
+            const chatChannels = serverConfig.chatsChannelsId
+            const newChatChannels = chatChannels.filter(x => {
+                return x != message.channel.id
+            })
+            console.log(newChatChannels)
+            await message.channel.delete();
+            MongoService.updateServerSettings(message.guildId, {
+                chatsChannelsId: newChatChannels
+            })
+        }
+        catch (err) { console.log(err) }
+    }
+
+    public static async renameGroupChannel(message: Message, args: string[]) {
+        if (args.length != 1) { throw new Error("Use ?renomear <nomedogrupo> para renomear seu grupo!") }
+        try {
+            const gpchannel = message.channel as TextChannel
+            await gpchannel.setName(args[0]);
+            return
+        }
+        catch (err) {
+            throw new Error(err)
         }
     }
 }

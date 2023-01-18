@@ -1,4 +1,4 @@
-import { Guild, Message, ChannelType, TextChannel, CategoryChannel, User, } from "discord.js"
+import { Guild, Message, ChannelType, TextChannel, CategoryChannel, User, EmbedBuilder, } from "discord.js"
 import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
@@ -101,6 +101,8 @@ export class ServerServices {
     }
 
     static async createGroupChannel(message: Message, owner: MomentoUser): Promise<TextChannel> {
+        const checkChannel = message.guild.channels.cache.get(String(owner.groupChatId)) as TextChannel
+        if (checkChannel) { throw new Error(`Você já possui um grupo nesse servidor! Para apagar, use ?delete no canal <#${checkChannel.id}>`) }
         let serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
 
         const groupChannel = await message.guild.channels.create({
@@ -122,9 +124,48 @@ export class ServerServices {
 
         serverConfig.chatsChannelsId.push(groupChannel.id)
         console.log(serverConfig.chatsChannelsId)
-        await MongoService.updateServerSettings(owner, {
+        await MongoService.updateServerSettings(owner.guildId, {
             chatsChannelsId: serverConfig.chatsChannelsId
         })
+        await MongoService.updateProfile(owner, {
+            groupChatId: groupChannel.id
+        })
+
+        const newGroupEmbedMessage: EmbedBuilder = new EmbedBuilder()
+            .setTitle('**Momento Talks**')
+            .setAuthor(
+                {
+                    name: 'MOMENTO TALKS',
+                    iconURL: 'https://imgur.com/P06HH5G.png',
+                }
+            )
+            .setColor(0xDD247B)
+            .setTitle(`Bem vindo(a) ao seu Talks!`)
+            .setDescription(`Aqui você terá um espaço para uma conversa entre você e seus amigos mais próximos, sem interferências externas ou pessoas bisbilhotando o assunto de vocês. Vamos começar configurando seu novo **Talk**!`)
+            .setFields([
+                {
+                    name: "?renomear <nome>",
+                    value: "Altera o nome do seu Talk. No momento, só é permitido um nome de até 1 (uma) palavra. Afinal, é uma versão de testes!",
+                    inline: true
+                },
+                {
+                    name: "?add <#PerfilDoUsuário>",
+                    value: "Convida um usuário específico para seu Talks!",
+                    inline: false
+                },
+                {
+                    name: "?remove <#PerfilDoUsuário>",
+                    value: "Remove um usuário específico de seu Talks!",
+                    inline: true
+                },
+                {
+                    name: "?delete",
+                    value: "Encerra seu Talks e fecha o grupo!",
+                    inline: true
+                },
+            ])
+            .setThumbnail("https://imgur.com/P06HH5G.png")
+        await groupChannel.send({ embeds: [newGroupEmbedMessage] })
         return groupChannel
     }
 }

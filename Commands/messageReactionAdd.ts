@@ -120,7 +120,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         }
                         const reactedMessage = message.channel as ThreadChannel
                         if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
-                            await ThreadService.disablePostComment(message)
+                            if (message.hasThread) { await ThreadService.disablePostComment(message) }
                             await tryDeleteMessage(message)
                             break
                         }
@@ -136,6 +136,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     if (isCollage && reactUser.id == reactedUser.id) {
                         try {
                             await UserServices.analyticProfile(message.guild, reactedUser)
+                            await removeReaction(reactUser, message, reaction.emoji.name)
                         }
                         catch (err) {
                             console.log(err)

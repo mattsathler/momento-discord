@@ -113,6 +113,15 @@ export async function messageCreate(message: Message, client: Client) {
                         reply = await message.reply(`Removendo usuário do grupo...`)
                         await GroupServices.removeUserToGroupChannel(client, message)
                         break
+                    case "delete":
+                        console.log(`MOMENTO - Deletando o grupo...`)
+                        GroupServices.deleteGroupChat(serverConfig, message)
+                        break
+                    case "renomear":
+                        console.log(`MOMENTO - Renmoeando o grupo...`)
+                        reply = await message.reply(`Renomeando o grupo...`)
+                        await GroupServices.renameGroupChannel(message, args);
+                        break
                 }
                 if (message) { tryDeleteMessage(message) }
                 if (reply) { tryDeleteMessage(reply) }
@@ -161,7 +170,7 @@ export async function messageCreate(message: Message, client: Client) {
     catch (err) {
         if (reply) { await tryDeleteMessage(reply) }
         sendErrorMessage(message, err.message)
-        console.log(err)
+        console.log(err.message)
         return
     }
 }

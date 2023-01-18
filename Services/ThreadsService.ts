@@ -15,10 +15,10 @@ export class ThreadService {
 
     public static async disablePostComment(message: Message) {
         try {
+
             const momentoUser = await MongoService.getUserByProfileChannel(message.channelId, message.guildId)
             let commentChannel: ThreadChannel = await this.getPostCommentChannel(momentoUser, message) as ThreadChannel
             if (!commentChannel) { return }
-
             await commentChannel.delete()
         }
         catch (err) {

@@ -123,7 +123,8 @@ export class MongoService {
                     response[0].followers,
                     response[0].momentos,
                     response[0].notifications,
-                    response[0].darkmode
+                    response[0].darkmode,
+                    response[0].groupChatId
                 )
                 return momentoUser;
             }
@@ -160,7 +161,8 @@ export class MongoService {
                 response[0].followers,
                 response[0].momentos,
                 response[0].notifications,
-                response[0].darkmode
+                response[0].darkmode,
+                response[0].groupChatId ?? "",
             )
             return momentoUser;
         }
@@ -273,11 +275,11 @@ export class MongoService {
         }
     }
 
-    static async updateServerSettings(user: MomentoUser, setting: {}) {
+    static async updateServerSettings(guildId: String, setting: {}) {
         const servers = mongo.model('servers');
         console.log('MOMENTO - Atualizando configuração do servidor...')
         try {
-            const newServerConfig = await servers.findOneAndUpdate({ id: user.guildId }, setting)
+            const newServerConfig = await servers.findOneAndUpdate({ id: guildId }, setting)
             return newServerConfig
         }
         catch (err) {

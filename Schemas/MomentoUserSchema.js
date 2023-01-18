@@ -83,6 +83,10 @@ const schema = new mongo.Schema({
         type: Boolean,
         default: false
     },
+    'groupChatId': {
+        type: String,
+        default: ""
+    },
 })
 
 module.exports = mongo.model('users', schema)
