@@ -1,5 +1,11 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 7.0 | FEATURE/GROUP-CHAT | 18/01/2023
+- MOMENTO TALKS!;
+- Adiciona a criação de talks;
+- Adiciona o delete de talks;
+- Relaciona usuário com sala no banco de dados;
+
 ## 6.3 | RELEASE/6.0 | 16/01/2023
 - Pequeno rework no repost, adicionando um Embed para diferenciar;
 

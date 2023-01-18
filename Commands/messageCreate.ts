@@ -89,9 +89,9 @@ export async function messageCreate(message: Message, client: Client) {
                         reply = await message.reply("Alterando o darkmode, aguarde...")
                         await UserServices.toggleDarkmode(message, momentoUser)
                         break
-                    case "grupo":
-                        console.log(`MOMENTO - Criando o grupo de ${momentoUser.username}...`)
-                        reply = await message.reply("Criando seu grupo, aguarde...")
+                    case "talks":
+                        console.log(`MOMENTO - Criando o talks de ${momentoUser.username}...`)
+                        reply = await message.reply("Criando seu talks, aguarde...")
                         await ServerServices.createGroupChannel(message, momentoUser)
                         break
                 }
