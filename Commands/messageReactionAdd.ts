@@ -120,8 +120,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         }
                         const reactedMessage = message.channel as ThreadChannel
                         if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
-                            if (message.hasThread) { await ThreadService.disablePostComment(message) }
-                            await tryDeleteMessage(message)
+                            PostService.deletePost()
                             break
                         }
                         await removeReaction(reactUser, message, String(reactEmoji))

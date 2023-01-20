@@ -6,6 +6,7 @@ import { LinkGenerator } from "../Utils/LinkGenerator";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
+import { ThreadService } from "./ThreadsService";
 import { UserServices } from "./UserServices";
 
 export class PostService {
@@ -81,5 +82,34 @@ export class PostService {
         const newUser = await MongoService.updateProfile(user, {
             followers: newFollowers,
         })
+    }
+
+    static calculateFollowers(postList: MomentoPost[], author: MomentoUser) {
+        let newFollowersList: Number[] = []
+        postList.map(post => {
+            const oldFollowers = Number(author.followers)
+
+            let momentos = Number(author.momentos)
+            if (momentos == 0) { momentos = 1 }
+
+            //CONTA BIZARRA PARA CALCULAR O RESULTADO DO POST
+            const newFollowersBase = Math.random() * (8 - 3) + 3
+            const FollowersMultiplier = Math.random() * (2 - 1) + 1
+
+            let followersFromPost = Math.floor(newFollowersBase * FollowersMultiplier * momentos / 2)
+            if (followersFromPost == 0) { followersFromPost = 1 }
+
+            // const momentoPost = await MongoService.getPostFromMessage(post);
+            if (post.isTrending) { followersFromPost = followersFromPost * 2 }
+            const newFollowers = oldFollowers + followersFromPost
+            newFollowersList.push(newFollowers)
+        })
+        return newFollowersList
+    }
+
+    public static async deletePost(momentoPost: MomentoPost) {
+        await MongoService.deletePostFromMessage(momentoPost)
+        await ThreadService.disablePostComment(momentoPost.postMessage)
+        await tryDeleteMessage(momentoPost.postMessage)
     }
 }

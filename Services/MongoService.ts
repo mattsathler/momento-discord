@@ -223,6 +223,20 @@ export class MongoService {
         return newPost
     }
 
+    static async deletePostFromMessage(post: MomentoPost): Promise<Boolean> {
+        try{
+            const posts = mongo.model('posts');
+            await posts.deleteOne({
+                messageId: post.postMessage.id,
+                guildId: post.postMessage.guildId
+            })
+            return true
+        }
+        catch(err){
+            throw new Error(err.message)
+        }
+    }
+
     static async getPostFromMessage(message: Message): Promise<MomentoPost> {
         const posts = mongo.model('posts');
         try {
@@ -320,7 +334,7 @@ export class MongoService {
         }
     }
 
-    static async fetchProfilePosts(guild: Guild, user: MomentoUser): Promise<Message[]> {
+    static async fetchProfilePostsMessages(guild: Guild, user: MomentoUser): Promise<Message[]> {
         try {
             const posts = mongo.model('posts')
             const response = await posts.find({

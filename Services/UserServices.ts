@@ -1,6 +1,6 @@
 const ms = require('ms');
 
-import { Guild, Message, TextChannel } from "discord.js"
+import { EmbedBuilder, Guild, Message, TextChannel, time } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
@@ -13,6 +13,9 @@ import { AnalyticsService } from "./AnalyticsService"
 import * as Config from "../config.json"
 import { PostService } from "./PostService";
 import { ThreadService } from "./ThreadsService";
+import { MomentoPost } from "../Classes/MomentoPost";
+import { TimeConverter } from "../Utils/TimeConverter";
+import { NotificationsService } from "./NotificationsService";
 
 export class UserServices {
     static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
@@ -48,7 +51,6 @@ export class UserServices {
 
         const userCollageImage: Buffer = await CollageCanvas.drawCollage(user)
         const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userCollageImage)
-
 
         const userProfileChannel = await ServerServices.createProfileChannel(message, user)
         const userProfileMessage: Message = await userProfileChannel.send(userProfileImageURL)
@@ -316,25 +318,53 @@ export class UserServices {
     }
 
     static async analyticProfile(guild: Guild, momentoUser: MomentoUser) {
+        await NotificationsService.sendNotificationEmbed(guild,
+            new EmbedBuilder()
+                .setColor(0xdd247b)
+                .setAuthor({
+                    name: String(`MOMENTO ANALYTICS`),
+                    iconURL: 'https://imgur.com/nFwo2PT.png'
+                })
+                .setDescription('Gerando seu Analytics!')
+            ,
+            momentoUser,
+            true
+        )
+
+        //DEMORA
         const profilePosts = await this.fetchProfilePosts(guild, momentoUser)
-        profilePosts.map(async post => {
-            const timestamp = ms(Date.now() - post.createdTimestamp, { long: true })
-            if (ms(timestamp) >= Config.momentosTimeout) {
-                const momentoPost = await PostService.getPostFromMessage(post)
-                if (momentoPost) {
-                    await AnalyticsService.generateAnalytics(guild, momentoPost)
-                }
-                await ThreadService.disablePostComment(momentoPost.postMessage)
-                tryDeleteMessage(post)
-            }
+        //===
+
+        let analyticsPosts: MomentoPost[] = []
+        profilePosts.map(momentoPost => {
+            const timePassed = TimeConverter.msToTime(momentoPost.postMessage.createdTimestamp)
+            if (timePassed.hours >= Config.momentosTimeout) { analyticsPosts.push(momentoPost) }
         })
-        const newUser: MomentoUser = await MongoService.getUserById(momentoUser.id, momentoUser.guildId)
+
+        if (analyticsPosts.length == 0) { return }
+        const followersFromPost = PostService.calculateFollowers(analyticsPosts, momentoUser)
+        const followersSum = followersFromPost.reduce((a, b) => Number(a) + Number(b), 0)
+
+        analyticsPosts.map(async (momentoPost, index) => {
+            await AnalyticsService.generateAnalytics(guild, momentoPost, followersFromPost[index])
+        })
+
+        const newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: followersSum })
         await UserServices.updateProfileImages(guild, newUser, true, false)
         return
     }
 
-    static async fetchProfilePosts(guild: Guild, momentoUser: MomentoUser) {
-        const postList = await MongoService.fetchProfilePosts(guild, momentoUser)
+
+    static async fetchProfilePosts(guild: Guild, momentoUser: MomentoUser): Promise<MomentoPost[]> {
+        const postMessageList = await MongoService.fetchProfilePostsMessages(guild, momentoUser)
+        let postList: MomentoPost[] = [];
+
+        await Promise.all(
+            postMessageList.map(async msg => {
+                const post = await MongoService.getPostFromMessage(msg)
+                postList.push(post)
+            })
+        )
         return postList
     }
 }

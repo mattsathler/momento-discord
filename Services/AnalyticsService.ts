@@ -1,32 +1,12 @@
 import { EmbedBuilder, Guild, Utils } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
+import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { StringFormater } from "../Utils/StringFormater";
-import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
-import { UserServices } from "./UserServices";
+import { ThreadService } from "./ThreadsService";
 
 export class AnalyticsService {
-    public static async generateAnalytics(guild: Guild, post: MomentoPost) {
-        const oldFollowers = Number(post.author.followers)
-
-        let momentos = Number(post.author.momentos)
-        if (momentos == 0) { momentos = 1 }
-
-        //CONTA BIZARRA PARA CALCULAR O RESULTADO DO POST
-        const newFollowersBase = Math.random() * (10 - 5) + 5
-        const FollowersMultiplier = Math.random() * (2 - 1) + 1
-
-        let followersFromPost = Math.floor(newFollowersBase * FollowersMultiplier * momentos / 2)
-        if (followersFromPost == 0) { followersFromPost = 1 }
-
-        if (post.isTrending) { followersFromPost = followersFromPost * 2 }
-        const newFollowers = oldFollowers + followersFromPost
-
-        const newUser = await MongoService.updateProfile(post.author, {
-            followers: newFollowers,
-        })
-
-
+    public static async generateAnalytics(guild: Guild, post: MomentoPost, followersFromPost: Number) {
         const description = post.description != "" ? post.description : 'Post sem descrição.'
         const embed = new EmbedBuilder()
             .setTitle('**Momento Analytics**')
@@ -47,7 +27,7 @@ export class AnalyticsService {
                 },
                 {
                     name: 'Novos seguidores',
-                    value: StringFormater.formatForProfile(followersFromPost, 1),
+                    value: StringFormater.formatForProfile(Number(followersFromPost), 1),
                     inline: true
                 }
             )
