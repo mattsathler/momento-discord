@@ -328,6 +328,8 @@ export class UserServices {
                 tryDeleteMessage(post)
             }
         })
+        const newUser: MomentoUser = await MongoService.getUserById(momentoUser.id, momentoUser.guildId)
+        await UserServices.updateProfileImages(guild, newUser, true, false)
         return
     }
 

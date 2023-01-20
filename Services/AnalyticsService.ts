@@ -27,7 +27,6 @@ export class AnalyticsService {
         })
 
 
-        await UserServices.updateProfileImages(guild, newUser, true, false)
         const description = post.description != "" ? post.description : 'Post sem descrição.'
         const embed = new EmbedBuilder()
             .setTitle('**Momento Analytics**')
