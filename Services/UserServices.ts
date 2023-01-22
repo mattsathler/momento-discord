@@ -201,7 +201,7 @@ export class UserServices {
 
         const newFollowers = AnalyticsService.calculateFollowers(analyticsPosts, momentoUser)
         analyticsPosts.map(async (momentoPost, index) => {
-            await PostService.deletePost(momentoPost)
+            await PostService.deletePost(momentoPost, momentoPost.postMessage)
             await AnalyticsService.generateAnalytics(guild, momentoPost, newFollowers.list[index])
         })
         const newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })

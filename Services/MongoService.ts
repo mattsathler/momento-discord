@@ -90,6 +90,7 @@ export class MongoService {
                     response[0].postDescription,
                     response[0].isTrending
                 )
+
                 return momentoPost;
             }
             else {

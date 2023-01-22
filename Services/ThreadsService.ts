@@ -1,4 +1,4 @@
-import { AnyThreadChannel, Collection, FetchedThreads, Message, MessageType, TextChannel, ThreadChannel } from "discord.js";
+import { AnyThreadChannel, Collection, FetchedThreads, Guild, Message, MessageType, TextChannel, ThreadChannel } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
@@ -14,10 +14,9 @@ export class ThreadService {
         })
     }
 
-    public static async disablePostComment(post: MomentoPost) {
+    public static async disablePostComment(post: MomentoPost, message: Message) {
         try {
-            const momentoUser = post.author
-            let commentChannel: ThreadChannel = await this.getPostCommentChannel(momentoUser, post.postMessage) as ThreadChannel
+            let commentChannel: ThreadChannel = await this.getPostCommentChannel(post.author, message) as ThreadChannel
             if (!commentChannel) { return }
             await commentChannel.delete()
         }
@@ -48,10 +47,10 @@ export class ThreadService {
 
     public static async getPostCommentChannel(momentoUser: MomentoUser, message: Message): Promise<ThreadChannel> {
         const profileChannel: TextChannel = message.guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
-        const channelThreads = (await profileChannel.threads.fetch()).threads
+        const channelThreads = await profileChannel.threads.fetch()
 
         let postCommentThread: ThreadChannel
-        channelThreads.map(thread => {
+        channelThreads.threads.map(thread => {
             if (thread.id == message.id) {
                 postCommentThread = thread as ThreadChannel
             }

@@ -93,11 +93,11 @@ export class PostService {
         return newUser
     }
 
-    public static async deletePost(momentoPost: MomentoPost) {
+    public static async deletePost(momentoPost: MomentoPost, message: Message) {
         try {
-            await ThreadService.disablePostComment(momentoPost)
-            await MongoService.deletePostFromMessage(momentoPost.postMessage)
-            await tryDeleteMessage(momentoPost.postMessage)
+            await ThreadService.disablePostComment(momentoPost, message)
+            await MongoService.deletePostFromMessage(message)
+            await tryDeleteMessage(message)
         }
         catch (err) {
             throw new Error(err)

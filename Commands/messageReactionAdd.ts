@@ -4,7 +4,6 @@ import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
 import { PostService } from "../Services/PostService";
-import { ThreadService } from "../Services/ThreadsService";
 import { UserServices } from "../Services/UserServices";
 import { removeAllReactions, removeUserReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
 import * as Config from '../config.json';
@@ -66,7 +65,6 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         break
                     }
                     break
-
                 case "🫂":
                     if (isCollage && reactUser.id != reactedUser.id) {
                         await UserServices.changeFollowers(message.guild, reactedUser, true)
@@ -112,7 +110,6 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         NotificationsService.sendNotification(message.guild, notification, true)
                         break
                     }
-
                 case '🗑️':
                     try {
                         if (isComment && reactUser.id == reactedUser.id) {
@@ -121,7 +118,14 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         }
                         const reactedMessage = message.channel as ThreadChannel
                         if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
-                            PostService.deletePost(isPost)
+                            await PostService.delet ePost(isPost, message)
+                            if (isPost) {
+                                const newMomentos = Number(reactUser.momentos) - 1
+                                const newUser = await MongoService.updateProfile(reactUser, {
+                                    momentos: newMomentos
+                                })
+                                await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
+                            }
                             break
                         }
                         await removeUserReaction(reactUser, message, String(reactEmoji))
@@ -130,7 +134,6 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         console.log(err)
                     }
                     break
-
                 case '📊':
                     await removeAllReactions(message, reaction.emoji.name)
                     if (isCollage && reactUser.id == reactedUser.id) {
@@ -144,7 +147,6 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             console.log(err)
                         }
                     }
-
                 default:
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
