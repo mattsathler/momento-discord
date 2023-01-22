@@ -32,7 +32,7 @@ export class AnalyticsService {
                     inline: true
                 }
             )
-            .setImage(String(post.postMessage.attachments.first().url))
+            .setImage(String(post.imageURL))
             .setFooter({
                 text: 'Este é o Seu Momento!',
                 iconURL: 'https://imgur.com/nFwo2PT.png'
@@ -43,28 +43,25 @@ export class AnalyticsService {
     static calculateFollowers(postList: MomentoPost[], author: MomentoUser): { list: Number[], sum: Number } {
         let newFollowersList: Number[] = []
         postList.map(post => {
-            const oldFollowers = Number(author.followers)
-
             let momentos = Number(author.momentos)
             if (momentos == 0) { momentos = 1 }
 
             //CONTA BIZARRA PARA CALCULAR O RESULTADO DO POST
-            const newFollowersBase = Math.random() * (8 - 3) + 3
-            const FollowersMultiplier = Math.random() * (2 - 1) + 1
+            const newFollowersBase = Math.random() * (25 - 10) + 10
+            const followersMultiplier = Math.random() * (4 - 1) + 1
 
-            let followersFromPost = Math.floor(newFollowersBase * FollowersMultiplier * momentos / 2)
+            let followersFromPost = Math.floor(newFollowersBase * followersMultiplier / 2)
+            followersFromPost += post.postMessage.reactions.cache.get('❤️').count
             if (followersFromPost == 0) { followersFromPost = 1 }
 
-            // const momentoPost = await MongoService.getPostFromMessage(post);
             if (post.isTrending) { followersFromPost = followersFromPost * 2 }
-            const newFollowers = oldFollowers + followersFromPost
-            newFollowersList.push(newFollowers)
+            newFollowersList.push(followersFromPost)
         })
 
         const followersSum = newFollowersList.reduce((a, b) => Number(a) + Number(b), 0)
         return {
             list: newFollowersList,
-            sum: followersSum
+            sum: Number(followersSum) + Number(author.followers)
         }
     }
 
@@ -73,7 +70,6 @@ export class AnalyticsService {
         await Promise.all(
             profilePosts.map(async momentoPost => {
                 const timePassed = TimeConverter.msToTime(momentoPost.postMessage.createdTimestamp)
-                console.log(timePassed.hours >= Config.momentosTimeout)
                 if (timePassed.hours >= Config.momentosTimeout) {
                     analyticsPosts.push(momentoPost)
                 }

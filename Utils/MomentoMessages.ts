@@ -43,7 +43,7 @@ export async function sendErrorMessage(message: Message, text?: string, timeout?
     }
 }
 
-export async function removeReaction(user: MomentoUser, message: Message, react: string) {
+export async function removeUserReaction(user: MomentoUser, message: Message, react: string) {
     try {
         const userReactions: Collection<string, MessageReaction> = message.reactions.cache.filter(reaction => reaction.users.cache.has(String(user.id)));
         for (const reaction of userReactions.values()) {
@@ -51,6 +51,18 @@ export async function removeReaction(user: MomentoUser, message: Message, react:
                 await reaction.users.remove(String(user.id))
             };
         }
+    } catch (error) {
+        console.error('MOMENTO - Houve um problema ao remover a reação!');
+    }
+    return
+}
+
+export async function removeAllReactions(message: Message, react: string) {
+    try {
+        message.reactions.cache.get(react).remove()
+            .catch(error => {
+                throw new Error(error)
+            });
     } catch (error) {
         console.error('MOMENTO - Houve um problema ao remover a reação!');
     }

@@ -183,27 +183,26 @@ export class UserServices {
     }
 
     static async analyticProfile(guild: Guild, momentoUser: MomentoUser) {
-        NotificationsService.sendNotificationEmbed(guild,
-            new EmbedBuilder()
-                .setColor(0xdd247b)
-                .setAuthor({
-                    name: String(`MOMENTO ANALYTICS`),
-                    iconURL: 'https://imgur.com/nFwo2PT.png'
-                })
-                .setDescription('Gerando seu Analytics!')
-            ,
-            momentoUser,
-            true
-        )
+        const embed = new EmbedBuilder()
+            .setColor(0xdd247b)
+            .setAuthor({
+                name: String(`MOMENTO ANALYTICS`),
+                iconURL: 'https://imgur.com/nFwo2PT.png'
+            })
+            .setDescription('Gerando seu Analytics!')
+
+
+
 
         const profilePosts = await this.fetchProfilePosts(guild, momentoUser)
         const analyticsPosts = await AnalyticsService.getAnalyticsPosts(profilePosts)
         if (analyticsPosts.length == 0) { return }
-        
+        await NotificationsService.sendNotificationEmbed(guild, embed, momentoUser, true)
+
         const newFollowers = AnalyticsService.calculateFollowers(analyticsPosts, momentoUser)
         analyticsPosts.map(async (momentoPost, index) => {
-            await AnalyticsService.generateAnalytics(guild, momentoPost, newFollowers.list[index])
             await PostService.deletePost(momentoPost)
+            await AnalyticsService.generateAnalytics(guild, momentoPost, newFollowers.list[index])
         })
         const newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
@@ -219,7 +218,6 @@ export class UserServices {
                 if (post) { postList.push(post) }
             })
         )
-        console.log(postList)
         return postList
     }
 }

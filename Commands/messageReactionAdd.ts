@@ -6,7 +6,7 @@ import { NotificationsService } from "../Services/NotificationsService";
 import { PostService } from "../Services/PostService";
 import { ThreadService } from "../Services/ThreadsService";
 import { UserServices } from "../Services/UserServices";
-import { removeReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
+import { removeAllReactions, removeUserReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
 import * as Config from '../config.json';
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { ProfileServices } from "../Services/ProfileService";
@@ -39,7 +39,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
             switch (reactEmoji) {
                 case "🔧":
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true);
-                    await removeReaction(reactUser, message, reaction.emoji.name)
+                    await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
                 case "❤️":
                     if (isPost) {
@@ -81,15 +81,15 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         await NotificationsService.sendNotification(message.guild, notification, false)
                         break
                     }
-                    await removeReaction(reactUser, message, String(reactEmoji))
+                    await removeUserReaction(reactUser, message, String(reactEmoji))
                     break
                 case "🔁":
                     if (isPost) {
                         await MomentoPost.sharePost(message.client, message, reactUser)
-                        await removeReaction(reactUser, message, String(reactEmoji))
+                        await removeUserReaction(reactUser, message, String(reactEmoji))
                         break
                     }
-                    await removeReaction(reactUser, message, String(reactEmoji))
+                    await removeUserReaction(reactUser, message, String(reactEmoji))
                     break
                 case "🔔": case "🔕":
                     if (reactUser.id == reactedUser.id && isCollage) {
@@ -124,7 +124,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             PostService.deletePost(isPost)
                             break
                         }
-                        await removeReaction(reactUser, message, String(reactEmoji))
+                        await removeUserReaction(reactUser, message, String(reactEmoji))
                     }
                     catch (err) {
                         console.log(err)
@@ -132,19 +132,21 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
 
                 case '📊':
-                    await removeReaction(reactUser, message, reaction.emoji.name)
+                    await removeAllReactions(message, reaction.emoji.name)
                     if (isCollage && reactUser.id == reactedUser.id) {
                         try {
-                            await removeReaction(reactUser, message, reaction.emoji.name)
+                            await removeUserReaction(reactUser, message, reaction.emoji.name)
                             await UserServices.analyticProfile(message.guild, reactedUser)
+                            await message.react('📊')
                             return
                         }
                         catch (err) {
                             console.log(err)
                         }
                     }
+
                 default:
-                    await removeReaction(reactUser, message, reaction.emoji.name)
+                    await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
             }
             return
