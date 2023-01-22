@@ -3,6 +3,7 @@ import { MomentoServer } from "../Classes/MomentoServer";
 import mongo from "mongoose"
 import { MomentoPost } from "../Classes/MomentoPost";
 import { Client, Guild, Message, TextChannel } from "discord.js";
+import { PostService } from "./PostService";
 require("dotenv").config();
 
 const MomentoUserSchema = require("../Schemas/MomentoUserSchema");
@@ -223,16 +224,16 @@ export class MongoService {
         return newPost
     }
 
-    static async deletePostFromMessage(post: MomentoPost): Promise<Boolean> {
-        try{
+    static async deletePostFromMessage(message: Message): Promise<Boolean> {
+        try {
             const posts = mongo.model('posts');
             await posts.deleteOne({
-                messageId: post.postMessage.id,
-                guildId: post.postMessage.guildId
+                messageId: message.id,
+                guildId: message.guildId
             })
             return true
         }
-        catch(err){
+        catch (err) {
             throw new Error(err.message)
         }
     }
@@ -336,22 +337,19 @@ export class MongoService {
 
     static async fetchProfilePostsMessages(guild: Guild, user: MomentoUser): Promise<Message[]> {
         try {
-            const posts = mongo.model('posts')
-            const response = await posts.find({
-                authorProfileChannelId: user.profileChannelId,
-                guildId: user.guildId
-            })
             const profileChannel: TextChannel = guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
             let postList: Message[] = []
-            await profileChannel.messages.fetch()
-            response.map(message => {
-                const msg: Message = profileChannel.messages.cache.get(message.messageId)
-                if (msg) { postList.push(msg) }
-            })
+            const msgs = await profileChannel.messages.fetch()
+            await Promise.all(
+                msgs.map(async message => {
+                    const post = await PostService.getPostFromMessage(message);
+                    if (post) { postList.push(message) }
+                })
+            )
             return postList
         }
         catch (err) {
-            console.error(err)
+            throw new Error(err)
         }
     }
 }

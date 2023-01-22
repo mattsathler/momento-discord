@@ -6,6 +6,7 @@ import { MomentoServer } from "../Classes/MomentoServer";
 import * as config from "../config.json";
 import { GroupServices } from "../Services/GroupServices";
 import { MongoService } from "../Services/MongoService";
+import { ProfileServices } from "../Services/ProfileService";
 import { ServerServices } from "../Services/ServerServices";
 import { UserServices } from "../Services/UserServices";
 import { sendErrorMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
@@ -47,7 +48,7 @@ export async function messageCreate(message: Message, client: Client) {
                 if (command.slice(0, -1) == 'collage') {
                     reply = await message.reply("Alterando sua foto de collage, aguarde...")
                     const collageNumber: Number = Number(command.charAt(7)) - 1
-                    await UserServices.changeProfileCollage(message, momentoUser, collageNumber)
+                    await ProfileServices.changeProfileCollage(message, momentoUser, collageNumber)
                     if (reply) { await tryDeleteMessage(reply) }
                     tryDeleteMessage(message)
                     return
@@ -57,22 +58,22 @@ export async function messageCreate(message: Message, client: Client) {
                     case "perfil":
                         console.log(`MOMENTO - Alterando foto de perfil de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua foto de perfil, aguarde...")
-                        await UserServices.changeProfilePicture(message, momentoUser)
+                        await ProfileServices.changeProfilePicture(message, momentoUser)
                         break
                     case "capa":
                         console.log(`MOMENTO - Alterando foto de capa de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando sua foto de capa, aguarde...")
-                        await UserServices.changeProfileCover(message, momentoUser)
+                        await ProfileServices.changeProfileCover(message, momentoUser)
                         break
                     case "user":
                         console.log(`MOMENTO - Alterando usuário de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando seu usuário, aguarde...")
-                        await UserServices.changeProfileUser(message, momentoUser, args)
+                        await UserServices.changeProfileUsername(message, momentoUser, args)
                         break
                     case "nome":
                         console.log(`MOMENTO - Alterando nome de perfil de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando seu nome, aguarde...")
-                        await UserServices.changeProfileName(message, momentoUser, args)
+                        await UserServices.changeUserNameAndSurname(message, momentoUser, args)
                         break
                     case "bio":
                         console.log(`MOMENTO - Alterando bio de ${momentoUser.username}...`)
@@ -82,12 +83,12 @@ export async function messageCreate(message: Message, client: Client) {
                     case "estilo":
                         console.log(`MOMENTO - Alterando o estilo da collage de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando o estilo da collage, aguarde...")
-                        await UserServices.changeCollageStyle(message, momentoUser, Number(args[0]))
+                        await ProfileServices.changeCollageStyle(message, momentoUser, Number(args[0]))
                         break
                     case "modo":
                         console.log(`MOMENTO - Alterando o darkmode de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando o darkmode, aguarde...")
-                        await UserServices.toggleDarkmode(message, momentoUser)
+                        await ProfileServices.toggleDarkmode(message, momentoUser)
                         break
                     case "talks":
                         console.log(`MOMENTO - Criando o talks de ${momentoUser.username}...`)

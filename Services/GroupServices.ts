@@ -52,7 +52,6 @@ export class GroupServices {
             const newChatChannels = chatChannels.filter(x => {
                 return x != message.channel.id
             })
-            console.log(newChatChannels)
             await message.channel.delete();
             MongoService.updateServerSettings(message.guildId, {
                 chatsChannelsId: newChatChannels

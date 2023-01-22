@@ -6,6 +6,7 @@ import { LinkGenerator } from "../Utils/LinkGenerator";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
+import { ProfileServices } from "./ProfileService";
 import { ThreadService } from "./ThreadsService";
 import { UserServices } from "./UserServices";
 
@@ -16,9 +17,7 @@ export class PostService {
 
     public static async getPostFromMessage(message: Message): Promise<MomentoPost> {
         const post = await MongoService.getPostFromMessage(message)
-
-        if (post) return post
-        else throw new Error("Post não encontrado!")
+        return post
     }
 
     public static async trendPost(guild: Guild, post: MomentoPost, notification: MomentoNotification) {
@@ -50,7 +49,7 @@ export class PostService {
         const newUser = await MongoService.updateProfile(post.author, {
             trends: Number(post.author.trends) + 1
         })
-        await UserServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(guild, newUser, true, false)
         return
     }
 
@@ -84,32 +83,24 @@ export class PostService {
         })
     }
 
-    static calculateFollowers(postList: MomentoPost[], author: MomentoUser) {
-        let newFollowersList: Number[] = []
-        postList.map(post => {
-            const oldFollowers = Number(author.followers)
-
-            let momentos = Number(author.momentos)
-            if (momentos == 0) { momentos = 1 }
-
-            //CONTA BIZARRA PARA CALCULAR O RESULTADO DO POST
-            const newFollowersBase = Math.random() * (8 - 3) + 3
-            const FollowersMultiplier = Math.random() * (2 - 1) + 1
-
-            let followersFromPost = Math.floor(newFollowersBase * FollowersMultiplier * momentos / 2)
-            if (followersFromPost == 0) { followersFromPost = 1 }
-
-            // const momentoPost = await MongoService.getPostFromMessage(post);
-            if (post.isTrending) { followersFromPost = followersFromPost * 2 }
-            const newFollowers = oldFollowers + followersFromPost
-            newFollowersList.push(newFollowers)
+    static async addNewMomento(guild: Guild, user: MomentoUser) {
+        const newMomentos = Number(user.momentos) + 1
+        const newUser = await MongoService.updateProfile(user, {
+            momentos: newMomentos
         })
-        return newFollowersList
+
+        ProfileServices.updateProfileImages(guild, newUser, true, false)
+        return newUser
     }
 
     public static async deletePost(momentoPost: MomentoPost) {
-        await MongoService.deletePostFromMessage(momentoPost)
-        await ThreadService.disablePostComment(momentoPost.postMessage)
-        await tryDeleteMessage(momentoPost.postMessage)
+        try {
+            await ThreadService.disablePostComment(momentoPost)
+            await MongoService.deletePostFromMessage(momentoPost.postMessage)
+            await tryDeleteMessage(momentoPost.postMessage)
+        }
+        catch (err) {
+            throw new Error(err)
+        }
     }
 }

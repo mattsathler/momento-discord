@@ -1,4 +1,5 @@
 import { AnyThreadChannel, Collection, FetchedThreads, Message, MessageType, TextChannel, ThreadChannel } from "discord.js";
+import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
@@ -13,11 +14,10 @@ export class ThreadService {
         })
     }
 
-    public static async disablePostComment(message: Message) {
+    public static async disablePostComment(post: MomentoPost) {
         try {
-
-            const momentoUser = await MongoService.getUserByProfileChannel(message.channelId, message.guildId)
-            let commentChannel: ThreadChannel = await this.getPostCommentChannel(momentoUser, message) as ThreadChannel
+            const momentoUser = post.author
+            let commentChannel: ThreadChannel = await this.getPostCommentChannel(momentoUser, post.postMessage) as ThreadChannel
             if (!commentChannel) { return }
             await commentChannel.delete()
         }

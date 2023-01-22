@@ -1,21 +1,19 @@
 const ms = require('ms');
 
-import { EmbedBuilder, Guild, Message, TextChannel, time } from "discord.js"
+import { EmbedBuilder, Guild, Message, TextChannel } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
-import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages"
+import { sendReplyMessage } from "../Utils/MomentoMessages"
 import { StringFormater } from "../Utils/StringFormater"
 import { MongoService } from "./MongoService"
 import { ServerServices } from "./ServerServices"
 import { AnalyticsService } from "./AnalyticsService"
-import * as Config from "../config.json"
 import { PostService } from "./PostService";
-import { ThreadService } from "./ThreadsService";
 import { MomentoPost } from "../Classes/MomentoPost";
-import { TimeConverter } from "../Utils/TimeConverter";
 import { NotificationsService } from "./NotificationsService";
+import { ProfileServices } from "./ProfileService";
 
 export class UserServices {
     static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
@@ -35,7 +33,7 @@ export class UserServices {
         let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
 
         //CADASTRA SE NÃO EXISTIR
-        if (!user) { user = await this.registerProfile(message) }
+        if (!user) { user = await this.registerUser(message) }
         if (user.profileChannelId != "") {
             const userHaveProfile = await this.userAlreadyHaveProfileChannel(message.guild, user)
             if (userHaveProfile) {
@@ -69,12 +67,8 @@ export class UserServices {
         return user
     }
 
-    static async registerProfile(message: Message): Promise<MomentoUser> {
+    static async registerUser(message: Message): Promise<MomentoUser> {
         console.log('MOMENTO - Verificando perfil...')
-        // const isUserAlreadyTaken: Boolean = await MongoService.checkIfUsernameExists(message.author.username, message.guildId)
-        // if (isUserAlreadyTaken) {
-        //     throw new Error('Usuário já cadastrado!')
-        // }
         let newMomentoUser: MomentoUser = new MomentoUser(
             message.author.id,
             message.author.username,
@@ -114,61 +108,11 @@ export class UserServices {
             followers: newFollowers
         })
 
-        await UserServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(guild, newUser, true, false)
         return newUser;
     }
 
-    static async changeCollageStyle(message: Message, user: MomentoUser, newCollageStyle: Number) {
-        const guild: Guild = message.guild
-        const collage = Number(newCollageStyle) - 1
-        console.log(`MOMENTO - Alterando o estilo de collage de ${user.username}`)
-        if (newCollageStyle && collage <= 4 && collage >= 0) {
-            const newUser = await MongoService.updateProfile(user, {
-                profileCollageStyle: collage
-            })
-
-            await UserServices.updateProfileImages(guild, newUser, false, true)
-            // await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
-            return newUser;
-        }
-        else {
-            throw new Error("Você precisa definir um estilo entre 1 e 5! Use ?estilo <1-5> para alterar.")
-        }
-    }
-
-    static async toggleDarkmode(message: Message, user: MomentoUser) {
-        const guild: Guild = message.guild
-        const newDarkmode = !user.darkmode
-        console.log(`MOMENTO - Alterando o darkmode de ${user.username}`)
-        const newUser = await MongoService.updateProfile(user, {
-            darkmode: newDarkmode
-        })
-
-        await UserServices.updateProfileImages(guild, newUser, true, true)
-        // await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
-        return newUser;
-    }
-
-
-    static async changeProfilePicture(message: Message, user: MomentoUser) {
-        const guild: Guild = message.guild
-        console.log(`MOMENTO - Alterando a foto de perfil de ${user.username}`)
-        if (message.attachments.first()) {
-            const newProfilePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
-            const newUser = await MongoService.updateProfile(user, {
-                profilePicture: newProfilePicture
-            })
-
-            await UserServices.updateProfileImages(guild, newUser, true, false)
-            // await sendReplyMessage(message, "Imagem de perfil alterada com sucesso!", null, false)
-            return newUser;
-        }
-        else {
-            throw new Error("Você precisa anexar uma foto na mensagem para alterar seu perfil!")
-        }
-    }
-
-    static async changeProfileUser(message: Message, user: MomentoUser, newUsername: String[]) {
+    static async changeProfileUsername(message: Message, user: MomentoUser, newUsername: String[]) {
         const guild: Guild = message.guild
 
         console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newUsername}`)
@@ -179,7 +123,7 @@ export class UserServices {
             const newUser = await MongoService.updateProfile(user, {
                 username: String(newUsername[0]).toLowerCase()
             })
-            await UserServices.updateProfileImages(guild, newUser, true, false)
+            await ProfileServices.updateProfileImages(guild, newUser, true, false)
             console.log('MOMENTO - Nome de usuário alterado com sucesso!')
         }
         catch (err) {
@@ -195,17 +139,8 @@ export class UserServices {
         return
     }
 
-    static async addNewMomento(guild: Guild, user: MomentoUser) {
-        const newMomentos = Number(user.momentos) + 1
-        const newUser = await MongoService.updateProfile(user, {
-            momentos: newMomentos
-        })
 
-        UserServices.updateProfileImages(guild, newUser, true, false)
-        return newUser
-    }
-
-    static async changeProfileName(message: Message, user: MomentoUser, newName: String[]) {
+    static async changeUserNameAndSurname(message: Message, user: MomentoUser, newName: String[]) {
         const guild: Guild = message.guild
 
         console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newName}`)
@@ -220,7 +155,7 @@ export class UserServices {
                 surname: String(newName[1])
             }
             const newUser = await MongoService.updateProfile(user, field)
-            await UserServices.updateProfileImages(guild, newUser, true, false)
+            await ProfileServices.updateProfileImages(guild, newUser, true, false)
             console.log('MOMENTO - Nome de usuário alterado com sucesso!')
         }
         catch (err) {
@@ -241,84 +176,14 @@ export class UserServices {
         const newUser = await MongoService.updateProfile(user, {
             bio: bio
         })
-        await UserServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(guild, newUser, true, false)
         console.log('MOMENTO - Bio alterada com sucesso!')
         // await sendReplyMessage(message, "Bio alterada com sucesso!", null, false)
         return
     }
 
-    static async changeProfileCover(message: Message, user: MomentoUser) {
-        const guild: Guild = message.guild
-        console.log(`MOMENTO - Alterando a foto de capa de ${user.username}`)
-        if (message.attachments.first()) {
-            const newProfileCover: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
-            const newUser = await MongoService.updateProfile(user, {
-                profileCover: newProfileCover
-            })
-
-            await UserServices.updateProfileImages(guild, newUser, true, false)
-            // await sendReplyMessage(message, "Imagem de capa alterada com sucesso!", null, false)
-            return newUser;
-        }
-        else {
-            throw new Error("Você precisa anexar uma foto na mensagem para alterar seu perfil!")
-        }
-    }
-
-    static async changeProfileCollage(message: Message, user: MomentoUser, collageIndex: Number) {
-        const guild: Guild = message.guild
-        console.log(`MOMENTO - Alterando a foto de collage${collageIndex} de ${user.username}`)
-        if (collageIndex > 5 || collageIndex < 0) { throw new Error("Você só pode alterar collages entre 1 e 6!") }
-        if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para trocar a collage!") }
-        if (message.attachments.first()) {
-            const newCollagePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
-
-            let fields: {}
-            if (collageIndex == 0) { fields = { 'collage.0': newCollagePicture } }
-            if (collageIndex == 1) { fields = { 'collage.1': newCollagePicture } }
-            if (collageIndex == 2) { fields = { 'collage.2': newCollagePicture } }
-            if (collageIndex == 3) { fields = { 'collage.3': newCollagePicture } }
-            if (collageIndex == 4) { fields = { 'collage.4': newCollagePicture } }
-            if (collageIndex == 5) { fields = { 'collage.5': newCollagePicture } }
-
-            const newUser = await MongoService.updateProfile(user, fields)
-
-            await UserServices.updateProfileImages(guild, newUser, false, true)
-            // await sendReplyMessage(message, "Imagem de collage alterada com sucesso!", null, false)
-            return newUser;
-        }
-        else {
-            throw new Error("Você precisa anexar uma foto na mensagem para alterar seu perfil!")
-        }
-    }
-
-    static async updateProfileImages(guild: Guild, momentoUser: MomentoUser, updateProfile?: Boolean, updateCollage?: Boolean) {
-        if (updateProfile == undefined) { updateProfile = true }
-        if (updateCollage == undefined) { updateCollage = true }
-
-        const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
-
-        if (updateProfile) {
-            const profileCanvas: ProfileCanvas = new ProfileCanvas(momentoUser)
-
-            const userProfileImage: Buffer = await profileCanvas.drawProfile()
-            const userProfileImageURL: string = await LinkGenerator.uploadImageToMomento(guild, userProfileImage)
-
-            const profileMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileMessageId)) as Message
-            await profileMessage.edit(userProfileImageURL)
-        }
-        if (updateCollage) {
-            const userCollageImage: Buffer = await CollageCanvas.drawCollage(momentoUser)
-            const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(guild, userCollageImage)
-
-            const collageMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileCollageId)) as Message
-            await collageMessage.edit(userCollageImageURL)
-        }
-        return
-    }
-
     static async analyticProfile(guild: Guild, momentoUser: MomentoUser) {
-        await NotificationsService.sendNotificationEmbed(guild,
+        NotificationsService.sendNotificationEmbed(guild,
             new EmbedBuilder()
                 .setColor(0xdd247b)
                 .setAuthor({
@@ -331,40 +196,30 @@ export class UserServices {
             true
         )
 
-        //DEMORA
         const profilePosts = await this.fetchProfilePosts(guild, momentoUser)
-        //===
-
-        let analyticsPosts: MomentoPost[] = []
-        profilePosts.map(momentoPost => {
-            const timePassed = TimeConverter.msToTime(momentoPost.postMessage.createdTimestamp)
-            if (timePassed.hours >= Config.momentosTimeout) { analyticsPosts.push(momentoPost) }
-        })
-
+        const analyticsPosts = await AnalyticsService.getAnalyticsPosts(profilePosts)
         if (analyticsPosts.length == 0) { return }
-        const followersFromPost = PostService.calculateFollowers(analyticsPosts, momentoUser)
-        const followersSum = followersFromPost.reduce((a, b) => Number(a) + Number(b), 0)
-
+        
+        const newFollowers = AnalyticsService.calculateFollowers(analyticsPosts, momentoUser)
         analyticsPosts.map(async (momentoPost, index) => {
-            await AnalyticsService.generateAnalytics(guild, momentoPost, followersFromPost[index])
+            await AnalyticsService.generateAnalytics(guild, momentoPost, newFollowers.list[index])
+            await PostService.deletePost(momentoPost)
         })
-
-        const newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: followersSum })
-        await UserServices.updateProfileImages(guild, newUser, true, false)
+        const newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })
+        await ProfileServices.updateProfileImages(guild, newUser, true, false)
         return
     }
-
 
     static async fetchProfilePosts(guild: Guild, momentoUser: MomentoUser): Promise<MomentoPost[]> {
         const postMessageList = await MongoService.fetchProfilePostsMessages(guild, momentoUser)
         let postList: MomentoPost[] = [];
-
         await Promise.all(
             postMessageList.map(async msg => {
-                const post = await MongoService.getPostFromMessage(msg)
-                postList.push(post)
+                const post = await PostService.getPostFromMessage(msg);
+                if (post) { postList.push(post) }
             })
         )
+        console.log(postList)
         return postList
     }
 }

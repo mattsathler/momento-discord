@@ -123,7 +123,6 @@ export class ServerServices {
         })
 
         serverConfig.chatsChannelsId.push(groupChannel.id)
-        console.log(serverConfig.chatsChannelsId)
         await MongoService.updateServerSettings(owner.guildId, {
             chatsChannelsId: serverConfig.chatsChannelsId
         })
