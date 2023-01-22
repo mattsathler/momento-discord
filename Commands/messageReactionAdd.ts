@@ -118,7 +118,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         }
                         const reactedMessage = message.channel as ThreadChannel
                         if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
-                            await PostService.delet ePost(isPost, message)
+                            await PostService.deletePost(isPost, message)
                             if (isPost) {
                                 const newMomentos = Number(reactUser.momentos) - 1
                                 const newUser = await MongoService.updateProfile(reactUser, {
