@@ -1,5 +1,8 @@
 ### VERSÃO | BRANCH | DATA DE CRIAÇÃO ###
 
+## 7.1 | BUGFIX/ANALYTICS | 22/01/2023
+- Bugfix no analytics;
+
 ## 7.0 | FEATURE/GROUP-CHAT | 18/01/2023
 - MOMENTO TALKS!;
 - Adiciona a criação de talks;
