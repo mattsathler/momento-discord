@@ -1,4 +1,4 @@
-import { Message, MessageReaction, ThreadChannel, User } from "discord.js";
+import { Message, MessageReaction, ThreadChannel, time, User } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
@@ -9,6 +9,7 @@ import { removeAllReactions, removeUserReaction, tryDeleteMessage } from "../Uti
 import * as Config from '../config.json';
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { ProfileServices } from "../Services/ProfileService";
+import { TimeConverter } from "../Utils/TimeConverter";
 const ms = require('ms');
 
 export async function messageReactionAdd(user: User, reaction: MessageReaction) {
@@ -54,11 +55,12 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         const likesCount: Number = message.reactions.cache.get("❤️").count - 1
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
-                        const timestamp = ms(ms(Date.now() - post.postMessage.createdTimestamp, { long: true }))
+                        const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
+                        // const timestamp = ms(ms(Date.now() - post.postMessage.createdTimestamp, { long: true }))
                         if (
                             !post.isTrending &&
                             likesCount >= Config.likesToTrend &&
-                            timestamp <= Config.momentosTimeout
+                            Number(timePassed.hours) <= Config.momentosTimeout
                         ) {
                             PostService.trendPost(message.guild, post, notification)
                         }

@@ -1,5 +1,5 @@
 {
     "prefix" : "?",
     "likesToTrend": 35,
-    "momentosTimeout": 0 
+    "momentosTimeout": 24 
 }
