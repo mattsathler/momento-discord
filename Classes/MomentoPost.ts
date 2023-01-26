@@ -18,10 +18,7 @@ export class MomentoPost {
     public postMessage: Message;
     public isTrending: Boolean = false;
 
-    public postSafeAreaSize: number = 10
-    public postHeaderSize: number = 160
-    public postSafeGap: number = 20
-    public profilePictureSize: number = 80
+
 
     public authorRoundImage: Image
 

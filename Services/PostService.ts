@@ -8,7 +8,6 @@ import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
 import { ThreadService } from "./ThreadsService";
-import { UserServices } from "./UserServices";
 
 export class PostService {
     public static async savePostInDatabase(post: MomentoPost, postOriginalImageURL: String): Promise<void> {
@@ -55,7 +54,6 @@ export class PostService {
 
     public static async generatePostAnalytics(post: MomentoPost) {
         const user: MomentoUser = post.author
-        // const oldLikes = parseInt(user.likes)
         const oldFollowers = Number(user.followers)
 
         let momentos = Number(user.momentos)
@@ -78,7 +76,7 @@ export class PostService {
 
         const newFollowers = oldFollowers + followersFromPost
 
-        const newUser = await MongoService.updateProfile(user, {
+        await MongoService.updateProfile(user, {
             followers: newFollowers,
         })
     }

@@ -4,7 +4,6 @@ import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
 import { MongoService } from "./MongoService"
-import { UserServices } from "./UserServices"
 
 export class ProfileServices{
     static async changeCollageStyle(message: Message, user: MomentoUser, newCollageStyle: Number) {
