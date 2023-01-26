@@ -4,18 +4,12 @@ import ImageCropper from "../Utils/ImageCropper";
 import * as CollageStyles from "../styles.json";
 import * as styleColors from '../colors.json'
 import { MongoService } from "../Services/MongoService";
+import { Colors } from "./Colors";
 
 export class CollageCanvas {
     public static async drawCollage(momentoUser: MomentoUser): Promise<Buffer> {
 
-        let colors: {
-            "primary": String,
-            "secondary": String,
-            "background": String,
-            "onBackground": String,
-            "onPrimary": String,
-            "onSecondary": String
-        }
+        let colors: Colors
 
         if (!momentoUser.darkmode) {
             colors = styleColors["light-mode"]

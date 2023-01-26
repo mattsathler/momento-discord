@@ -1,6 +1,4 @@
-import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
-import { MomentoPost } from "../Classes/MomentoPost";
-import ImageCropper from "../Utils/ImageCropper";
+import { createCanvas, Image, loadImage } from "canvas";
 
 export class CanvasUtils {
     public static async drawFromURL(url: String): Promise<Buffer> {

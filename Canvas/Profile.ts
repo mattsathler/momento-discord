@@ -3,18 +3,12 @@ import { MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
 import { StringFormater } from "../Utils/StringFormater";
 import * as colors from '../colors.json'
+import { Colors } from "./Colors";
 
 export class ProfileCanvas {
     private momentoUser: MomentoUser
 
-    private colors: {
-        "primary": String,
-        "secondary": String,
-        "background": String,
-        "onBackground": String,
-        "onPrimary": String,
-        "onSecondary": String
-    }
+    private colors: Colors
 
     constructor(user: MomentoUser) {
         this.momentoUser = user

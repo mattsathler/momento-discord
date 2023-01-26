@@ -4,11 +4,12 @@ import { Post } from "../Canvas/Post";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
 import { PostService } from "../Services/PostService";
-import { UserServices } from "../Services/UserServices";
 import { LinkGenerator } from "../Utils/LinkGenerator";
 import { MentionsParser } from "../Utils/MentionsParser";
 import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
+import * as PostConfig from '../Canvas/PostConfig.json'
+
 
 export class MomentoPost {
     public author: MomentoUser;
@@ -34,7 +35,7 @@ export class MomentoPost {
 
     public static async createPost(client: Client, message: Message, user: MomentoUser, isRepost?: Boolean): Promise<Post> {
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para criar um post!") }
-
+        if (message.content.length > PostConfig.descriptionLimit) { throw new Error("O limite máximo de caracteres para a descrição é de: " + PostConfig.descriptionLimit + " letras!") }
         const postDescription: String[] = await MentionsParser.parseUserMentions(message)
         let momentoPost: MomentoPost;
         let originalUser: MomentoUser;
