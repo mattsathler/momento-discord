@@ -157,7 +157,8 @@ export async function messageCreate(message: Message, client: Client) {
             reply = await message.reply("Criando seu post, aguarde...")
             await MomentoPost.createPost(client, message, momentoUser)
             if (reply) { tryDeleteMessage(reply) }
-            tryDeleteMessage(message)
+            await tryDeleteMessage(message)
+            return
         }
 
         if (isGroupChat) {
