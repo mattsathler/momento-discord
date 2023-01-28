@@ -3,7 +3,7 @@ import { MomentoComment } from "../Classes/MomentoComment";
 import { MomentoMessage } from "../Classes/MomentoMessage";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoServer } from "../Classes/MomentoServer";
-import * as config from "../config.json";
+import * as config from "../Settings/MomentoConfig.json";
 import { GroupServices } from "../Services/GroupServices";
 import { MongoService } from "../Services/MongoService";
 import { ProfileServices } from "../Services/ProfileService";

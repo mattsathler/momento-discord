@@ -1,4 +1,4 @@
-import { AnyThreadChannel, Collection, FetchedThreads, Guild, Message, MessageType, TextChannel, ThreadChannel } from "discord.js";
+import { Collection, Message, TextChannel, ThreadChannel } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";

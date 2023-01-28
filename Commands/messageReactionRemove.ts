@@ -1,8 +1,6 @@
-import { Client, Message, MessageReaction, ThreadChannel, User } from "discord.js";
+import { Message, MessageReaction, User } from "discord.js";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
-import { NotificationsService } from "../Services/NotificationsService";
-import { ThreadService } from "../Services/ThreadsService";
 import { UserServices } from "../Services/UserServices";
 
 export async function messageReactionRemove(user: User, reaction: MessageReaction) {

@@ -87,6 +87,10 @@ const schema = new mongo.Schema({
         type: String,
         default: ""
     },
+    'isVerified': {
+        type: Boolean,
+        default: false
+    },
 })
 
 module.exports = mongo.model('users', schema)

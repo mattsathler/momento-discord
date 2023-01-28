@@ -1,7 +1,7 @@
 import { EmbedBuilder, Guild, Utils } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
-import * as Config from "../config.json"
+import * as Config from "../Settings/MomentoConfig.json"
 import { StringFormater } from "../Utils/StringFormater";
 import { TimeConverter } from "../Utils/TimeConverter";
 import { NotificationsService } from "./NotificationsService";

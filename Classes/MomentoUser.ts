@@ -18,11 +18,12 @@ export class MomentoUser {
     public notifications: Boolean;
     public darkmode: Boolean;
     public groupChatId: String;
+    public isVerified: Boolean;
 
     constructor(id: String, username: String, name: String, surname: String, guildId: String, profileChannelId: String,
         profileMessageId: String, profileCollageId: String, profileCollageStyle: Number, profilePicture: String, profileCover: String, collage: String[],
         bio: String, trends: Number, followers: Number, momentos: Number, notifications: Boolean,
-        darkmode: Boolean, groupChatId: String) {
+        darkmode: Boolean, groupChatId: String, isVerified: Boolean) {
         this.id = id
         this.username = username
         this.name = name
@@ -42,5 +43,6 @@ export class MomentoUser {
         this.notifications = notifications
         this.darkmode = darkmode
         this.groupChatId = groupChatId
+        this.isVerified = isVerified
     };
 }

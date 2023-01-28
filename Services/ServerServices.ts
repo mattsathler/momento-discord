@@ -2,7 +2,7 @@ import { Guild, Message, ChannelType, TextChannel, CategoryChannel, User, EmbedB
 import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
-import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
+import { sendReplyMessage } from "../Utils/MomentoMessages";
 
 export class ServerServices {
     static async createServerConfig(message: Message) {

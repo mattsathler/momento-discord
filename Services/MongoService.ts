@@ -2,7 +2,7 @@ import { MomentoUser } from "../Classes/MomentoUser";
 import { MomentoServer } from "../Classes/MomentoServer";
 import mongo from "mongoose"
 import { MomentoPost } from "../Classes/MomentoPost";
-import { Client, Guild, Message, TextChannel } from "discord.js";
+import { Guild, Message, TextChannel } from "discord.js";
 import { PostService } from "./PostService";
 require("dotenv").config();
 
@@ -81,7 +81,6 @@ export class MongoService {
             const response: any[] = await posts.find({ messageId: postMessageId, guildId: postGuildId })
             if (response.length > 0) {
                 const user: MomentoUser = await MongoService.getUserByProfileChannel(response[0].authorProfileChannelId, postGuildId)
-                // const user: MomentoUser = await MongoService.getUserByProfileChannel
                 const momentoPost: MomentoPost = new MomentoPost(
                     user,
                     response[0].postImageUrl,
@@ -126,7 +125,8 @@ export class MongoService {
                     response[0].momentos,
                     response[0].notifications,
                     response[0].darkmode,
-                    response[0].groupChatId
+                    response[0].groupChatId ?? "",
+                    response[0].isVerified ?? false
                 )
                 return momentoUser;
             }
@@ -165,6 +165,7 @@ export class MongoService {
                 response[0].notifications,
                 response[0].darkmode,
                 response[0].groupChatId ?? "",
+                response[0].isVerified ?? false,
             )
             return momentoUser;
         }

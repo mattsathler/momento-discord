@@ -1,23 +1,9 @@
-import { Attachment, EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
-import { MongoService } from "../Services/MongoService";
-import { NotificationsService } from "../Services/NotificationsService";
+import { Attachment, EmbedBuilder, Message } from "discord.js";
 import { LinkGenerator } from "../Utils/LinkGenerator";
-import { MentionsParser } from "../Utils/MentionsParser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
-import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
 
 export class MomentoMessage {
-    // public author: MomentoUser;
-    // public content: String;
-    // public message: Message
-
-    // constructor(author: MomentoUser, message: Message) {
-    //     this.author = author
-    //     this.content = message.content
-    //     this.message = message
-    // }
-
     public static async sendMomentoMessageEmbed(author: MomentoUser, message: Message): Promise<Message> {
         try {
             const momentoMessageEmbed = await MomentoMessage.createMomentoMessageEmbed(author, message)

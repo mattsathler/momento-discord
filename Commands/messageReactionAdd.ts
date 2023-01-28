@@ -6,7 +6,7 @@ import { NotificationsService } from "../Services/NotificationsService";
 import { PostService } from "../Services/PostService";
 import { UserServices } from "../Services/UserServices";
 import { removeAllReactions, removeUserReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
-import * as Config from '../config.json';
+import * as Config from '../Settings/MomentoConfig.json';
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { ProfileServices } from "../Services/ProfileService";
 import { TimeConverter } from "../Utils/TimeConverter";
@@ -37,7 +37,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         const reactEmoji: String = reaction.emoji.name;
         try {
             switch (reactEmoji) {
-                case "🔧":
+                case "↩️":
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true);
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break

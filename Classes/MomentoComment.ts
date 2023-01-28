@@ -74,10 +74,4 @@ export class MomentoComment {
             .setTimestamp()
         return commentEmbed
     }
-
-    // public static async parseUserMentions(user: MomentoUser, message: Message, comment: MomentoComment) {
-    //     let content = message.content.split(' ')
-    //     const parsedComment = await NotificationsService.parseMentions(user, content, message, comment, true)
-    //     return parsedComment
-    // }
 }

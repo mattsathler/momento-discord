@@ -8,7 +8,7 @@ import { LinkGenerator } from "../Utils/LinkGenerator";
 import { MentionsParser } from "../Utils/MentionsParser";
 import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
-import * as PostConfig from '../Canvas/PostConfig.json'
+import * as PostConfig from '../Settings/PostConfig.json'
 
 
 export class MomentoPost {
