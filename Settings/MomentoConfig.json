@@ -5,7 +5,8 @@
     "prefix" : "?",
     "likesToTrend": 35,
     "momentosTimeout": 24,
+    
     "momentosToVerify": 30,
     "followersToVerify": 5000,
-    "trendsToVerify": 16
+    "trendsToVerify": 15
 }

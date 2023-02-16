@@ -2,6 +2,7 @@ import { Message, MessageReaction, User } from "discord.js";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
 import { UserServices } from "../Services/UserServices";
+import * as Config from '../Settings/MomentoConfig.json';
 
 export async function messageReactionRemove(user: User, reaction: MessageReaction) {
     if (user.bot) { return }
@@ -11,6 +12,7 @@ export async function messageReactionRemove(user: User, reaction: MessageReactio
     let reactedUser: MomentoUser = await MongoService.getUserByProfileChannel(reaction.message.channelId, message.guildId)
     let isComment: Boolean = false;
 
+    if (Config.maintenance) { return }
     if (reactedUser && reactUser || isComment) {
         const messageId: String = reaction.message.id;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;

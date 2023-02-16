@@ -48,8 +48,11 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
                 case "🔧":
-                    // await ProfileServices.updateProfileImages(message.guild, reactedUser, true, false)
-                    await AnalyticsService.checkVerified(message.guild, reactedUser)
+                    await ProfileServices.updateProfileImages(message.guild, reactedUser, true, false)
+                    break
+                case "✅":
+                    await removeUserReaction(reactUser, message, reaction.emoji.name)
+                    await AnalyticsService.checkVerified(message.guild, reactedUser, true)
                     break
                 case "❤️":
                     if (isPost) {
@@ -66,13 +69,13 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
-                        // const timestamp = ms(ms(Date.now() - post.postMessage.createdTimestamp, { long: true }))
+                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend / 2 : Config.likesToTrend
                         if (
                             !post.isTrending &&
-                            likesCount >= Config.likesToTrend &&
+                            likesCount >= likesToTrend &&
                             Number(timePassed.hours) <= Config.momentosTimeout
                         ) {
-                            PostService.trendPost(message.guild, post, notification)
+                            await PostService.trendPost(message.guild, post, notification)
                         }
                         break
                     }

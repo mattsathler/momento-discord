@@ -188,7 +188,6 @@ export class UserServices {
         })
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
         console.log('MOMENTO - Bio alterada com sucesso!')
-        // await sendReplyMessage(message, "Bio alterada com sucesso!", null, false)
         return
     }
 
@@ -211,9 +210,9 @@ export class UserServices {
             await PostService.deletePost(momentoPost, momentoPost.postMessage)
             await AnalyticsService.generateAnalytics(guild, momentoPost, newFollowers.list[index])
         })
-        const newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })
-        if (!momentoUser.isVerified) { await AnalyticsService.checkVerified(guild, momentoUser) }
+        let newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
+        if (!momentoUser.isVerified) { await AnalyticsService.checkVerified(guild, newUser) }
         return
     }
 

@@ -105,8 +105,8 @@ export class ProfileServices {
     }
 
     static async updateProfileImages(guild: Guild, momentoUser: MomentoUser, updateProfile?: Boolean, updateCollage?: Boolean) {
-        if (updateProfile == undefined) { updateProfile = true }
-        if (updateCollage == undefined) { updateCollage = true }
+        updateProfile ?? true
+        updateCollage ?? true
 
         const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
 
@@ -129,16 +129,17 @@ export class ProfileServices {
         return
     }
 
-    static async verifyUser(guild: Guild, momentoUser: MomentoUser, serverConfig: MomentoServer) {
+    static async verifyUser(guild: Guild, momentoUser: MomentoUser, serverConfig: MomentoServer): Promise<MomentoUser> {
         if (serverConfig.momentoVersion >= 9) {
             try {
                 const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
                 const verifiedCategory: CategoryChannel = await guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
-                await MongoService.updateProfile(momentoUser, { isVerified: true })
+                const newUser = await MongoService.updateProfile(momentoUser, { isVerified: true })
                 await profileChannel.setParent(verifiedCategory)
 
                 const verifyEmbedNotification = MomentoNotification.createVerifyJoinNotificationEmbed()
                 await NotificationsService.sendNotificationEmbed(guild, verifyEmbedNotification, momentoUser, true)
+                return newUser
             }
             catch (err) {
                 console.error(err)

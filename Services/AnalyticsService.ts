@@ -81,14 +81,16 @@ export class AnalyticsService {
         return analyticsPosts
     }
 
-    static async checkVerified(guild: Guild, momentoUser: MomentoUser) {
+    static async checkVerified(guild: Guild, momentoUser: MomentoUser, force?: Boolean) {
         if (
             momentoUser.trends >= Config.trendsToVerify &&
             momentoUser.followers >= Config.followersToVerify &&
-            momentoUser.momentos >= Config.momentosToVerify
+            momentoUser.momentos >= Config.momentosToVerify || force && !momentoUser.isVerified
         ) {
             const serverConfig = await MongoService.getServerConfigById(guild.id)
-            await ProfileServices.verifyUser(guild, momentoUser, serverConfig)
+            const newUser = await ProfileServices.verifyUser(guild, momentoUser, serverConfig)
+            await ProfileServices.updateProfileImages(guild, newUser, true, false)
+            return newUser
         }
     }
 }
