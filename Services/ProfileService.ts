@@ -1,12 +1,14 @@
 import { CategoryChannel, Guild, Message, TextChannel } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
+import { MomentoNotification } from "../Classes/MomentoNotification"
 import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
 import { MongoService } from "./MongoService"
+import { NotificationsService } from "./NotificationsService"
 
-export class ProfileServices{
+export class ProfileServices {
     static async changeCollageStyle(message: Message, user: MomentoUser, newCollageStyle: Number) {
         const guild: Guild = message.guild
         const collage = Number(newCollageStyle) - 1
@@ -56,7 +58,7 @@ export class ProfileServices{
         }
     }
 
-    
+
     static async changeProfileCover(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
         console.log(`MOMENTO - Alterando a foto de capa de ${user.username}`)
@@ -128,8 +130,19 @@ export class ProfileServices{
     }
 
     static async verifyUser(guild: Guild, momentoUser: MomentoUser, serverConfig: MomentoServer) {
-        const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
-        const verifiedCategory: CategoryChannel = await guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
-        profileChannel.setParent(verifiedCategory)
+        if (serverConfig.momentoVersion >= 9) {
+            try {
+                const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
+                const verifiedCategory: CategoryChannel = await guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
+                await MongoService.updateProfile(momentoUser, { isVerified: true })
+                await profileChannel.setParent(verifiedCategory)
+
+                const verifyEmbedNotification = MomentoNotification.createVerifyJoinNotificationEmbed()
+                await NotificationsService.sendNotificationEmbed(guild, verifyEmbedNotification, momentoUser, true)
+            }
+            catch (err) {
+                console.error(err)
+            }
+        }
     }
 }

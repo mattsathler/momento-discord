@@ -4,7 +4,9 @@ import { MomentoUser } from "../Classes/MomentoUser";
 import * as Config from "../Settings/MomentoConfig.json"
 import { StringFormater } from "../Utils/StringFormater";
 import { TimeConverter } from "../Utils/TimeConverter";
+import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
+import { ProfileServices } from "./ProfileService";
 
 export class AnalyticsService {
     public static async generateAnalytics(guild: Guild, post: MomentoPost, followersFromPost: Number) {
@@ -79,13 +81,14 @@ export class AnalyticsService {
         return analyticsPosts
     }
 
-    static async checkVerified(momentoUser: MomentoUser) {
+    static async checkVerified(guild: Guild, momentoUser: MomentoUser) {
         if (
             momentoUser.trends >= Config.trendsToVerify &&
             momentoUser.followers >= Config.followersToVerify &&
             momentoUser.momentos >= Config.momentosToVerify
         ) {
-            
+            const serverConfig = await MongoService.getServerConfigById(guild.id)
+            await ProfileServices.verifyUser(guild, momentoUser, serverConfig)
         }
     }
 }

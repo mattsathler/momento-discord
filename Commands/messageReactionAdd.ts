@@ -1,4 +1,4 @@
-import { Message, MessageReaction, ThreadChannel, time, User } from "discord.js";
+import { Message, MessageReaction, ThreadChannel, User } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
@@ -11,6 +11,7 @@ import { MomentoNotification } from "../Classes/MomentoNotification";
 import { ProfileServices } from "../Services/ProfileService";
 import { TimeConverter } from "../Utils/TimeConverter";
 import * as config from "../Settings/MomentoConfig.json";
+import { AnalyticsService } from "../Services/AnalyticsService";
 
 const ms = require('ms');
 
@@ -47,7 +48,8 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
                 case "🔧":
-                    await ProfileServices.updateProfileImages(message.guild, reactedUser, true, false)
+                    // await ProfileServices.updateProfileImages(message.guild, reactedUser, true, false)
+                    await AnalyticsService.checkVerified(message.guild, reactedUser)
                     break
                 case "❤️":
                     if (isPost) {

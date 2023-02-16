@@ -201,9 +201,6 @@ export class UserServices {
             })
             .setDescription('Gerando seu Analytics!')
 
-
-
-
         const profilePosts = await this.fetchProfilePosts(guild, momentoUser)
         const analyticsPosts = await AnalyticsService.getAnalyticsPosts(profilePosts)
         if (analyticsPosts.length == 0) { return }
@@ -215,6 +212,7 @@ export class UserServices {
             await AnalyticsService.generateAnalytics(guild, momentoPost, newFollowers.list[index])
         })
         const newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })
+        if (!momentoUser.isVerified) { await AnalyticsService.checkVerified(guild, momentoUser) }
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
         return
     }
