@@ -8,7 +8,7 @@ import { NotificationsService } from "./NotificationsService";
 
 export class AnalyticsService {
     public static async generateAnalytics(guild: Guild, post: MomentoPost, followersFromPost: Number) {
-        const description = post.description != "" ? post.description : 'Post sem descrição.'
+        const description = post.description == "" ? 'Momento sem descrição.' : post.description
         const embed = new EmbedBuilder()
             .setTitle('**Momento Analytics**')
             .setAuthor(

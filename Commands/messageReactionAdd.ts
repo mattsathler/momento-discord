@@ -10,6 +10,8 @@ import * as Config from '../Settings/MomentoConfig.json';
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { ProfileServices } from "../Services/ProfileService";
 import { TimeConverter } from "../Utils/TimeConverter";
+import * as config from "../Settings/MomentoConfig.json";
+
 const ms = require('ms');
 
 export async function messageReactionAdd(user: User, reaction: MessageReaction) {
@@ -29,12 +31,15 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
 
     if (reactedUser && reactUser || isComment) {
         const messageId: String = reaction.message.id;
-        const isProfile: Boolean = messageId == reactedUser.profileMessageId ? true : false;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;
         const isPost: MomentoPost = await MongoService.getPostById(message.id, message.guildId)
-        // const isPost: Boolean = !isProfile && !isCollage && !isComment ? true : false;
 
         const reactEmoji: String = reaction.emoji.name;
+
+        if (config.maintenance) {
+            await removeUserReaction(reactUser, message, String(reactEmoji))
+            return
+        }
         try {
             switch (reactEmoji) {
                 case "↩️":

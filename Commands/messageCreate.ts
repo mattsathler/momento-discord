@@ -9,7 +9,7 @@ import { MongoService } from "../Services/MongoService";
 import { ProfileServices } from "../Services/ProfileService";
 import { ServerServices } from "../Services/ServerServices";
 import { UserServices } from "../Services/UserServices";
-import { sendErrorMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
+import { sendErrorMessage, sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
 
 export async function messageCreate(message: Message, client: Client) {
     if (!message) return
@@ -39,6 +39,12 @@ export async function messageCreate(message: Message, client: Client) {
     const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
         && momentoUser.guildId == channel.guildId ? true : false;
     const isGroupChat = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
+    const isOffChat: Boolean = !isCommand && !isComment && !isGroupChat
+
+    if (config.maintenance && !isOffChat) {
+        await sendErrorMessage(message, "Ops! Parece que o bot está em manutenção. Tente novamente mais tarde!");
+        return
+    }
 
     let reply: Message
     try {
@@ -140,6 +146,10 @@ export async function messageCreate(message: Message, client: Client) {
                     reply = await message.reply("Configurando servidor, aguarde...")
                     await ServerServices.createServerConfig(message)
                     break
+                case "atualizar":
+                    reply = await message.reply("Atualizando servidor, aguarde...")
+                    await ServerServices.updateServer(message, serverConfig)
+                    break
                 case "pedirperfil":
                     if (channel.id == serverConfig.askProfileChannelId) {
                         reply = await message.reply("Criando seu perfil, aguarde...")
@@ -174,6 +184,7 @@ export async function messageCreate(message: Message, client: Client) {
             }
             await MomentoMessage.sendMomentoMessageEmbed(momentoUser, message)
         }
+        return
     }
     catch (err) {
         if (reply) { await tryDeleteMessage(reply) }

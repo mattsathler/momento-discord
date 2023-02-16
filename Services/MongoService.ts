@@ -50,6 +50,7 @@ export class MongoService {
                 response.trendsChannelId,
                 response.chatsChannelsId,
                 response.groupsCategoryId,
+                response.verifiedCategoryId,
             )
             return serverConfig
         }
@@ -271,9 +272,10 @@ export class MongoService {
         profilesChannelId: String,
         trendsChannelId: String,
         chatChannelId: String,
-        groupsCategory: String
+        groupsCategoryId: String,
+        verifiedCategoryId: String,
     ) {
-        console.log(`MOMENTO - Cadastrando nova configuração...`)        
+        console.log(`MOMENTO - Cadastrando nova configuração...`)
         const newServer = {
             id: serverId,
             uploaderChannelId: uploaderChannelId,
@@ -281,7 +283,8 @@ export class MongoService {
             profilesChannelId: profilesChannelId,
             trendsChannelId: trendsChannelId,
             chatChannelId: chatChannelId,
-            groupsCategoryId: groupsCategory
+            groupsCategoryId: groupsCategoryId,
+            verifiedCategoryId: verifiedCategoryId,
         }
         try {
             await new MomentoServerSchema(newServer).save()

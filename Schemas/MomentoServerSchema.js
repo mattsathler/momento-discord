@@ -14,6 +14,7 @@ const schema = new mongo.Schema({
     },
     'uploaderChannelId': reqString,
     'askProfileChannelId': reqString,
+    'verifiedCategoryId': reqString,
     'profilesChannelId': reqString,
     'trendsChannelId': reqString,
     'groupsCategoryId': reqString,

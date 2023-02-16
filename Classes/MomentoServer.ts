@@ -6,9 +6,10 @@ export class MomentoServer {
     public trendsChannelId: String;
     public groupsCategoryId: String;
     public chatsChannelsId: [String];
+    public verifiedCategoryId: String;
 
     constructor(id: String, profilesChannelId: String, askProfileChannelId: String, uploaderChannelId: String,
-        trendsChannelId: String, chatsChannelsId: [String], groupsCategoryId: String) {
+        trendsChannelId: String, chatsChannelsId: [String], groupsCategoryId: String, verifiedCategoryId: String) {
         this.id = id
         this.profilesChannelId = profilesChannelId
         this.askProfileChannelId = askProfileChannelId
@@ -16,5 +17,6 @@ export class MomentoServer {
         this.trendsChannelId = trendsChannelId
         this.chatsChannelsId = chatsChannelsId
         this.groupsCategoryId = groupsCategoryId
+        this.verifiedCategoryId = verifiedCategoryId
     }
 }

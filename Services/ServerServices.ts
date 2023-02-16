@@ -1,4 +1,4 @@
-import { Guild, Message, ChannelType, TextChannel, CategoryChannel, User, EmbedBuilder, } from "discord.js"
+import { Guild, Message, ChannelType, TextChannel, CategoryChannel, User, EmbedBuilder, MessageActivityType, } from "discord.js"
 import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
@@ -19,7 +19,8 @@ export class ServerServices {
                 channelsId.profilesCategoryId,
                 channelsId.trendsChannelId,
                 channelsId.chatChannelId,
-                channelsId.groupsCategoryId
+                channelsId.groupsCategoryId,
+                channelsId.verifiedCategoryId
             )
         sendReplyMessage(message, "Servidor configurado com sucesso!", null, false)
         return serverConfig
@@ -37,6 +38,10 @@ export class ServerServices {
         const chatChannelId = await guild.channels.create({
             name: "💭momentochat",
             type: ChannelType.GuildText,
+        })
+        const verifiedCategory = await guild.channels.create({
+            name: "🔹verificados",
+            type: ChannelType.GuildCategory,
         })
         const profilesCategory = await guild.channels.create({
             name: "🫂perfis",
@@ -73,7 +78,8 @@ export class ServerServices {
             askprofileChannelId: askProfileChannel.id,
             trendsChannelId: trendsChannel.id,
             chatChannelId: chatChannelId.id,
-            groupsCategoryId: groupsCategory.id
+            groupsCategoryId: groupsCategory.id,
+            verifiedCategoryId: verifiedCategory.id
         }
 
         return defaultChannelsIds
@@ -172,5 +178,19 @@ export class ServerServices {
             .setThumbnail("https://imgur.com/P06HH5G.png")
         await groupChannel.send({ embeds: [newGroupEmbedMessage] })
         return groupChannel
+    }
+
+    static async updateServer(message: Message, serverConfig: MomentoServer) {
+        //Versão 9.0
+        if (!serverConfig.verifiedCategoryId) {
+            const guild: Guild = message.guild;
+            const verifiedCategory = await guild.channels.create({
+                name: "🔹verificados",
+                type: ChannelType.GuildCategory,
+            })
+            await MongoService.updateServerSettings(guild.id, {
+                verifiedCategoryId: verifiedCategory
+            })
+        }
     }
 }
