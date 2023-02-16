@@ -135,15 +135,18 @@ export class ProfileServices {
                 const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
                 const verifiedCategory: CategoryChannel = await guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
                 const newUser = await MongoService.updateProfile(momentoUser, { isVerified: true })
-                await profileChannel.setParent(verifiedCategory)
-
+                await profileChannel.setParent(verifiedCategory, { lockPermissions: false })
                 const verifyEmbedNotification = MomentoNotification.createVerifyJoinNotificationEmbed()
                 await NotificationsService.sendNotificationEmbed(guild, verifyEmbedNotification, momentoUser, true)
+                console.log(newUser)
                 return newUser
             }
             catch (err) {
                 console.error(err)
             }
+        }
+        else {
+            return momentoUser
         }
     }
 }

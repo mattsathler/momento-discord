@@ -1,6 +1,6 @@
 const ms = require('ms');
 
-import { EmbedBuilder, Guild, Message, TextChannel } from "discord.js"
+import { EmbedBuilder, Guild, Message, TextChannel, User } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
@@ -229,8 +229,9 @@ export class UserServices {
     }
 
     static async fixProfile(message: Message, momentoUser: MomentoUser) {
-        const profileChannel: TextChannel = message.guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
+        let profileChannel: TextChannel = message.guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
         const collageMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileCollageId))
+        const discordUser: User = message.author
 
         try {
             if (profileChannel && collageMessage) {

@@ -51,7 +51,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, false)
                     break
                 case "✅":
-                    await removeUserReaction(reactUser, message, reaction.emoji.name)
+                    await removeUserReaction(reactedUser, message, reaction.emoji.name)
                     await AnalyticsService.checkVerified(message.guild, reactedUser, true)
                     break
                 case "❤️":
