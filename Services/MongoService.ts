@@ -270,16 +270,18 @@ export class MongoService {
         askProfileChannelId: String,
         profilesChannelId: String,
         trendsChannelId: String,
-        chatChannelId: String
+        chatChannelId: String,
+        groupsCategory: String
     ) {
-        console.log(`MOMENTO - Cadastrando nova configuração...`)
+        console.log(`MOMENTO - Cadastrando nova configuração...`)        
         const newServer = {
             id: serverId,
             uploaderChannelId: uploaderChannelId,
             askProfileChannelId: askProfileChannelId,
             profilesChannelId: profilesChannelId,
             trendsChannelId: trendsChannelId,
-            chatChannelId: chatChannelId
+            chatChannelId: chatChannelId,
+            groupsCategoryId: groupsCategory
         }
         try {
             await new MomentoServerSchema(newServer).save()
@@ -309,11 +311,12 @@ export class MongoService {
         const users = mongo.model('users');
         console.log('MOMENTO - Finalizando criação do perfil')
         try {
-            const newUser = await users.findOneAndUpdate({ id: user.id, guildId: user.guildId }, {
+            await users.findOneAndUpdate({ id: user.id, guildId: user.guildId }, {
                 profileChannelId: profileChannelId,
                 profileMessageId: profileMessageId,
                 profileCollageId: profileCollageId,
             })
+            const newUser: MomentoUser = await this.getUserById(user.id, user.guildId)
             return newUser
         }
         catch (err) {

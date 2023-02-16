@@ -4,7 +4,8 @@
   "description": "RPG Social Media",
   "main": "momento.ts",
   "scripts": {
-    "start": "ts-node momento.ts"
+    "start": "ts-node momento.ts",
+    "build": "yarn"
   },
   "author": "Matheus Sathler",
   "license": "ISC",

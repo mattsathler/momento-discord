@@ -137,8 +137,8 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     }
                     break
                 case '📊':
-                    await removeAllReactions(message, reaction.emoji.name)
                     if (isCollage && reactUser.id == reactedUser.id) {
+                        await removeAllReactions(message, reaction.emoji.name)
                         try {
                             await removeUserReaction(reactUser, message, reaction.emoji.name)
                             await UserServices.analyticProfile(message.guild, reactedUser)
