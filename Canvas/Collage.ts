@@ -1,9 +1,9 @@
 import { createCanvas, loadImage, Image, registerFont, Canvas } from "canvas";
 import { MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
-import * as CollageStyles from "../styles.json";
-import * as styleColors from '../colors.json'
-import { MongoService } from "../Services/MongoService";
+import * as CollageStyles from "../Settings/CollageStyles.json";
+import * as styleColors from '../Settings/StyleColors.json'
+
 import { Colors } from "./Colors";
 
 export class CollageCanvas {
@@ -29,7 +29,6 @@ export class CollageCanvas {
         context.fillRect(0, 0, canvas.width, canvas.height);
         
         let rowIndex: number = 1
-        const spacement: number = 8;
 
         for (let [index, image] of collage.entries()) {
             const style = CollageStyles[Number(momentoUser.profileCollageStyle)][index]

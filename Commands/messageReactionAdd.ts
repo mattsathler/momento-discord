@@ -41,6 +41,9 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true);
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
+                case "🔧":
+                    await ProfileServices.updateProfileImages(message.guild, reactedUser, true, false)
+                    break
                 case "❤️":
                     if (isPost) {
                         const notification: MomentoNotification = new MomentoNotification(

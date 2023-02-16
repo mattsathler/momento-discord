@@ -1,8 +1,8 @@
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
 import { MomentoPost } from "../Classes/MomentoPost";
 import ImageCropper from "../Utils/ImageCropper";
-import * as styleColors from '../colors.json'
-import * as postConfig from './PostConfig.json';
+import * as styleColors from '../Settings/StyleColors.json'
+import * as postConfig from '../Settings/PostConfig.json';
 import { Colors } from "./Colors";
 
 export class Post {

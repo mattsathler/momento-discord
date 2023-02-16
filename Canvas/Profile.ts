@@ -1,8 +1,8 @@
-import { createCanvas, loadImage, Image, registerFont, Canvas } from "canvas";
+import { createCanvas, registerFont, Canvas, loadImage, Image } from "canvas";
 import { MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
 import { StringFormater } from "../Utils/StringFormater";
-import * as colors from '../colors.json'
+import * as colors from '../Settings/StyleColors.json'
 import { Colors } from "./Colors";
 
 export class ProfileCanvas {
@@ -34,7 +34,7 @@ export class ProfileCanvas {
         const CroppedCover: Canvas = await ImageCropper.quickCropWithURL(String(this.momentoUser.profileCover), canvas.width, canvas.height / 2.5)
 
         // const profileBackground: Image = await loadImage('./Assets/background.png')
-        
+
         // BACKGROUND
         context.fillStyle = `#${this.colors.background}`;
         context.fillRect(0, 0, canvas.width, canvas.height);
@@ -52,6 +52,7 @@ export class ProfileCanvas {
         context.font = '30px FORTE'
         context.fillStyle = `#${this.colors.onBackground}`
         context.fillText("@" + this.momentoUser.username, canvas.width / 2, canvas.height - 270)
+        const usernameWidth = context.measureText(`@${String(this.momentoUser.username)}`)
 
         context.font = '55px FORTE'
         context.fillStyle = `#${this.colors.secondary}`
@@ -88,6 +89,10 @@ export class ProfileCanvas {
         context.fillStyle = `#${this.colors.onBackground}`
         context.fillText("followers", canvas.width / 2 + 250, canvas.height - 70)
 
+        if (this.momentoUser.isVerified) {
+            const verifiedLogo: Image = await loadImage('./Assets/Profile/verified.png')
+            context.drawImage(verifiedLogo, (canvas.width / 2 + usernameWidth.width / 2) + 8, canvas.height - 300, 32, 32)
+        }
         return canvas.toBuffer();
     }
 }
