@@ -19,6 +19,7 @@ export class ServerServices {
                 channelsId.profilesCategoryId,
                 channelsId.trendsChannelId,
                 channelsId.chatChannelId,
+                channelsId.groupsCategoryId
             )
         sendReplyMessage(message, "Servidor configurado com sucesso!", null, false)
         return serverConfig
@@ -49,6 +50,10 @@ export class ServerServices {
             name: "trendings",
             type: ChannelType.GuildText,
         })
+        const groupsCategory = await guild.channels.create({
+            name: "meus grupos",
+            type: ChannelType.GuildCategory,
+        })
 
         await askProfileChannel.setParent(momentoCategory);
         await trendsChannel.setParent(momentoCategory);
@@ -67,7 +72,8 @@ export class ServerServices {
             profilesCategoryId: profilesCategory.id,
             askprofileChannelId: askProfileChannel.id,
             trendsChannelId: trendsChannel.id,
-            chatChannelId: chatChannelId.id
+            chatChannelId: chatChannelId.id,
+            groupsCategoryId: groupsCategory.id
         }
 
         return defaultChannelsIds

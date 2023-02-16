@@ -5,7 +5,7 @@ import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
-import { sendReplyMessage } from "../Utils/MomentoMessages"
+import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages"
 import { StringFormater } from "../Utils/StringFormater"
 import { MongoService } from "./MongoService"
 import { ServerServices } from "./ServerServices"
@@ -14,6 +14,7 @@ import { PostService } from "./PostService";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
+import { MomentoNotification } from "../Classes/MomentoNotification";
 
 export class UserServices {
     static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
@@ -60,10 +61,18 @@ export class UserServices {
         userCollageMessage.react("📊")
 
         console.log("MOMENTO - Perfil criado, finalizando cadastro...")
-        MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
+        const userCreated = await MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
 
         console.log("MOMENTO - Usuário cadastrado!")
-        sendReplyMessage(message, "Seu perfil foi criado com sucesso!", null, false)
+
+        const createdNotification: MomentoNotification = new MomentoNotification(
+            userCreated,
+            userCreated,
+            new Date,
+            "Bem vindo ao Seu Momento!",
+            "https://i.imgur.com/TvJJmjx.png"
+        )
+        NotificationsService.sendNotification(message.guild, createdNotification, true)
         return user
     }
 
@@ -219,5 +228,21 @@ export class UserServices {
             })
         )
         return postList
+    }
+
+    static async fixProfile(message: Message, momentoUser: MomentoUser) {
+        const profileChannel: TextChannel = message.guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
+        const collageMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileCollageId))
+
+        try {
+            if (profileChannel && collageMessage) {
+                await collageMessage.react("📊")
+                return
+            }
+            throw new Error("Usuário não encontrado!");
+        }
+        catch (err) {
+            console.log(err.message)
+        }
     }
 }

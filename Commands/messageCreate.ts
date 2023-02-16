@@ -22,9 +22,7 @@ export async function messageCreate(message: Message, client: Client) {
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
 
     const isCommand = message.content.charAt(0) == config.prefix ? true : false;
-    const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
-        && momentoUser.guildId == channel.guildId ? true : false;
-    const isGroupChat = serverConfig.chatsChannelsId.includes(message.channelId);
+
 
     const isSomeoneProfileChannel: Boolean = await MongoService.getUserByProfileChannel(String(message.channelId), message.guildId) ? true : false
 
@@ -38,6 +36,9 @@ export async function messageCreate(message: Message, client: Client) {
 
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
+    const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
+        && momentoUser.guildId == channel.guildId ? true : false;
+    const isGroupChat = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
 
     let reply: Message
     try {
@@ -94,6 +95,11 @@ export async function messageCreate(message: Message, client: Client) {
                         console.log(`MOMENTO - Criando o talks de ${momentoUser.username}...`)
                         reply = await message.reply("Criando seu talks, aguarde...")
                         await ServerServices.createGroupChannel(message, momentoUser)
+                        break
+                    case "fix":
+                        console.log(`MOMENTO - Consertando o perfil de ${momentoUser.username}...`)
+                        reply = await message.reply("Consertando seu perfil, aguarde...")
+                        await UserServices.fixProfile(message, momentoUser)
                         break
                 }
 
