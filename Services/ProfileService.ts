@@ -1,6 +1,7 @@
-import { Guild, Message, TextChannel } from "discord.js"
+import { CategoryChannel, Guild, Message, TextChannel } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
+import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
 import { MongoService } from "./MongoService"
@@ -124,5 +125,11 @@ export class ProfileServices{
             await collageMessage.edit(userCollageImageURL)
         }
         return
+    }
+
+    static async verifyUser(guild: Guild, momentoUser: MomentoUser, serverConfig: MomentoServer) {
+        const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
+        const verifiedCategory: CategoryChannel = await guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
+        profileChannel.setParent(verifiedCategory)
     }
 }

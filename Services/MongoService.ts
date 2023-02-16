@@ -51,6 +51,7 @@ export class MongoService {
                 response.chatsChannelsId,
                 response.groupsCategoryId,
                 response.verifiedCategoryId,
+                response.momentoVersion ?? 8.0,
             )
             return serverConfig
         }

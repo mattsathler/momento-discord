@@ -54,6 +54,7 @@ export class AnalyticsService {
             followersFromPost += post.postMessage.reactions.cache.get('❤️').count
             if (followersFromPost == 0) { followersFromPost = 1 }
 
+            if (post.author.isVerified) { followersFromPost = followersFromPost * 3 }
             if (post.isTrending) { followersFromPost = followersFromPost * 2 }
             newFollowersList.push(followersFromPost)
         })
@@ -76,5 +77,15 @@ export class AnalyticsService {
             })
         )
         return analyticsPosts
+    }
+
+    static async checkVerified(momentoUser: MomentoUser) {
+        if (
+            momentoUser.trends >= Config.trendsToVerify &&
+            momentoUser.followers >= Config.followersToVerify &&
+            momentoUser.momentos >= Config.momentosToVerify
+        ) {
+            
+        }
     }
 }

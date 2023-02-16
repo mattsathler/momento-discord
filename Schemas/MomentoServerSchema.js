@@ -22,7 +22,8 @@ const schema = new mongo.Schema({
         type: [String],
         blackbox: true,
         default: []
-    }
+    },
+    'momentoVersion': Number
 })
 
 module.exports = mongo.model('servers', schema)

@@ -3,6 +3,7 @@ import { MomentoServer } from "../Classes/MomentoServer"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
 import { sendReplyMessage } from "../Utils/MomentoMessages";
+import * as Config from "../Settings/MomentoConfig.json"
 
 export class ServerServices {
     static async createServerConfig(message: Message) {
@@ -181,16 +182,21 @@ export class ServerServices {
     }
 
     static async updateServer(message: Message, serverConfig: MomentoServer) {
+        const guild: Guild = message.guild;
+        console.log(`Servidor de id ${guild.id} atualizando da versão ${serverConfig.momentoVersion} para a versão ${Config.momentoLatestVersion}...`)
+
         //Versão 9.0
         if (!serverConfig.verifiedCategoryId) {
-            const guild: Guild = message.guild;
             const verifiedCategory = await guild.channels.create({
                 name: "🔹verificados",
                 type: ChannelType.GuildCategory,
             })
             await MongoService.updateServerSettings(guild.id, {
-                verifiedCategoryId: verifiedCategory
+                verifiedCategoryId: verifiedCategory,
             })
         }
+
+        await MongoService.updateServerSettings(guild.id, { momentoVersion: Config.momentoLatestVersion })
+        console.log(`Servidor de id: ${guild.id} atualizado para a versão ${Config.momentoLatestVersion} com sucesso!`)
     }
 }

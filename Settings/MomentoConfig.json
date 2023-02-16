@@ -1,6 +1,11 @@
 {
+    "maintenance": false,
+
+    "momentoLatestVersion": 9.0,
     "prefix" : "?",
     "likesToTrend": 35,
     "momentosTimeout": 24,
-    "maintenance": true
+    "momentosToVerify": 30,
+    "followersToVerify": 5000,
+    "trendsToVerify": 16
 }
