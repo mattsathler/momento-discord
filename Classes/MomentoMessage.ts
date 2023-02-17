@@ -20,6 +20,7 @@ export class MomentoMessage {
     public static async createMomentoMessageEmbed(author: MomentoUser, message: Message): Promise<EmbedBuilder> {
         let attachment: Attachment;
         let attachmentUrl: string;
+        let comment = message.content == '' ? '_' : message.content
         if (message.attachments.size > 0) {
             attachment = message.attachments.first()
             attachmentUrl = String(await LinkGenerator.uploadLinkToMomento(message.guild, attachment.url))
@@ -31,7 +32,7 @@ export class MomentoMessage {
                 iconURL: String(author.profilePicture),
                 url: String(`https://discord.com/channels/${message.guildId}/${author.profileChannelId}`)
             })
-            .setDescription(`${String(message.content)}`)
+            .setDescription(`${String(comment)}`)
             .setFooter({
                 text: 'momento for iPhone'
             })

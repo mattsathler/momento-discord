@@ -122,28 +122,28 @@ export class UserServices {
         return newUser;
     }
 
-    static async changeProfileUsername(message: Message, user: MomentoUser, newUsername: String[]) {
+    static async changeProfileUsername(message: Message, user: MomentoUser, newUsername: String) {
         const guild: Guild = message.guild
 
         console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newUsername}`)
-        if (newUsername.length == 0 || newUsername.length > 1 || newUsername[0].length > 15) { throw new Error('O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo 15 caracteres!') }
-        if (StringFormater.containsSpecialChars(newUsername[0])) { throw new Error('O nome de usuário não pode conter caracteres especiais') }
+        if (newUsername.length == 0 || newUsername.length > 15) { throw new Error('O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo 15 caracteres!') }
+        if (StringFormater.containsSpecialChars(newUsername)) { throw new Error('O nome de usuário não pode conter caracteres especiais') }
 
         try {
             const newUser = await MongoService.updateProfile(user, {
-                username: String(newUsername[0]).toLowerCase()
+                username: String(newUsername)
             })
             await ProfileServices.updateProfileImages(guild, newUser, true, false)
             console.log('MOMENTO - Nome de usuário alterado com sucesso!')
         }
         catch (err) {
-            console.log(`MOMENTO - Não foi possível alterar o nickname deste usuário para ${newUsername[0]}!`)
+            console.log(`MOMENTO - Não foi possível alterar o nickname deste usuário para ${newUsername}!`)
             console.log(err)
         }
         try {
             const profileServer: TextChannel = guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-            profileServer.setName(String(newUsername[0]).toLowerCase())
-            await message.member.setNickname(String(newUsername[0]))
+            profileServer.setName(String(newUsername))
+            await message.member.setNickname(String(newUsername))
         }
         catch { }
         return

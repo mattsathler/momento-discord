@@ -75,7 +75,7 @@ export async function messageCreate(message: Message, client: Client) {
                     case "user":
                         console.log(`MOMENTO - Alterando usuário de ${momentoUser.username}...`)
                         reply = await message.reply("Alterando seu usuário, aguarde...")
-                        await UserServices.changeProfileUsername(message, momentoUser, args)
+                        await UserServices.changeProfileUsername(message, momentoUser, args[0].toLowerCase())
                         break
                     case "nome":
                         console.log(`MOMENTO - Alterando nome de perfil de ${momentoUser.username}...`)
@@ -156,6 +156,10 @@ export async function messageCreate(message: Message, client: Client) {
                         await UserServices.askProfile(message)
                         break
                     }
+                    break
+                case "teste":
+                    sendReplyMessage(message, "Opa! Tô' online sim.", null, true)
+                case "":
                     break
                 default:
                     sendErrorMessage(message, "Comando não encontrado!")

@@ -14,18 +14,18 @@ export async function tryDeleteMessage(message: Message) {
 
 export async function sendReplyMessage(message: Message, text: string, timeout?: number, remove?: Boolean) {
     const time = timeout ? timeout : 4000
-    setTimeout(async () => {
+    try {
         const msg = await message.reply(text)
-        try {
+        setTimeout(async () => {
             if (remove) {
-                await message.delete()
+                await tryDeleteMessage(message)
             }
-            await msg.delete()
-        }
-        catch (err) {
-            console.log(err)
-        }
-    }, time);
+            await tryDeleteMessage(msg)
+        }, time);
+    }
+    catch (err) {
+        console.log(err)
+    }
 }
 
 export async function sendErrorMessage(message: Message, text?: string, timeout?: number) {

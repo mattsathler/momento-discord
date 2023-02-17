@@ -33,7 +33,7 @@ export class MomentoNotification {
 
         if (notification.url) {
             commentEmbed.addFields({
-                name: '-', value: `[Confira!](${String(url)})`
+                name: '.', value: `[Confira!](${String(url)})`
             })
         }
         return commentEmbed

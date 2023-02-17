@@ -46,11 +46,12 @@ export class Post {
 
         context.font = '36px FORTE'
         context.fillStyle = `#${colors.primary}`
-        context.fillText(`${post.author.name} ${post.author.surname}`, postConfig.postSafeGap * 8, postConfig.postHeaderSize / 2 - postConfig.postSafeGap*1.6)
+        context.fillText(`${post.author.name} ${post.author.surname}`, postConfig.postSafeGap * 8, postConfig.postHeaderSize / 2 - postConfig.postSafeGap * 1.6)
 
         context.font = '28px FORTE'
         context.fillStyle = `#${colors.onBackground}`
         context.fillText(`@${post.author.username}`, postConfig.postSafeGap * 8, postConfig.postHeaderSize / 2 + 2)
+        const usernameWidth = context.measureText(`@${String(post.author.username)}`)
 
 
         context.textAlign = 'center'
@@ -60,6 +61,11 @@ export class Post {
 
             context.drawImage(imageCanvas, postConfig.postSafeAreaSize, postConfig.profilePictureSize + postConfig.postSafeGap * 2, imageCanvas.width, imageCanvas.height)
             context.drawImage(description, 0, imageCanvas.height + postConfig.profilePictureSize + postConfig.postSafeGap * 3)
+        }
+
+        if (post.author.isVerified) {
+            const verifiedLogo: Image = await loadImage('./Assets/Profile/verified.png')
+            context.drawImage(verifiedLogo, postConfig.postSafeGap * 8 + usernameWidth.width + 6, postConfig.postHeaderSize / 2 - 16, 24, 24)
         }
 
         return canvas.toBuffer();
