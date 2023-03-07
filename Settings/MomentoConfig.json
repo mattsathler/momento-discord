@@ -1,12 +1,13 @@
 {
     "maintenance": false,
 
+    "usernameMaxLength": 32,
     "momentoLatestVersion": 9.0,
     "prefix" : "?",
-    "likesToTrend": 35,
-    "momentosTimeout": 24,
+    "likesToTrend": 50,
+    "momentosTimeout": 0,
     
-    "momentosToVerify": 30,
-    "followersToVerify": 5000,
-    "trendsToVerify": 15
+    "momentosToVerify": 40,
+    "followersToVerify": 3000,
+    "trendsToVerify": 20
 }

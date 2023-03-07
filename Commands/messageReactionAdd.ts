@@ -48,7 +48,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
                 case "🔧":
-                    await ProfileServices.updateProfileImages(message.guild, reactedUser, true, false)
+                    await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true)
                     break
                 case "✅":
                     await removeUserReaction(reactedUser, message, reaction.emoji.name)
@@ -69,7 +69,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
-                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend / 2 : Config.likesToTrend
+                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.8 : Config.likesToTrend
                         if (
                             !post.isTrending &&
                             likesCount >= likesToTrend &&

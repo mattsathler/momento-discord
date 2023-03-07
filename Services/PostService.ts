@@ -12,6 +12,7 @@ import { ThreadService } from "./ThreadsService";
 export class PostService {
     public static async savePostInDatabase(post: MomentoPost, postOriginalImageURL: String): Promise<void> {
         await MongoService.uploadPost(post, postOriginalImageURL)
+        return
     }
 
     public static async getPostFromMessage(message: Message): Promise<MomentoPost> {
@@ -87,7 +88,7 @@ export class PostService {
             momentos: newMomentos
         })
 
-        ProfileServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(guild, newUser, true, false)
         return newUser
     }
 

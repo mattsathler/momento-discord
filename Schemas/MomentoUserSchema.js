@@ -46,12 +46,12 @@ const schema = new mongo.Schema({
         type: [String],
         blackbox: true,
         default: [
-            'https://imgur.com/bOD58pE.png',
-            'https://imgur.com/6aMb5b9.png',
-            'https://imgur.com/6aMb5b9.png',
-            'https://imgur.com/6aMb5b9.png',
-            'https://imgur.com/6aMb5b9.png',
-            'https://imgur.com/6aMb5b9.png',
+            'https://imgur.com/fbiUIMs.png',
+            'https://imgur.com/fbiUIMs.png',
+            'https://imgur.com/fbiUIMs.png',
+            'https://imgur.com/fbiUIMs.png',
+            'https://imgur.com/fbiUIMs.png',
+            'https://imgur.com/fbiUIMs.png',
         ],
         required: true
     },
@@ -68,7 +68,7 @@ const schema = new mongo.Schema({
     'followers': {
         type: Long,
         required: true,
-        default: 1   
+        default: 1
     },
     'momentos': {
         type: Long,

@@ -94,8 +94,8 @@ export class MomentoPost {
             momentoPost.postMessage = newPost
             const postOriginalImageURL: String = await LinkGenerator.uploadLinkToMomento(message.guild, momentoPost.imageURL)
             await PostService.savePostInDatabase(momentoPost, postOriginalImageURL)
-            await NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
-            await PostService.addNewMomento(momentoPost.postMessage.guild, user)
+            NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
+            PostService.addNewMomento(momentoPost.postMessage.guild, user)
             return newPost
         }
         catch (err) {

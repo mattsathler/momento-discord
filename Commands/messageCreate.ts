@@ -143,8 +143,9 @@ export async function messageCreate(message: Message, client: Client) {
 
             switch (command) {
                 case "configurar":
-                    reply = await message.reply("Configurando servidor, aguarde...")
-                    await ServerServices.createServerConfig(message)
+                    // reply = await message.reply("Configurando servidor, aguarde...")
+                    // await ServerServices.createServerConfig(message)
+                    sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
                     break
                 case "atualizar":
                     reply = await message.reply("Atualizando servidor, aguarde...")
@@ -157,8 +158,12 @@ export async function messageCreate(message: Message, client: Client) {
                         break
                     }
                     break
-                case "teste":
-                    sendReplyMessage(message, "Opa! Tô' online sim.", null, true)
+                    case "teste":
+                    sendReplyMessage(message, "Opa! Tô' online sim.", null, false)
+                    break
+                case "python":
+                    sendReplyMessage(message, "PYTHON É UMA BOSTA!", null, true)
+                    break
                 case "":
                     break
                 default:

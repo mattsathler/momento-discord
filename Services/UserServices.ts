@@ -5,7 +5,6 @@ import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
 import { LinkGenerator } from "../Utils/LinkGenerator"
-import { sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages"
 import { StringFormater } from "../Utils/StringFormater"
 import { MongoService } from "./MongoService"
 import { ServerServices } from "./ServerServices"
@@ -15,6 +14,8 @@ import { MomentoPost } from "../Classes/MomentoPost";
 import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
 import { MomentoNotification } from "../Classes/MomentoNotification";
+import * as config from "../Settings/MomentoConfig.json";
+
 
 export class UserServices {
     static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
@@ -63,8 +64,6 @@ export class UserServices {
         console.log("MOMENTO - Perfil criado, finalizando cadastro...")
         const userCreated = await MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
 
-        console.log("MOMENTO - Usuário cadastrado!")
-
         const createdNotification: MomentoNotification = new MomentoNotification(
             userCreated,
             userCreated,
@@ -73,6 +72,7 @@ export class UserServices {
             "https://i.imgur.com/TvJJmjx.png"
         )
         NotificationsService.sendNotification(message.guild, createdNotification, true)
+        console.log("MOMENTO - Usuário cadastrado!")
         return user
     }
 
@@ -126,7 +126,7 @@ export class UserServices {
         const guild: Guild = message.guild
 
         console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newUsername}`)
-        if (newUsername.length == 0 || newUsername.length > 15) { throw new Error('O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo 15 caracteres!') }
+        if (newUsername.length == 0 || newUsername.length > config.usernameMaxLength) { throw new Error(`O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo ${config.usernameMaxLength} caracteres!`) }
         if (StringFormater.containsSpecialChars(newUsername)) { throw new Error('O nome de usuário não pode conter caracteres especiais') }
 
         try {
@@ -222,7 +222,11 @@ export class UserServices {
         await Promise.all(
             postMessageList.map(async msg => {
                 const post = await PostService.getPostFromMessage(msg);
-                if (post) { postList.push(post) }
+                if (post) {
+                    if (post.author.id == momentoUser.id) {
+                        postList.push(post)
+                    }
+                }
             })
         )
         return postList

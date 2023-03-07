@@ -56,7 +56,7 @@ export class AnalyticsService {
             followersFromPost += post.postMessage.reactions.cache.get('❤️').count
             if (followersFromPost == 0) { followersFromPost = 1 }
 
-            if (post.author.isVerified) { followersFromPost = followersFromPost * 3 }
+            if (post.author.isVerified) { followersFromPost = followersFromPost * 2 }
             if (post.isTrending) { followersFromPost = followersFromPost * 2 }
             newFollowersList.push(followersFromPost)
         })
