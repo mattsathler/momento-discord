@@ -5,9 +5,12 @@
     "momentoLatestVersion": 9.0,
     "prefix" : "?",
     "likesToTrend": 50,
-    "momentosTimeout": 0,
+    "momentosTimeout": 24,
     
-    "momentosToVerify": 40,
-    "followersToVerify": 3000,
-    "trendsToVerify": 20
+    "momentosToVerify": 50,
+    "followersToVerify": 5000,
+    "trendsToVerify": 30,
+
+    "momento-server-id": "1084823963974246414",
+    "momento-server-feed-channel-id": "1084825060696657940"
 }

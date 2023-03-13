@@ -33,7 +33,7 @@ export class MomentoPost {
     }
 
 
-    public static async createPost(client: Client, message: Message, user: MomentoUser, isRepost?: Boolean): Promise<Post> {
+    public static async createPost(client: Client, message: Message, user: MomentoUser, isRepost?: Boolean): Promise<MomentoPost> {
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para criar um post!") }
         if (message.content.length > PostConfig.descriptionLimit) { throw new Error("O limite máximo de caracteres para a descrição é de: " + PostConfig.descriptionLimit + " letras!") }
         const postDescription: String[] = await MentionsParser.parseUserMentions(message)
@@ -41,7 +41,6 @@ export class MomentoPost {
         let originalUser: MomentoUser;
         if (isRepost) {
             momentoPost = await MongoService.getPostById(message.id, message.guildId)
-            // momentoPost.author = user
         }
         else {
             momentoPost =
@@ -96,7 +95,7 @@ export class MomentoPost {
             await PostService.savePostInDatabase(momentoPost, postOriginalImageURL)
             NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
             PostService.addNewMomento(momentoPost.postMessage.guild, user)
-            return newPost
+            return momentoPost
         }
         catch (err) {
             console.error(err)

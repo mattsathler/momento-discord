@@ -1,4 +1,4 @@
-import { Client, Message, MessageType, TextChannel } from "discord.js";
+import { Client, EmbedBuilder, Guild, Message, MessageType, TextChannel } from "discord.js";
 import { MomentoComment } from "../Classes/MomentoComment";
 import { MomentoMessage } from "../Classes/MomentoMessage";
 import { MomentoPost } from "../Classes/MomentoPost";
@@ -10,6 +10,7 @@ import { ProfileServices } from "../Services/ProfileService";
 import { ServerServices } from "../Services/ServerServices";
 import { UserServices } from "../Services/UserServices";
 import { sendErrorMessage, sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
+import { Post } from "../Canvas/Post";
 
 export async function messageCreate(message: Message, client: Client) {
     if (!message) return
@@ -41,7 +42,7 @@ export async function messageCreate(message: Message, client: Client) {
     const isGroupChat = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
     const isOffChat: Boolean = !isCommand && !isComment && !isGroupChat
 
-    if (config.maintenance && !isOffChat) {
+    if (config.maintenance && message.author.id != "598301572325310474" && !isOffChat) {
         await sendErrorMessage(message, "Ops! Parece que o bot está em manutenção. Tente novamente mais tarde!");
         return
     }
@@ -145,7 +146,7 @@ export async function messageCreate(message: Message, client: Client) {
                 case "configurar":
                     // reply = await message.reply("Configurando servidor, aguarde...")
                     // await ServerServices.createServerConfig(message)
-                    sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
+                    await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
                     break
                 case "atualizar":
                     reply = await message.reply("Atualizando servidor, aguarde...")
@@ -158,7 +159,7 @@ export async function messageCreate(message: Message, client: Client) {
                         break
                     }
                     break
-                    case "teste":
+                case "teste":
                     sendReplyMessage(message, "Opa! Tô' online sim.", null, false)
                     break
                 case "python":
@@ -180,9 +181,40 @@ export async function messageCreate(message: Message, client: Client) {
         }
         if (isProfileCommand) {
             reply = await message.reply("Criando seu post, aguarde...")
-            await MomentoPost.createPost(client, message, momentoUser)
+            const post: MomentoPost = await MomentoPost.createPost(client, message, momentoUser)
             if (reply) { tryDeleteMessage(reply) }
             await tryDeleteMessage(message)
+
+            const momentoServer: Guild = client.guilds.cache.get(config["momento-server-id"])
+            const globalFeedChannel: TextChannel = momentoServer.channels.cache.get(config["momento-server-feed-channel-id"]) as TextChannel
+            const postGuild: Guild = client.guilds.cache.get(String(post.author.guildId))
+            const postEmbed = new EmbedBuilder()
+                .setImage(String(post.imageURL))
+                .setColor(0xdd247b)
+                .setAuthor({
+                    name: 'MOMENTO ANALYTICS',
+                    iconURL: 'https://imgur.com/nFwo2PT.png'
+                })
+                .setThumbnail('https://imgur.com/nFwo2PT.png')
+                .addFields(
+                    {
+                        name: 'RPG', value: postGuild.name
+                    },
+                    {
+                        name: 'USERNAME', value: `@${String(post.author.username)}`
+                    }
+                )
+                .addFields(
+                    {
+                        name: 'USER-ID', value: String(post.author.id)
+                    },
+                    {
+                        name: 'RPG-ID', value: postGuild.id
+                    }
+                )
+
+            const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
+            await globalFeedMessage.react('⚠️')
             return
         }
 

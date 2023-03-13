@@ -12,7 +12,7 @@ export async function messageReactionRemove(user: User, reaction: MessageReactio
     let reactedUser: MomentoUser = await MongoService.getUserByProfileChannel(reaction.message.channelId, message.guildId)
     let isComment: Boolean = false;
 
-    if (Config.maintenance) { return }
+    if (Config.maintenance && user.id != "598301572325310474") { return }
     if (reactedUser && reactUser || isComment) {
         const messageId: String = reaction.message.id;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;
