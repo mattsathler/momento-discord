@@ -210,6 +210,9 @@ export async function messageCreate(message: Message, client: Client) {
                     },
                     {
                         name: 'RPG-ID', value: postGuild.id
+                    },
+                    {
+                        name: '_', value: `[Conferir](https://discord.com/channels/${post.postMessage.guildId}/${post.author.profileChannelId})`
                     }
                 )
 
