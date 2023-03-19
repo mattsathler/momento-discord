@@ -49,6 +49,8 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
                 case "🔧":
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true)
+                    const serverConfig = await MongoService.getServerConfigById(message.guildId)
+                    // await ProfileServices.verifyUser(message.guild, reactedUser, serverConfig)
                     break
                 case "✅":
                     await removeUserReaction(reactedUser, message, reaction.emoji.name)

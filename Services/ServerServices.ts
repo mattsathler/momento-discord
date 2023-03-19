@@ -96,8 +96,17 @@ export class ServerServices {
         })
         userProfileChannel.setRateLimitPerUser(20)
 
-        const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
-        await userProfileChannel.setParent(profileCategoryChannel)
+       
+        if(momentoUser.isVerified) {
+            const verifiedCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
+            await userProfileChannel.setParent(verifiedCategoryChannel)
+        }
+        else {
+            const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
+            await userProfileChannel.setParent(profileCategoryChannel)
+        }
+        
+
 
         await userProfileChannel.permissionOverwrites.create(message.guild.roles.everyone, {
             SendMessages: false,

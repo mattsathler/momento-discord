@@ -37,13 +37,14 @@ export async function messageCreate(message: Message, client: Client) {
 
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-    const isProfileCommand = momentoUser && momentoUser.profileChannelId == message.channel.id
+    const isProfileCommand = momentoUser 
+    && momentoUser.profileChannelId == message.channel.id
         && momentoUser.guildId == channel.guildId ? true : false;
     const isGroupChat = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
-    const isOffChat: Boolean = !isCommand && !isComment && !isGroupChat
+    const isOffChat: Boolean = !isCommand && !isComment && !isGroupChat && !isProfileCommand
 
     if (config.maintenance && message.author.id != "598301572325310474" && !isOffChat) {
-        await sendErrorMessage(message, "Ops! Parece que o bot está em manutenção. Tente novamente mais tarde!");
+        await sendErrorMessage(message, "Ops! Estamos em manutenção... Tente novamente mais tarde! =(");
         return
     }
 
@@ -184,40 +185,6 @@ export async function messageCreate(message: Message, client: Client) {
             const post: MomentoPost = await MomentoPost.createPost(client, message, momentoUser)
             if (reply) { tryDeleteMessage(reply) }
             await tryDeleteMessage(message)
-
-            const momentoServer: Guild = client.guilds.cache.get(config["momento-server-id"])
-            const globalFeedChannel: TextChannel = momentoServer.channels.cache.get(config["momento-server-feed-channel-id"]) as TextChannel
-            const postGuild: Guild = client.guilds.cache.get(String(post.author.guildId))
-            const postEmbed = new EmbedBuilder()
-                .setImage(String(post.imageURL))
-                .setColor(0xdd247b)
-                .setAuthor({
-                    name: 'MOMENTO ANALYTICS',
-                    iconURL: 'https://imgur.com/nFwo2PT.png'
-                })
-                .setThumbnail('https://imgur.com/nFwo2PT.png')
-                .addFields(
-                    {
-                        name: 'RPG', value: postGuild.name
-                    },
-                    {
-                        name: 'USERNAME', value: `@${String(post.author.username)}`
-                    }
-                )
-                .addFields(
-                    {
-                        name: 'USER-ID', value: String(post.author.id)
-                    },
-                    {
-                        name: 'RPG-ID', value: postGuild.id
-                    },
-                    {
-                        name: '_', value: `[Conferir](https://discord.com/channels/${post.postMessage.guildId}/${post.author.profileChannelId})`
-                    }
-                )
-
-            const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
-            await globalFeedMessage.react('⚠️')
             return
         }
 

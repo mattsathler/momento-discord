@@ -1,5 +1,5 @@
 {
-    "maintenance": false,
+    "maintenance": true,
 
     "usernameMaxLength": 32,
     "momentoLatestVersion": 9.0,
