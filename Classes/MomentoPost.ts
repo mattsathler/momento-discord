@@ -10,6 +10,7 @@ import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
 import * as PostConfig from '../Settings/PostConfig.json'
 import * as config from "../Settings/MomentoConfig.json";
+import ImageCropper from "../Utils/ImageCropper";
 
 
 export class MomentoPost {
@@ -39,7 +40,6 @@ export class MomentoPost {
         if (message.content.length > PostConfig.descriptionLimit) { throw new Error("O limite máximo de caracteres para a descrição é de: " + PostConfig.descriptionLimit + " letras!") }
         const postDescription: String[] = await MentionsParser.parseUserMentions(message)
         let momentoPost: MomentoPost;
-        let originalUser: MomentoUser;
         if (isRepost) {
             momentoPost = await MongoService.getPostById(message.id, message.guildId)
         }
@@ -55,13 +55,12 @@ export class MomentoPost {
         try {
             const post: Buffer = await Post.drawPost(momentoPost)
             const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-
+            const postImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, post)
             let newPost: Message
             if (!isRepost) {
                 newPost = await profileChannel.send({ files: [post] })
             }
             else {
-                const postImageUrl = await LinkGenerator.uploadImageToMomento(message.guild, post)
                 const sharedPostEmber =
                     new EmbedBuilder()
                         .setDescription("Compartilhou um Momento!")
@@ -72,7 +71,7 @@ export class MomentoPost {
                             iconURL: String(user.profilePicture),
                             url: String(`https://discord.com/channels/${message.guildId}/${user.profileChannelId}`)
                         })
-                        .setImage(postImageUrl)
+                        .setImage(String(postImageURL))
                 newPost = await profileChannel.send({ embeds: [sharedPostEmber] })
             }
 
@@ -92,17 +91,15 @@ export class MomentoPost {
             }
 
             momentoPost.postMessage = newPost
-            const postOriginalImageURL: String = await LinkGenerator.uploadLinkToMomento(message.guild, momentoPost.imageURL)
-            await PostService.savePostInDatabase(momentoPost, postOriginalImageURL)
+            await PostService.savePostInDatabase(momentoPost, postImageURL)
 
             if (!isRepost) {
                 await NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
                 const momentoServer: Guild = client.guilds.cache.get(config["momento-server-id"])
                 const globalFeedChannel: TextChannel = momentoServer.channels.cache.get(config["momento-server-feed-channel-id"]) as TextChannel
                 const postGuild: Guild = client.guilds.cache.get(String(newPost.guildId))
-                console.log(momentoPost)
                 const postEmbed = new EmbedBuilder()
-                    .setImage(String(postOriginalImageURL))
+                    .setImage(String(postImageURL))
                     .setColor(0xdd247b)
                     .setAuthor({
                         name: 'MOMENTO ANALYTICS',

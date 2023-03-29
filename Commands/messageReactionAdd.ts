@@ -56,6 +56,31 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     await removeUserReaction(reactedUser, message, reaction.emoji.name)
                     await AnalyticsService.checkVerified(message.guild, reactedUser, true)
                     break
+                case "⭐":
+                    if (isPost) {
+                        const notification: MomentoNotification = new MomentoNotification(
+                            reactedUser,
+                            reactUser,
+                            new Date,
+                            `Curtiu sua foto!`,
+                            message.attachments.first().url,
+                            `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
+                        )
+                        await NotificationsService.sendNotification(message.guild, notification, false)
+                        const likesCount: Number = message.reactions.cache.get("❤️").count - 1  
+                        let post: MomentoPost = await PostService.getPostFromMessage(message)
+                        post.imageURL = message.attachments.first().url
+                        const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
+                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.8 : Config.likesToTrend
+                        if (
+                            !post.isTrending &&
+                            likesCount >= likesToTrend
+                        ) {
+                            await PostService.trendPost(message.guild, post, notification)
+                        }
+                        break
+                    }
+                    break
                 case "❤️":
                     if (isPost) {
                         const notification: MomentoNotification = new MomentoNotification(
@@ -100,8 +125,8 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
                 case "🔁":
                     if (isPost) {
-                        await MomentoPost.sharePost(message.client, message, reactUser)
-                        await removeUserReaction(reactUser, message, String(reactEmoji))
+                        // await MomentoPost.sharePost(message.client, message, reactUser)
+                        // await removeUserReaction(reactUser, message, String(reactEmoji))
                         break
                     }
                     await removeUserReaction(reactUser, message, String(reactEmoji))

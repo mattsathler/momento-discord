@@ -23,8 +23,8 @@ export class Post {
         if (image.width <= 800 || image.height <= 800) {
             imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 800, 800)
         }
-        else if (image.width > 2240 || image.height > 2240) {
-            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 2240, 2240)
+        else if (image.width > 1366 || image.height > 1366) {
+            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 1366, 1366)
         }
         else {
             imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), image.width, image.height);
