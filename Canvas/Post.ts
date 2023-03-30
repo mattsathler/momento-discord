@@ -20,15 +20,7 @@ export class Post {
 
         let image: Image = await loadImage(String(post.imageURL));
         let imageCanvas: Canvas
-        if (image.width <= 800 || image.height <= 800) {
-            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 800, 800)
-        }
-        else if (image.width > 1366 || image.height > 1366) {
-            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 1366, 1366)
-        }
-        else {
-            imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), image.width, image.height);
-        }
+        imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 1080, 1350)
 
         const description = this.createDescription(post.description, imageCanvas.width, postConfig.lineHeight, postConfig.postSafeGap, colors)
         const canvas = createCanvas(

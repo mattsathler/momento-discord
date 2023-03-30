@@ -9,7 +9,6 @@ import { MentionsParser } from "../Utils/MentionsParser";
 import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
 import * as PostConfig from '../Settings/PostConfig.json'
-import * as config from "../Settings/MomentoConfig.json";
 import ImageCropper from "../Utils/ImageCropper";
 
 
@@ -53,9 +52,11 @@ export class MomentoPost {
                 )
         }
         try {
+            const croppedImg = await ImageCropper.quickCropWithURL(String(momentoPost.imageURL), 1080, 1350)
             const post: Buffer = await Post.drawPost(momentoPost)
+            const bufferedImg = croppedImg.toBuffer()
             const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-            const postImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, post)
+            const postImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, bufferedImg)
             let newPost: Message
             if (!isRepost) {
                 newPost = await profileChannel.send({ files: [post] })
@@ -91,45 +92,12 @@ export class MomentoPost {
             }
 
             momentoPost.postMessage = newPost
+            momentoPost.imageURL = postImageURL
             await PostService.savePostInDatabase(momentoPost, postImageURL)
 
             if (!isRepost) {
                 await NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
-                const momentoServer: Guild = client.guilds.cache.get(config["momento-server-id"])
-                const globalFeedChannel: TextChannel = momentoServer.channels.cache.get(config["momento-server-feed-channel-id"]) as TextChannel
-                const postGuild: Guild = client.guilds.cache.get(String(newPost.guildId))
-                const postEmbed = new EmbedBuilder()
-                    .setImage(String(postImageURL))
-                    .setColor(0xdd247b)
-                    .setAuthor({
-                        name: 'MOMENTO ANALYTICS',
-                        iconURL: 'https://imgur.com/nFwo2PT.png'
-                    })
-                    .setThumbnail('https://imgur.com/nFwo2PT.png')
-                    .addFields(
-                        {
-                            name: 'RPG', value: postGuild.name
-                        },
-                        {
-                            name: 'USERNAME', value: `@${String(momentoPost.author.username)}`
-                        }
-                    )
-                    .addFields(
-                        {
-                            name: 'USER-ID', value: String(momentoPost.author.id)
-                        },
-                        {
-                            name: 'RPG-ID', value: postGuild.id
-                        },
-                        {
-                            name: 'Descrição', value: momentoPost.description ? String(momentoPost.description) : 'Post sem descrição'
-                        },
-                        {
-                            name: '_', value: `[Conferir](https://discord.com/channels/${newPost.guildId}/${newPost.channelId})`
-                        }
-                    )
-                const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
-                await globalFeedMessage.react('⚠️')
+                await PostService.sendPostToAnalytics(client, momentoPost)
             }
             await PostService.addNewMomento(momentoPost.postMessage.guild, user)
 

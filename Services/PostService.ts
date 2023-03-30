@@ -1,4 +1,4 @@
-import { EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
+import { Client, EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
@@ -8,6 +8,7 @@ import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
 import { ThreadService } from "./ThreadsService";
+import * as config from "../Settings/MomentoConfig.json";
 
 export class PostService {
     public static async savePostInDatabase(post: MomentoPost, postOriginalImageURL: String): Promise<void> {
@@ -101,5 +102,44 @@ export class PostService {
         catch (err) {
             throw new Error(err)
         }
+    }
+
+    public static async sendPostToAnalytics(client: Client, momentoPost: MomentoPost) {
+        console.log("MOMENTO - Uploading to Global Analytics...")
+        const momentoServer: Guild = client.guilds.cache.get(config["momento-server-id"])
+        const globalFeedChannel: TextChannel = momentoServer.channels.cache.get(config["momento-server-feed-channel-id"]) as TextChannel
+        const postGuild: Guild = client.guilds.cache.get(String(momentoPost.postMessage.guildId))
+        const postEmbed = new EmbedBuilder()
+            .setImage(String(momentoPost.imageURL))
+            .setColor(0xdd247b)
+            .setAuthor({
+                name: 'MOMENTO ANALYTICS',
+                iconURL: 'https://imgur.com/nFwo2PT.png'
+            })
+            .setThumbnail('https://imgur.com/nFwo2PT.png')
+            .addFields(
+                {
+                    name: 'RPG', value: postGuild.name
+                },
+                {
+                    name: 'USERNAME', value: `@${String(momentoPost.author.username)}`
+                }
+            )
+            .addFields(
+                {
+                    name: 'USER-ID', value: String(momentoPost.author.id)
+                },
+                {
+                    name: 'RPG-ID', value: postGuild.id
+                },
+                {
+                    name: 'Descrição', value: momentoPost.description ? String(momentoPost.description) : 'Post sem descrição'
+                },
+                {
+                    name: '_', value: `[Conferir](https://discord.com/channels/${momentoPost.postMessage.guildId}/${momentoPost.postMessage.channelId})`
+                }
+            )
+        const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
+        await globalFeedMessage.react('⚠️')
     }
 }
