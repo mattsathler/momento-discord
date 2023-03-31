@@ -232,6 +232,12 @@ export class UserServices {
         return postList
     }
 
+    static async deleteProfile(message: Message, momentoUser: MomentoUser) {
+        let profileChannel: TextChannel = message.guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
+        await profileChannel.delete()
+        return
+    }
+
     static async fixProfile(message: Message, momentoUser: MomentoUser) {
         let profileChannel: TextChannel = message.guild.channels.cache.get(String(momentoUser.profileChannelId)) as TextChannel
         const collageMessage: Message = await profileChannel.messages.fetch(String(momentoUser.profileCollageId))

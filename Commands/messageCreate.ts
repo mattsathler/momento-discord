@@ -109,6 +109,11 @@ export async function messageCreate(message: Message, client: Client) {
                         reply = await message.reply("Consertando seu perfil, aguarde...")
                         await UserServices.fixProfile(message, momentoUser)
                         break
+                    case "delete":
+                        console.log(`MOMENTO - Deletando o perfil de ${momentoUser.username}...`)
+                        await UserServices.deleteProfile(message, momentoUser)
+                        break
+                        
                 }
 
                 if (reply) { await tryDeleteMessage(reply) }
@@ -133,7 +138,7 @@ export async function messageCreate(message: Message, client: Client) {
                         GroupServices.deleteGroupChat(serverConfig, message)
                         break
                     case "renomear":
-                        console.log(`MOMENTO - Renmoeando o grupo...`)
+                        console.log(`MOMENTO - Renomeando o grupo...`)
                         reply = await message.reply(`Renomeando o grupo...`)
                         await GroupServices.renameGroupChannel(message, args);
                         break
