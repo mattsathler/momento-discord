@@ -1,4 +1,5 @@
 import { createCanvas, Image, loadImage } from "canvas";
+import ImageCropper from "../Utils/ImageCropper";
 
 export class CanvasUtils {
     public static async drawFromURL(url: String): Promise<Buffer> {
@@ -6,7 +7,8 @@ export class CanvasUtils {
         const canvas = createCanvas(1080, 1350)
         const context = canvas.getContext('2d')
 
-        context.drawImage(image, 0, 0, canvas.width, canvas.height)
+        const croppedImage = await ImageCropper.quickCropWithImage(image, 1080, 1350)
+        context.drawImage(croppedImage, 0, 0, canvas.width, canvas.height)
 
         return canvas.toBuffer();
     }
