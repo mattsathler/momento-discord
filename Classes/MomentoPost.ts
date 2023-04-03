@@ -56,7 +56,8 @@ export class MomentoPost {
             const post: Buffer = await Post.drawPost(momentoPost)
             const bufferedImg = croppedImg.toBuffer()
             const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-            const postImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, bufferedImg)
+            const postOriginalImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, bufferedImg)
+            const postImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, post)
             let newPost: Message
             if (!isRepost) {
                 newPost = await profileChannel.send({ files: [post] })
@@ -92,8 +93,8 @@ export class MomentoPost {
             }
 
             momentoPost.postMessage = newPost
-            momentoPost.imageURL = postImageURL
-            await PostService.savePostInDatabase(momentoPost, postImageURL)
+            momentoPost.imageURL = postOriginalImageURL
+            await PostService.savePostInDatabase(momentoPost, postOriginalImageURL)
 
             if (!isRepost) {
                 await NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")

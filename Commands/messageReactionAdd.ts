@@ -67,7 +67,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
                         await NotificationsService.sendNotification(message.guild, notification, false)
-                        const likesCount: Number = message.reactions.cache.get("❤️").count - 1  
+                        const likesCount: number = message.reactions.cache.get("❤️").count - 1  
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
@@ -92,7 +92,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
                         await NotificationsService.sendNotification(message.guild, notification, false)
-                        const likesCount: Number = message.reactions.cache.get("❤️").count - 1
+                        const likesCount: number = message.reactions.cache.get("❤️").count - 1
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
@@ -125,8 +125,8 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
                 case "🔁":
                     if (isPost) {
-                        // await MomentoPost.sharePost(message.client, message, reactUser)
-                        // await removeUserReaction(reactUser, message, String(reactEmoji))
+                        await MomentoPost.sharePost(message.client, message, reactUser)
+                        await removeUserReaction(reactUser, message, String(reactEmoji))
                         break
                     }
                     await removeUserReaction(reactUser, message, String(reactEmoji))
