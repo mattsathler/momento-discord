@@ -57,7 +57,7 @@ export class MomentoComment {
         )
         await NotificationsService.sendNotification(message.guild, notification, false)
 
-        NotificationsService.notifyMentions(message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
+        await NotificationsService.notifyMentions(message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
         return comment
     }
 

@@ -71,7 +71,7 @@ export class UserServices {
             "Bem vindo ao Seu Momento!",
             "https://i.imgur.com/TvJJmjx.png"
         )
-        NotificationsService.sendNotification(message.guild, createdNotification, true)
+        await NotificationsService.sendNotification(message.guild, createdNotification, true)
         console.log("MOMENTO - Usuário cadastrado!")
         return user
     }

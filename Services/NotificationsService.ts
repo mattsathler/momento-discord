@@ -23,21 +23,25 @@ export class NotificationsService {
 
     public static async sendNotification(guild: Guild, notification: MomentoNotification, force?: Boolean): Promise<Message> {
         if (!notification.notifiedUser.notifications && !force) { return }
-        const notifiedUserChannel: TextChannel = guild.channels.cache.get(String(notification.notifiedUser.profileChannelId)) as TextChannel
-        let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
+        const notifiedUserChannel: TextChannel = await guild.channels.fetch(String(notification.notifiedUser.profileChannelId)) as TextChannel
 
-        const notificationEmbed: EmbedBuilder = MomentoNotification.createSimpleNotificationEmbed(notification)
-        if (notification.thumbnailURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }
+        if (notifiedUserChannel) {
 
-        const notificationMessage = await userNotificationChannel.send({
-            embeds: [notificationEmbed]
-        })
+            let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
 
-        await notificationMessage.react('🗑️')
-        const mentionMsg = await userNotificationChannel.send(`<@${notification.notifiedUser.id}>`)
-        await tryDeleteMessage(mentionMsg)
+            const notificationEmbed: EmbedBuilder = MomentoNotification.createSimpleNotificationEmbed(notification)
+            if (notification.thumbnailURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }
 
-        return notificationMessage
+            const notificationMessage = await userNotificationChannel.send({
+                embeds: [notificationEmbed]
+            })
+
+            await notificationMessage.react('🗑️')
+            const mentionMsg = await userNotificationChannel.send(`<@${notification.notifiedUser.id}>`)
+            await tryDeleteMessage(mentionMsg)
+
+            return notificationMessage
+        }
     }
 
     public static async getUserNotificationChannel(targetUserChannel: TextChannel): Promise<ThreadChannel> {

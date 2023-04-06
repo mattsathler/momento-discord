@@ -149,7 +149,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             notificationMsg
                         )
 
-                        NotificationsService.sendNotification(message.guild, notification, true)
+                        await NotificationsService.sendNotification(message.guild, notification, true)
                         break
                     }
                 case '🗑️':

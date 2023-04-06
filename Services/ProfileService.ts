@@ -80,7 +80,7 @@ export class ProfileServices {
     static async changeProfileCollage(message: Message, user: MomentoUser, collageIndex: Number) {
         const guild: Guild = message.guild
         console.log(`MOMENTO - Alterando a foto de collage${collageIndex} de ${user.username}`)
-        if (collageIndex > 5 || collageIndex < 0) { throw new Error("Você só pode alterar collages entre 1 e 6!") }
+        if (Number(collageIndex) > 5 || Number(collageIndex) < 0) { throw new Error("Você só pode alterar collages entre 1 e 6!") }
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para trocar a collage!") }
         if (message.attachments.first()) {
             const newCollagePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
@@ -130,7 +130,7 @@ export class ProfileServices {
     }
 
     static async verifyUser(guild: Guild, momentoUser: MomentoUser, serverConfig: MomentoServer): Promise<MomentoUser> {
-        if (serverConfig.momentoVersion >= 9) {
+        if (Number(serverConfig.momentoVersion) >= 9) {
             try {
                 const profileChannel: TextChannel = await guild.channels.fetch(String(momentoUser.profileChannelId)) as TextChannel
                 const verifiedCategory: CategoryChannel = await guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
