@@ -106,8 +106,8 @@ export class PostService {
 
     public static async sendPostToAnalytics(client: Client, momentoPost: MomentoPost) {
         console.log("MOMENTO - Uploading to Global Analytics...")
-        const momentoServer: Guild = client.guilds.cache.get(config["momento-server-id"])
-        const globalFeedChannel: TextChannel = momentoServer.channels.cache.get(config["momento-server-feed-channel-id"]) as TextChannel
+        const momentoServer: Guild = await client.guilds.fetch(config["momento-server-id"])
+        const globalFeedChannel: TextChannel = await momentoServer.channels.fetch(config["momento-server-feed-channel-id"]) as TextChannel
         const postGuild: Guild = client.guilds.cache.get(String(momentoPost.postMessage.guildId))
         const postEmbed = new EmbedBuilder()
             .setImage(String(momentoPost.imageURL))

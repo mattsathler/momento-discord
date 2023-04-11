@@ -45,6 +45,7 @@ export class NotificationsService {
     }
 
     public static async getUserNotificationChannel(targetUserChannel: TextChannel): Promise<ThreadChannel> {
+        await targetUserChannel.threads.fetch()
         let notifiedUserNotificationsChannel: ThreadChannel = targetUserChannel.threads.cache.find(t => t.parentId == targetUserChannel.id && t.name == "Novas Notificações!");
         if (!notifiedUserNotificationsChannel) {
             notifiedUserNotificationsChannel = await targetUserChannel.threads.create({
