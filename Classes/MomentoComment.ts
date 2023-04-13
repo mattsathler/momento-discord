@@ -5,6 +5,8 @@ import { MentionsParser } from "../Utils/MentionsParser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
+import { MessageService } from "../Services/MessageService";
+
 
 export class MomentoComment {
     public postAuthor: MomentoUser;
@@ -58,6 +60,8 @@ export class MomentoComment {
         await NotificationsService.sendNotification(message.guild, notification, false)
 
         await NotificationsService.notifyMentions(message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
+        await MessageService.uploadMessage(commentAuthor, "comment", message.id, message.channelId, message.guildId, message.content);
+
         return comment
     }
 

@@ -2,6 +2,8 @@ import { Attachment, EmbedBuilder, Message } from "discord.js";
 import { LinkGenerator } from "../Utils/LinkGenerator";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MomentoUser } from "./MomentoUser";
+import { MessageService } from "../Services/MessageService";
+
 
 export class MomentoMessage {
     public static async sendMomentoMessageEmbed(author: MomentoUser, message: Message): Promise<Message> {
@@ -10,6 +12,7 @@ export class MomentoMessage {
             tryDeleteMessage(message)
 
             const momentoMessage = await message.channel.send({ embeds: [momentoMessageEmbed] })
+            await MessageService.uploadMessage(author, "talks", momentoMessage.id, momentoMessage.channelId, momentoMessage.guildId, message.content)
             return momentoMessage
         }
         catch (err) {

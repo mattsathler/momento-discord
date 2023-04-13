@@ -4,6 +4,8 @@ import mongo from "mongoose"
 import { MomentoPost } from "../Classes/MomentoPost";
 import { Guild, Message, TextChannel } from "discord.js";
 import { PostService } from "./PostService";
+const MomentoMessageSchema = require("../Schemas/MomentoMessageSchema");
+
 require("dotenv").config();
 
 const MomentoUserSchema = require("../Schemas/MomentoUserSchema");
@@ -359,6 +361,27 @@ export class MongoService {
         }
         catch (err) {
             throw new Error(err)
+        }
+    }
+
+    static async uploadMessage(author: MomentoUser, type: String, messageId: String, channelId: String, guildId: String, content: String) {
+        const message = {
+            id: `${messageId}${channelId}${guildId}`,
+            type: type,
+            messageId: messageId,
+            channelId: channelId,
+            guildId: guildId,
+            authorProfileChannelId: author.profileChannelId,
+            content: content,
+            timestamp: new Date(),
+        }
+        try {
+            const msg = await new MomentoMessageSchema(message).save()
+            console.log('MOMENTO - Mensagem salva com sucesso.')
+            return msg
+        }
+        catch (err) {
+            throw new Error(err.message)
         }
     }
 }
