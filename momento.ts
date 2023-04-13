@@ -3,6 +3,7 @@ import { Client, GatewayIntentBits, Partials } from "discord.js";
 require("dotenv").config();
 
 import { DiscordEvents } from './Events/DiscordEvents';
+import { AnalyticsService } from "./Services/AnalyticsService";
 
 const client = new Client({
 	partials: [
@@ -20,13 +21,13 @@ const client = new Client({
 	],
 });
 
+client.login(process.env.TOKEN);
 const events: DiscordEvents = new DiscordEvents(client);
 for (let event of events.eventsList) {
-	console.log(`MOMENTO - Carregando o evento ${event}`);
 	client.on(event, async (...args) => {
 		events[event](...args)
 	})
+	AnalyticsService.logAnalytic(client, `Evento ${event} iniciado!`, "success")
 }
 
-console.log(`MOMENTO - Esse é o seu momento!`);
-client.login(process.env.TOKEN);
+AnalyticsService.logAnalytic(client, `Esse é o SEU momento!`)

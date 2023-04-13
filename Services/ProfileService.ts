@@ -12,7 +12,7 @@ export class ProfileServices {
     static async changeCollageStyle(message: Message, user: MomentoUser, newCollageStyle: Number) {
         const guild: Guild = message.guild
         const collage = Number(newCollageStyle) - 1
-        console.log(`MOMENTO - Alterando o estilo de collage de ${user.username}`)
+        console.log(`Alterando o estilo de collage de ${user.username}`)
         if (newCollageStyle && collage <= 4 && collage >= 0) {
             const newUser = await MongoService.updateProfile(user, {
                 profileCollageStyle: collage
@@ -29,7 +29,7 @@ export class ProfileServices {
     static async toggleDarkmode(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
         const newDarkmode = !user.darkmode
-        console.log(`MOMENTO - Alterando o darkmode de ${user.username}`)
+        console.log(`Alterando o darkmode de ${user.username}`)
         const newUser = await MongoService.updateProfile(user, {
             darkmode: newDarkmode
         })
@@ -42,7 +42,7 @@ export class ProfileServices {
 
     static async changeProfilePicture(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
-        console.log(`MOMENTO - Alterando a foto de perfil de ${user.username}`)
+        console.log(`Alterando a foto de perfil de ${user.username}`)
         if (message.attachments.first()) {
             const newProfilePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
             const newUser = await MongoService.updateProfile(user, {
@@ -61,7 +61,7 @@ export class ProfileServices {
 
     static async changeProfileCover(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
-        console.log(`MOMENTO - Alterando a foto de capa de ${user.username}`)
+        console.log(`Alterando a foto de capa de ${user.username}`)
         if (message.attachments.first()) {
             const newProfileCover: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
             const newUser = await MongoService.updateProfile(user, {
@@ -79,7 +79,7 @@ export class ProfileServices {
 
     static async changeProfileCollage(message: Message, user: MomentoUser, collageIndex: Number) {
         const guild: Guild = message.guild
-        console.log(`MOMENTO - Alterando a foto de collage${collageIndex} de ${user.username}`)
+        console.log(`Alterando a foto de collage${collageIndex} de ${user.username}`)
         if (Number(collageIndex) > 5 || Number(collageIndex) < 0) { throw new Error("Você só pode alterar collages entre 1 e 6!") }
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para trocar a collage!") }
         if (message.attachments.first()) {

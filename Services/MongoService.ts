@@ -65,7 +65,7 @@ export class MongoService {
     }
 
     static async checkIfUsernameExists(username: String, userGuildId: String): Promise<Boolean> {
-        console.log(`MOMENTO - Verificando se o usuário ${username} já existe...`)
+        console.log(`Verificando se o usuário ${username} já existe...`)
         const users = mongo.model('users')
         try {
             const response = await users.find({ username: username, guildId: userGuildId }).count()
@@ -182,7 +182,7 @@ export class MongoService {
 
     static async registerUser(user: MomentoUser): Promise<MomentoUser> {
         try {
-            console.log(`MOMENTO - Cadastrando novo perfil para ${user.username}...`)
+            console.log(`Cadastrando novo perfil para ${user.username}...`)
             const newUser = {
                 id: user.id,
                 username: user.username.toLowerCase(),
@@ -201,7 +201,7 @@ export class MongoService {
 
     static async uploadPost(post: MomentoPost, postOriginalImageURL: String): Promise<MomentoPost> {
         try {
-            console.log(`MOMENTO - Cadastrando novo post de ${post.author.username}...`)
+            console.log(`Cadastrando novo post de ${post.author.username}...`)
             post.description = post.description ? post.description : ""
             const newPost = {
                 id: post.postMessage.id,
@@ -279,7 +279,7 @@ export class MongoService {
         groupsCategoryId: String,
         verifiedCategoryId: String,
     ) {
-        console.log(`MOMENTO - Cadastrando nova configuração...`)
+        console.log(`Cadastrando nova configuração...`)
         const newServer = {
             id: serverId,
             uploaderChannelId: uploaderChannelId,
@@ -293,7 +293,7 @@ export class MongoService {
         try {
             await new MomentoServerSchema(newServer).save()
             const createdServer = this.getServerConfigById(serverId)
-            console.log('MOMENTO - Servidor configurado com sucesso.')
+            console.log('Servidor configurado com sucesso.')
             return createdServer
         }
         catch (err) {
@@ -303,7 +303,7 @@ export class MongoService {
 
     static async updateServerSettings(guildId: String, setting: {}) {
         const servers = mongo.model('servers');
-        console.log('MOMENTO - Atualizando configuração do servidor...')
+        console.log('Atualizando configuração do servidor...')
         try {
             const newServerConfig = await servers.findOneAndUpdate({ id: guildId }, setting)
             return newServerConfig
@@ -316,7 +316,7 @@ export class MongoService {
 
     static async updateProfileChannelsId(user: MomentoUser, profileChannelId: String, profileMessageId: String, profileCollageId: String) {
         const users = mongo.model('users');
-        console.log('MOMENTO - Finalizando criação do perfil')
+        console.log('Finalizando criação do perfil')
         try {
             await users.findOneAndUpdate({ id: user.id, guildId: user.guildId }, {
                 profileChannelId: profileChannelId,
@@ -334,11 +334,11 @@ export class MongoService {
 
     static async updateProfile(user: MomentoUser, fields: {}) {
         const users = mongo.model('users');
-        console.log('MOMENTO - Atualizando usuário: ' + user.username)
+        console.log('Atualizando usuário: ' + user.username)
         try {
             await users.findOneAndUpdate({ id: user.id, guildId: user.guildId }, fields)
             const newUser: MomentoUser = await users.findOne({ id: user.id, guildId: user.guildId })
-            console.log('MOMENTO - Usuário ' + user.username + ' atualizado!')
+            console.log('Usuário ' + user.username + ' atualizado!')
             return newUser
         }
         catch (err) {
@@ -378,7 +378,7 @@ export class MongoService {
         }
         try {
             const msg = await new MomentoMessageSchema(message).save()
-            console.log('MOMENTO - Mensagem salva com sucesso.')
+            console.log('Mensagem salva com sucesso.')
             return msg
         }
         catch (err) {
@@ -386,8 +386,8 @@ export class MongoService {
         }
     }
 
-    static async getMessage(author: MomentoUser, messageId: String, channelId: String, guildId: String): Promise<MomentoMessage> {
-        const messages = mongo.model('messages');
+    static async getMessage(messageId: String, channelId: String, guildId: String): Promise<MomentoMessage> {
+        const messages = mongo.model('message');
         try {
             const response = await messages.findOne({ messageId: messageId, channelId: channelId, guildId: guildId })
             if(response) {

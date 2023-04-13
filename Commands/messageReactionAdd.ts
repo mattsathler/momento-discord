@@ -1,4 +1,4 @@
-import { Message, MessageReaction, ThreadChannel, User } from "discord.js";
+import { Client, Message, MessageReaction, ThreadChannel, User } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
@@ -12,16 +12,27 @@ import { ProfileServices } from "../Services/ProfileService";
 import { TimeConverter } from "../Utils/TimeConverter";
 import * as config from "../Settings/MomentoConfig.json";
 import { AnalyticsService } from "../Services/AnalyticsService";
+import { MessageService } from "../Services/MessageService";
+import { MomentoServer } from "../Classes/MomentoServer";
 
 const ms = require('ms');
 
-export async function messageReactionAdd(user: User, reaction: MessageReaction) {
+export async function messageReactionAdd(client: Client, user: User, reaction: MessageReaction) {
     if (user.bot) { return }
     const message: Message = reaction.message as Message;
+    const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
+    const messageId: String = reaction.message.id;
+    const reactEmoji: String = reaction.emoji.name;
 
     const reactUser: MomentoUser = await MongoService.getUserById(user.id, message.guildId)
     let reactedUser: MomentoUser = await MongoService.getUserByProfileChannel(reaction.message.channelId, message.guildId)
     let isComment: Boolean = false;
+    const isMessage = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
+
+    if (config.maintenance && reactUser.id != "598301572325310474") {
+        await removeUserReaction(reactUser, message, String(reactEmoji))
+        return
+    }
 
     if (!reactedUser) {
         const messageChannel = message.guild.channels.cache.get(message.channelId)
@@ -30,56 +41,47 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
         isComment = reactedUser ? true : false
     }
 
-    if (reactedUser && reactUser || isComment) {
-        const messageId: String = reaction.message.id;
+    if (isComment || isMessage) {
+        switch (reactEmoji) {
+            case '🗑️':
+
+                const msg = await MessageService.getMessage(messageId, message.channelId, message.guildId)
+                if (msg) {
+                    if (msg.authorProfileChannelId === reactUser.profileChannelId || reactUser.id == reactedUser.id) {
+                        AnalyticsService.logAnalytic(client, `Excluindo mensagem de ${reactUser.username}...`, "command")
+                        await tryDeleteMessage(message);
+                    }
+                    else {
+                        await removeUserReaction(reactUser, message, String(reactEmoji))
+                    }
+                }
+                break
+        }
+
+        return
+    }
+
+    if (reactedUser && reactUser) {
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;
         const isPost: MomentoPost = await MongoService.getPostById(message.id, message.guildId)
 
-        const reactEmoji: String = reaction.emoji.name;
-
-        if (config.maintenance && reactUser.id != "598301572325310474") {
-            await removeUserReaction(reactUser, message, String(reactEmoji))
-            return
-        }
         try {
             switch (reactEmoji) {
                 case "↩️":
+                    AnalyticsService.logAnalytic(client, `Recarregando de perfil de ${reactedUser.username}...`, "command")
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true);
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
                 case "🔧":
+                    AnalyticsService.logAnalytic(client, `Consertando perfil de ${reactedUser.username}...`, "command")
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true)
                     const serverConfig = await MongoService.getServerConfigById(message.guildId)
                     // await ProfileServices.verifyUser(message.guild, reactedUser, serverConfig)
                     break
                 case "✅":
+                    AnalyticsService.logAnalytic(client, `Verificando perfil de ${reactedUser.username}...`, "command")
                     await removeUserReaction(reactedUser, message, reaction.emoji.name)
                     await AnalyticsService.checkVerified(message.guild, reactedUser, true)
-                    break
-                case "⭐":
-                    if (isPost) {
-                        const notification: MomentoNotification = new MomentoNotification(
-                            reactedUser,
-                            reactUser,
-                            new Date,
-                            `Curtiu sua foto!`,
-                            message.attachments.first().url,
-                            `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
-                        )
-                        await NotificationsService.sendNotification(message.guild, notification, false)
-                        const likesCount: number = message.reactions.cache.get("❤️").count - 1  
-                        let post: MomentoPost = await PostService.getPostFromMessage(message)
-                        post.imageURL = message.attachments.first().url
-                        const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
-                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.8 : Config.likesToTrend
-                        if (
-                            !post.isTrending &&
-                            likesCount >= likesToTrend
-                        ) {
-                            await PostService.trendPost(message.guild, post, notification)
-                        }
-                        break
-                    }
                     break
                 case "❤️":
                     if (isPost) {
@@ -96,6 +98,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
+                        AnalyticsService.logAnalytic(client, `${reactUser.username} curtiu o post de ${reactedUser.username}...`, "command")
                         const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.8 : Config.likesToTrend
                         if (
                             !post.isTrending &&
@@ -103,11 +106,13 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                             Number(timePassed.hours) <= Config.momentosTimeout
                         ) {
                             await PostService.trendPost(message.guild, post, notification)
+                            AnalyticsService.logAnalytic(client, `Post de ${reactedUser.username} entrando para trending`, "command")
                         }
                         break
                     }
                     break
                 case "🫂":
+                    AnalyticsService.logAnalytic(client, `${reactUser} começou a seguir ${reactedUser.username}...`, "command")
                     if (isCollage && reactUser.id != reactedUser.id) {
                         await UserServices.changeFollowers(message.guild, reactedUser, true)
                         const notification: MomentoNotification = new MomentoNotification(
@@ -125,6 +130,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
                 case "🔁":
                     if (isPost) {
+                        AnalyticsService.logAnalytic(client, `${reactUser} repostou um momento de ${reactedUser.username}...`, "command")
                         await MomentoPost.sharePost(message.client, message, reactUser)
                         await removeUserReaction(reactUser, message, String(reactEmoji))
                         break
@@ -133,33 +139,27 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
                 case "🔔": case "🔕":
                     if (reactUser.id == reactedUser.id && isCollage) {
+                        AnalyticsService.logAnalytic(client, `${reactedUser.username} desativou as notificações...`, "command")
                         const notificationToggle: Boolean = reaction.emoji.name == '🔔' ? true : false
                         const notificationEmoji: string = reaction.emoji.name == '🔔' ? '🔕' : '🔔'
-
                         await reaction.remove()
                         await MongoService.updateProfile(reactedUser, { notifications: notificationToggle })
                         await message.react(notificationEmoji)
-
                         const notificationMsg = notificationToggle ? 'Você ativou as notificações de perfil!' : 'Você desativou as notificações de perfil!'
-
                         const notification = new MomentoNotification(
                             reactedUser,
                             reactUser,
                             new Date,
                             notificationMsg
                         )
-
                         await NotificationsService.sendNotification(message.guild, notification, true)
                         break
                     }
                 case '🗑️':
                     try {
-                        if (isComment && reactUser.id == reactedUser.id) {
-                            await tryDeleteMessage(message)
-                            break
-                        }
                         const reactedMessage = message.channel as ThreadChannel
                         if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
+                            AnalyticsService.logAnalytic(client, `${reactedUser.username} excluiu o próprio post...`, "command")
                             await PostService.deletePost(isPost, message)
                             if (isPost) {
                                 const newMomentos = Number(reactUser.momentos) - 1
@@ -178,6 +178,7 @@ export async function messageReactionAdd(user: User, reaction: MessageReaction) 
                     break
                 case '📊':
                     if (isCollage && reactUser.id == reactedUser.id) {
+                        AnalyticsService.logAnalytic(client, `Usando analytics em ${reactedUser.username}...`, "command")
                         await removeAllReactions(message, reaction.emoji.name)
                         try {
                             await removeUserReaction(reactUser, message, reaction.emoji.name)

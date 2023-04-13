@@ -10,7 +10,7 @@ import { ProfileServices } from "../Services/ProfileService";
 import { ServerServices } from "../Services/ServerServices";
 import { UserServices } from "../Services/UserServices";
 import { sendErrorMessage, sendReplyMessage, tryDeleteMessage } from "../Utils/MomentoMessages";
-import { Post } from "../Canvas/Post";
+import { AnalyticsService } from "../Services/AnalyticsService";
 
 export async function messageCreate(message: Message, client: Client) {
     if (!message) return
@@ -37,8 +37,8 @@ export async function messageCreate(message: Message, client: Client) {
 
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-    const isProfileCommand = momentoUser 
-    && momentoUser.profileChannelId == message.channel.id
+    const isProfileCommand = momentoUser
+        && momentoUser.profileChannelId == message.channel.id
         && momentoUser.guildId == channel.guildId ? true : false;
     const isGroupChat = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
     const isOffChat: Boolean = !isCommand && !isComment && !isGroupChat && !isProfileCommand
@@ -51,10 +51,15 @@ export async function messageCreate(message: Message, client: Client) {
     let reply: Message
     try {
         if (isCommand) {
-            if (!serverConfig && command != "configurar") { throw new Error("Servidor não configurado! Use ?configurar para iniciarmos!") }
+            if (!serverConfig && command != "configurar") {
+                AnalyticsService.logAnalytic(client, `Servidor não configurado!`, "error")
+                throw new Error("Servidor não configurado! Use ?configurar para iniciarmos!")
+            }
 
             if (isProfileCommand) {
                 if (command.slice(0, -1) == 'collage') {
+                    AnalyticsService.logAnalytic(client, `Alterando foto de collage de ${momentoUser.username}...`, "command")
+
                     reply = await message.reply("Alterando sua foto de collage, aguarde...")
                     const collageNumber: Number = Number(command.charAt(7)) - 1
                     await ProfileServices.changeProfileCollage(message, momentoUser, collageNumber)
@@ -65,55 +70,55 @@ export async function messageCreate(message: Message, client: Client) {
 
                 switch (command) {
                     case "perfil":
-                        console.log(`MOMENTO - Alterando foto de perfil de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Alterando foto de perfil de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando sua foto de perfil, aguarde...")
                         await ProfileServices.changeProfilePicture(message, momentoUser)
                         break
                     case "capa":
-                        console.log(`MOMENTO - Alterando foto de capa de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Alterando foto de capa de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando sua foto de capa, aguarde...")
                         await ProfileServices.changeProfileCover(message, momentoUser)
                         break
                     case "user":
-                        console.log(`MOMENTO - Alterando usuário de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Alterando usuário de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando seu usuário, aguarde...")
-                        await UserServices.changeProfileUsername(message, momentoUser, args[0].toLowerCase())
+                        await UserServices.changeProfileUsername(client, message, momentoUser, args[0].toLowerCase())
                         break
                     case "nome":
-                        console.log(`MOMENTO - Alterando nome de perfil de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Alterando nome de perfil de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando seu nome, aguarde...")
                         await UserServices.changeUserNameAndSurname(message, momentoUser, args)
                         break
                     case "bio":
-                        console.log(`MOMENTO - Alterando bio de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Alterando bio de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando sua bio, aguarde...")
                         await UserServices.changeProfileBio(message, momentoUser, args)
                         break
                     case "estilo":
-                        console.log(`MOMENTO - Alterando o estilo da collage de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Alterando o estilo da collage de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando o estilo da collage, aguarde...")
                         await ProfileServices.changeCollageStyle(message, momentoUser, Number(args[0]))
                         break
                     case "modo":
-                        console.log(`MOMENTO - Alterando o darkmode de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Alterando o darkmode de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando o darkmode, aguarde...")
                         await ProfileServices.toggleDarkmode(message, momentoUser)
                         break
                     case "talks":
-                        console.log(`MOMENTO - Criando o talks de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Criando o talks de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Criando seu talks, aguarde...")
                         await ServerServices.createGroupChannel(message, momentoUser)
                         break
                     case "fix":
-                        console.log(`MOMENTO - Consertando o perfil de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Consertando o perfil de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Consertando seu perfil, aguarde...")
                         await UserServices.fixProfile(message, momentoUser)
                         break
                     case "delete":
-                        console.log(`MOMENTO - Deletando o perfil de ${momentoUser.username}...`)
+                        AnalyticsService.logAnalytic(client, `Deletando o perfil de ${momentoUser.username}...`, "command")
                         await UserServices.deleteProfile(message, momentoUser)
                         break
-                        
+
                 }
 
                 if (reply) { await tryDeleteMessage(reply) }
@@ -124,21 +129,20 @@ export async function messageCreate(message: Message, client: Client) {
             if (isGroupChat) {
                 switch (command) {
                     case "add":
-                        console.log(`MOMENTO - Adicionando usuário ao grupo...`)
-                        reply = await message.reply(`Convidando usuário para grupo...`)
+                        AnalyticsService.logAnalytic(client, `Convidando usuário para grupo...`, "command")
                         await GroupServices.addUserToGroupChannel(client, message)
                         break
                     case "remove":
-                        console.log(`MOMENTO - Removendo usuário do grupo...`)
+                        AnalyticsService.logAnalytic(client, `Removendo usuário do grupo...`, "command")
                         reply = await message.reply(`Removendo usuário do grupo...`)
                         await GroupServices.removeUserToGroupChannel(client, message)
                         break
                     case "delete":
-                        console.log(`MOMENTO - Deletando o grupo...`)
+                        AnalyticsService.logAnalytic(client, `Deletando o grupo...`, "command")
                         GroupServices.deleteGroupChat(serverConfig, message)
                         break
                     case "renomear":
-                        console.log(`MOMENTO - Renomeando o grupo...`)
+                        AnalyticsService.logAnalytic(client, `Renomeando o grupo...`, "command")
                         reply = await message.reply(`Renomeando o grupo...`)
                         await GroupServices.renameGroupChannel(message, args);
                         break
@@ -159,9 +163,10 @@ export async function messageCreate(message: Message, client: Client) {
                     await ServerServices.updateServer(message, serverConfig)
                     break
                 case "pedirperfil":
+                    AnalyticsService.logAnalytic(client, `criando perfil de ${message.author.username}`, "command")
                     if (channel.id == serverConfig.askProfileChannelId) {
                         reply = await message.reply("Criando seu perfil, aguarde...")
-                        await UserServices.askProfile(message)
+                        await UserServices.askProfile(client, message)
                         break
                     }
                     break
@@ -182,14 +187,17 @@ export async function messageCreate(message: Message, client: Client) {
             return
         }
         if (isComment) {
+            AnalyticsService.logAnalytic(client, `Criando comentário de ${momentoUser.username}...`, "command")
             await MomentoComment.createComment(message.guild, message)
             return
         }
         if (isProfileCommand) {
+            AnalyticsService.logAnalytic(client, `Criando post de ${momentoUser.username}...`, "command")
             reply = await message.reply("Criando seu post, aguarde...")
             const post: MomentoPost = await MomentoPost.createPost(client, message, momentoUser)
             if (reply) { tryDeleteMessage(reply) }
             await tryDeleteMessage(message)
+            AnalyticsService.logAnalytic(client, `Post de ${momentoUser.username} criado!`, "success")
             return
         }
 
@@ -198,7 +206,11 @@ export async function messageCreate(message: Message, client: Client) {
                 tryDeleteMessage(message)
                 return
             }
-            await MomentoMessage.sendMomentoMessageEmbed(momentoUser, message)
+            AnalyticsService.logAnalytic(client, `Enviando mensagem de ${momentoUser.username}...`, "command")
+
+            const msg = await MomentoMessage.sendMomentoMessageEmbed(momentoUser, message)
+            await msg.react('❤️')
+            await msg.react('🗑️')
         }
         return
     }

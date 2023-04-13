@@ -1,11 +1,11 @@
-import { Attachment, Guild, Message, TextChannel } from "discord.js";
+import { Attachment, Client, Guild, Message, TextChannel } from "discord.js";
 import { CanvasUtils } from "../Canvas/Utils";
 import { MomentoServer } from "../Classes/MomentoServer";
 import { MongoService } from "../Services/MongoService";
+import { AnalyticsService } from "../Services/AnalyticsService";
 
 export class LinkGenerator {
     static async uploadImageToMomento(guild: Guild, image: Buffer): Promise<string> {
-        console.log("MOMENTO - Gerando um link da imagem!")
 
         try {
             const serverConfig: MomentoServer = await MongoService.getServerConfigById(guild.id)

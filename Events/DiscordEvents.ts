@@ -37,7 +37,7 @@ export class DiscordEvents {
             }
         }
 
-        messageReactionAdd(user, reaction)
+        messageReactionAdd(this.client, user, reaction)
     }
 
     public async messageReactionRemove(reaction: MessageReaction, user: User) {

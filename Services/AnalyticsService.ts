@@ -1,4 +1,4 @@
-import { EmbedBuilder, Guild, Utils } from "discord.js";
+import { Client, ColorResolvable, EmbedBuilder, Guild, ReactionUserManager, TextChannel, Utils } from "discord.js";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import * as Config from "../Settings/MomentoConfig.json"
@@ -9,6 +9,48 @@ import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
 
 export class AnalyticsService {
+    public static async logAnalytic(client: Client, content: String, type?: String) {
+        const momentoServer: Guild = await client.guilds.fetch(Config["momento-server-id"])
+        const logChannel = await momentoServer.channels.fetch(Config["momento-server-log-channel-id"]) as TextChannel
+        let color: ColorResolvable
+        switch (type) {
+            case "warning":
+                color = 0xFCC419
+                break
+            case "error":
+                color = 0xFF7528
+                break
+            case "command":
+                color = 0x1E2225
+                break
+            case "success":
+                color = 0x00BF79
+                break
+            default:
+                color = 0xDD247B
+                break
+        }
+
+        try {
+            const logEmbed = new EmbedBuilder()
+                .setAuthor(
+                    {
+                        name: 'MOMENTO ANALYTICS',
+                        iconURL: 'https://imgur.com/nFwo2PT.png',
+                    }
+                )
+                .setDescription(`${String(content)}`)
+                .setColor(color)
+
+            const logMessage = await logChannel.send({ embeds: [logEmbed] });
+            return
+        }
+        catch (err) {
+            console.log(err)
+            return
+        }
+    }
+
     public static async generateAnalytics(guild: Guild, post: MomentoPost, followersFromPost: Number) {
         const description = post.description == "" ? 'Momento sem descrição.' : post.description
         const embed = new EmbedBuilder()
@@ -83,9 +125,9 @@ export class AnalyticsService {
 
     static async checkVerified(guild: Guild, momentoUser: MomentoUser, force?: Boolean) {
         if (
-            momentoUser.trends >= Config.trendsToVerify &&
-            momentoUser.followers >= Config.followersToVerify &&
-            momentoUser.momentos >= Config.momentosToVerify || force && !momentoUser.isVerified
+            Number(momentoUser.trends) >= Config.trendsToVerify &&
+            Number(momentoUser.followers) >= Config.followersToVerify &&
+            Number(momentoUser.momentos) >= Config.momentosToVerify || force && !momentoUser.isVerified
         ) {
             const serverConfig = await MongoService.getServerConfigById(guild.id)
             const newUser = await ProfileServices.verifyUser(guild, momentoUser, serverConfig)

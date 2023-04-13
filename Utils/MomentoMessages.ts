@@ -52,7 +52,7 @@ export async function removeUserReaction(user: MomentoUser, message: Message, re
             };
         }
     } catch (error) {
-        console.error('MOMENTO - Houve um problema ao remover a reação!');
+        console.error('Houve um problema ao remover a reação!');
     }
     return
 }
@@ -64,7 +64,7 @@ export async function removeAllReactions(message: Message, react: string) {
                 throw new Error(error)
             });
     } catch (error) {
-        console.error('MOMENTO - Houve um problema ao remover a reação!');
+        console.error('Houve um problema ao remover a reação!');
     }
     return
 }

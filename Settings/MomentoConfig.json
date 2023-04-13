@@ -12,5 +12,6 @@
     "followersToVerify": 5000,
 
     "momento-server-id": "1084823963974246414",
-    "momento-server-feed-channel-id": "1084825060696657940"
+    "momento-server-feed-channel-id": "1084825060696657940",
+    "momento-server-log-channel-id": "1096196937411215390"
 }

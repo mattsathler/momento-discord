@@ -9,6 +9,7 @@ import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
 import { ThreadService } from "./ThreadsService";
 import * as config from "../Settings/MomentoConfig.json";
+import { AnalyticsService } from "./AnalyticsService";
 
 export class PostService {
     public static async savePostInDatabase(post: MomentoPost, postOriginalImageURL: String): Promise<void> {
@@ -105,7 +106,7 @@ export class PostService {
     }
 
     public static async sendPostToAnalytics(client: Client, momentoPost: MomentoPost) {
-        console.log("MOMENTO - Uploading to Global Analytics...")
+        AnalyticsService.logAnalytic(client, `Subindo para o Analytics Global`, "command")
         const momentoServer: Guild = await client.guilds.fetch(config["momento-server-id"])
         const globalFeedChannel: TextChannel = await momentoServer.channels.fetch(config["momento-server-feed-channel-id"]) as TextChannel
         const postGuild: Guild = client.guilds.cache.get(String(momentoPost.postMessage.guildId))

@@ -1,6 +1,6 @@
 const ms = require('ms');
 
-import { EmbedBuilder, Guild, Message, TextChannel, User } from "discord.js"
+import { Client, EmbedBuilder, Guild, Message, TextChannel, User } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
@@ -31,7 +31,7 @@ export class UserServices {
         }
     }
 
-    static async askProfile(message: Message): Promise<MomentoUser> {
+    static async askProfile(client: Client, message: Message): Promise<MomentoUser> {
         let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
 
         //CADASTRA SE NÃO EXISTIR
@@ -42,8 +42,7 @@ export class UserServices {
                 throw new Error(`Usuário já cadastrado nesse servidor! Confira: <#${user.profileChannelId}>`)
             }
         }
-
-        console.log("MOMENTO - Usuário cadastrado, criando perfil...")
+        AnalyticsService.logAnalytic(client, "Usuário cadastrado, criando perfil...", "command")
         const profileCanvas: ProfileCanvas = new ProfileCanvas(user)
 
         const userProfileImage: Buffer = await profileCanvas.drawProfile()
@@ -60,8 +59,8 @@ export class UserServices {
         userCollageMessage.react("🫂")
         userCollageMessage.react(notificationEmoji)
         userCollageMessage.react("📊")
+        AnalyticsService.logAnalytic(client, "Perfil criado, finalizando cadastro...", "command")
 
-        console.log("MOMENTO - Perfil criado, finalizando cadastro...")
         const userCreated = await MongoService.updateProfileChannelsId(user, userProfileChannel.id, userProfileMessage.id, userCollageMessage.id)
 
         const createdNotification: MomentoNotification = new MomentoNotification(
@@ -72,12 +71,12 @@ export class UserServices {
             "https://i.imgur.com/TvJJmjx.png"
         )
         await NotificationsService.sendNotification(message.guild, createdNotification, true)
-        console.log("MOMENTO - Usuário cadastrado!")
+        AnalyticsService.logAnalytic(client, `Usuário ${message.author.username} cadastrado`, "success")
         return user
     }
 
     static async registerUser(message: Message): Promise<MomentoUser> {
-        console.log('MOMENTO - Verificando perfil...')
+        console.log('Verificando perfil...')
         let newMomentoUser: MomentoUser = new MomentoUser(
             message.author.id,
             message.author.username,
@@ -112,7 +111,7 @@ export class UserServices {
     }
 
     static async changeFollowers(guild: Guild, user: MomentoUser, isAdding: Boolean): Promise<MomentoUser> {
-        console.log(`MOMENTO - Alterando seguidores de ${user.username}`)
+        console.log(`Alterando seguidores de ${user.username}`)
         const newFollowers = isAdding ? Number(user.followers) + 1 : Number(user.followers) - 1
         const newUser = await MongoService.updateProfile(user, {
             followers: newFollowers
@@ -122,22 +121,21 @@ export class UserServices {
         return newUser;
     }
 
-    static async changeProfileUsername(message: Message, user: MomentoUser, newUsername: String) {
+    static async changeProfileUsername(client: Client, message: Message, user: MomentoUser, newUsername: String) {
         const guild: Guild = message.guild
-
-        console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newUsername}`)
+        AnalyticsService.logAnalytic(client, `Alterando o usuário de ${user.username} para ${newUsername}`, "command")
         if (newUsername.length == 0 || newUsername.length > config.usernameMaxLength) { throw new Error(`O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo ${config.usernameMaxLength} caracteres!`) }
         if (StringFormater.containsSpecialChars(newUsername)) { throw new Error('O nome de usuário não pode conter caracteres especiais') }
-
+        
         try {
             const newUser = await MongoService.updateProfile(user, {
                 username: String(newUsername)
             })
             await ProfileServices.updateProfileImages(guild, newUser, true, false)
-            console.log('MOMENTO - Nome de usuário alterado com sucesso!')
+            AnalyticsService.logAnalytic(client, `Usuário ${user.username} alteardo para ${newUsername}`, "success")
         }
         catch (err) {
-            console.log(`MOMENTO - Não foi possível alterar o nickname deste usuário para ${newUsername}!`)
+            AnalyticsService.logAnalytic(client, `Não foi possível alterar o nickname deste usuário para ${newUsername}!`, "error")
             console.log(err)
         }
         try {
@@ -153,7 +151,7 @@ export class UserServices {
     static async changeUserNameAndSurname(message: Message, user: MomentoUser, newName: String[]) {
         const guild: Guild = message.guild
 
-        console.log(`MOMENTO - Alterando o usuário de ${user.username} para ${newName}`)
+        console.log(`Alterando o usuário de ${user.username} para ${newName}`)
         if (!newName || !Array.isArray(newName)) { throw new Error('Você precisa definir um nome e sobrenome de usuário. Por exemplo: ?nome José Souza') }
         if (newName.length != 2) { throw new Error('Você precisa definir um nome e sobrenome de usuário. Por exemplo: ?nome José Souza') }
         if (newName[0].length > 12 || newName[1].length > 12) { throw new Error('Nome de usuário muito longo! O máximo é 12 caracteres.') }
@@ -166,10 +164,8 @@ export class UserServices {
             }
             const newUser = await MongoService.updateProfile(user, field)
             await ProfileServices.updateProfileImages(guild, newUser, true, false)
-            console.log('MOMENTO - Nome de usuário alterado com sucesso!')
         }
         catch (err) {
-            console.log(`MOMENTO - Não foi possível alterar o nome deste usuário para ${newName[0]}!`)
             console.log(err)
         }
         return
@@ -187,7 +183,7 @@ export class UserServices {
             bio: bio
         })
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
-        console.log('MOMENTO - Bio alterada com sucesso!')
+        console.log('Bio alterada com sucesso!')
         return
     }
 
