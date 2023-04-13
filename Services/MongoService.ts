@@ -4,6 +4,7 @@ import mongo from "mongoose"
 import { MomentoPost } from "../Classes/MomentoPost";
 import { Guild, Message, TextChannel } from "discord.js";
 import { PostService } from "./PostService";
+import { MomentoMessage } from "../Classes/MomentoMessage";
 const MomentoMessageSchema = require("../Schemas/MomentoMessageSchema");
 
 require("dotenv").config();
@@ -382,6 +383,31 @@ export class MongoService {
         }
         catch (err) {
             throw new Error(err.message)
+        }
+    }
+
+    static async getMessage(author: MomentoUser, messageId: String, channelId: String, guildId: String): Promise<MomentoMessage> {
+        const messages = mongo.model('messages');
+        try {
+            const response = await messages.findOne({ messageId: messageId, channelId: channelId, guildId: guildId })
+            if(response) {
+                const message: MomentoMessage = new MomentoMessage(
+                    response.id,
+                    response.type,
+                    response.messageId,
+                    response.channelId,
+                    response.guildId,
+                    response.authorProfileChannelId,
+                    response.content,
+                    response.timestamp,
+                )
+                return message
+            }
+            return null
+        }
+        catch (err) {
+            console.error(err)
+            return
         }
     }
 }

@@ -6,6 +6,27 @@ import { MessageService } from "../Services/MessageService";
 
 
 export class MomentoMessage {
+    public id: String
+    public type: String
+    public messageId: String
+    public channelId: String
+    public guildId: String
+    public authorProfileChannelId: String
+    public content: String
+    public timestamp: Date
+
+    constructor(id: String, type: String, messageId: String, channelId: String, guildId: String, authorProfileChannelId: String, content: String, timestamp: Date) {
+        this.id = id
+        this.type = type
+        this.messageId = messageId
+        this.channelId = channelId
+        this.guildId = guildId
+        this.authorProfileChannelId = authorProfileChannelId
+        this.content = content
+        this.timestamp = timestamp
+    }
+
+
     public static async sendMomentoMessageEmbed(author: MomentoUser, message: Message): Promise<Message> {
         try {
             const momentoMessageEmbed = await MomentoMessage.createMomentoMessageEmbed(author, message)
