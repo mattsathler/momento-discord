@@ -31,8 +31,11 @@ export class PostService {
         const trendImageURL: String = await LinkGenerator.uploadLinkToMomento(guild, post.imageURL)
         const embed = MomentoNotification.createTrendNotificationEmbed(notification)
         await NotificationsService.sendNotificationEmbed(guild, embed, post.author, true)
+        let description = post.description == '' ? 'Momento sem legenda.' : post.description
+
         const trendEmbed = new EmbedBuilder()
             .setImage(String(trendImageURL))
+            .setDescription(String(description))
             .setColor(0xdd247b)
             .setAuthor({
                 name: String(`@${post.author.username}`),
