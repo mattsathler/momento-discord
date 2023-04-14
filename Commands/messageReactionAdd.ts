@@ -96,7 +96,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         await NotificationsService.sendNotification(message.guild, notification, false)
                         const likesCount: number = message.reactions.cache.get("❤️").count - 1
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
-                        post.imageURL = message.attachments.first().url
+                        // post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
                         AnalyticsService.logAnalytic(client, `${reactUser.username} curtiu o post de ${reactedUser.username}...`, "command")
                         const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.8 : Config.likesToTrend
@@ -112,7 +112,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                     }
                     break
                 case "🫂":
-                    AnalyticsService.logAnalytic(client, `${reactUser} começou a seguir ${reactedUser.username}...`, "command")
+                    AnalyticsService.logAnalytic(client, `${reactUser.username} começou a seguir ${reactedUser.username}...`, "command")
                     if (isCollage && reactUser.id != reactedUser.id) {
                         await UserServices.changeFollowers(message.guild, reactedUser, true)
                         const notification: MomentoNotification = new MomentoNotification(
