@@ -76,7 +76,12 @@ export class NotificationsService {
                 text
             )
 
-            await this.sendNotification(guild, notification, true);
+            try {
+                await this.sendNotification(guild, notification, true);
+            }
+            catch (err) {
+                console.log(err)
+            }
         })
     }
 
