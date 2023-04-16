@@ -110,7 +110,9 @@ export class PostService {
 
     public static async sendPostToAnalytics(client: Client, momentoPost: MomentoPost) {
         AnalyticsService.logAnalytic(client, `Subindo para o Analytics Global`, "command")
-        const momentoServer: Guild = await client.guilds.fetch(config["momento-server-id"])
+        let momentoServer: Guild = null
+        momentoServer = await client.guilds.fetch(config["momento-server-id"])
+        console.log(momentoServer)
         const globalFeedChannel: TextChannel = await momentoServer.channels.fetch(config["momento-server-feed-channel-id"]) as TextChannel
         const postGuild: Guild = client.guilds.cache.get(String(momentoPost.postMessage.guildId))
         const postEmbed = new EmbedBuilder()
@@ -143,7 +145,9 @@ export class PostService {
                     name: '_', value: `[Conferir](https://discord.com/channels/${momentoPost.postMessage.guildId}/${momentoPost.postMessage.channelId})`
                 }
             )
-        const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
-        await globalFeedMessage.react('⚠️')
+        if(globalFeedChannel) {
+            const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
+            await globalFeedMessage.react('⚠️')
+        }
     }
 }
