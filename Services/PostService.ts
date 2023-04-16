@@ -149,6 +149,7 @@ export class PostService {
         if (globalFeedChannel) {
             const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
             await globalFeedMessage.react('⚠️')
+            console.log("Done!")
         }
         else {
             AnalyticsService.logAnalytic(client, "Não foi possível subir para o Global Analytics!", "error")
