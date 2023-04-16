@@ -390,7 +390,7 @@ export class MongoService {
         const messages = mongo.model('message');
         try {
             const response = await messages.findOne({ messageId: messageId, channelId: channelId, guildId: guildId })
-            if(response) {
+            if (response) {
                 const message: MomentoMessage = new MomentoMessage(
                     response.id,
                     response.type,
@@ -408,6 +408,30 @@ export class MongoService {
         catch (err) {
             console.error(err)
             return
+        }
+    }
+
+    static async deleteMessage(channelId: String, guildId: String, messageId?: String): Promise<boolean> {
+        try {
+            const message = mongo.model('message');
+            if (messageId) {
+                await message.deleteOne({
+                    messageId: messageId,
+                    guildId: guildId,
+                    channelId: channelId
+                })
+                return true
+            }
+            else {
+                await message.deleteMany({
+                    guildId: guildId,
+                    channelId: channelId
+                })
+                return true
+            }
+        }
+        catch (err) {
+            throw new Error(err.message)
         }
     }
 }
