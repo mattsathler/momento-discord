@@ -145,9 +145,13 @@ export class PostService {
                     name: '_', value: `[Conferir](https://discord.com/channels/${momentoPost.postMessage.guildId}/${momentoPost.postMessage.channelId})`
                 }
             )
-        if(globalFeedChannel) {
+        console.log(globalFeedChannel)
+        if (globalFeedChannel) {
             const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
             await globalFeedMessage.react('⚠️')
+        }
+        else {
+            AnalyticsService.logAnalytic(client, "Não foi possível subir para o Global Analytics!", "error")
         }
     }
 }
