@@ -44,7 +44,10 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
     if (isComment || isMessage) {
         switch (reactEmoji) {
             case '🗑️':
-
+                if (isComment && reactUser.id == reactedUser.id) {
+                    await tryDeleteMessage(message)
+                    break
+                }
                 const msg = await MessageService.getMessage(messageId, message.channelId, message.guildId)
                 if (msg) {
                     if (msg.authorProfileChannelId === reactUser.profileChannelId || reactUser.id == reactedUser.id) {
@@ -161,13 +164,11 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         if (isPost && reactUser.id == reactedUser.id || isPost && reactedUser.id == reactedMessage.parentId) {
                             AnalyticsService.logAnalytic(client, `${reactedUser.username} excluiu o próprio post...`, "command")
                             await PostService.deletePost(isPost, message)
-                            if (isPost) {
-                                const newMomentos = Number(reactUser.momentos) - 1
-                                const newUser = await MongoService.updateProfile(reactUser, {
-                                    momentos: newMomentos
-                                })
-                                await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
-                            }
+                            const newMomentos = Number(reactUser.momentos) - 1
+                            const newUser = await MongoService.updateProfile(reactUser, {
+                                momentos: newMomentos
+                            })
+                            await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
                             break
                         }
                         await removeUserReaction(reactUser, message, String(reactEmoji))
