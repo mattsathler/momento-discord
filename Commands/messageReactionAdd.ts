@@ -102,7 +102,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         // post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
                         AnalyticsService.logAnalytic(client, `${reactUser.username} curtiu o post de ${reactedUser.username}...`, "command")
-                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.8 : Config.likesToTrend
+                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.9 : Config.likesToTrend
                         if (
                             !post.isTrending &&
                             likesCount >= likesToTrend &&

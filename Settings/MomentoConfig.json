@@ -4,7 +4,7 @@
     "usernameMaxLength": 32,
     "momentoLatestVersion": 9.0,
     "prefix" : "?",
-    "likesToTrend": 60,
+    "likesToTrend": 50,
     "momentosTimeout": 24,
     
     "momentosToVerify": 60,
