@@ -15,6 +15,7 @@ import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import * as config from "../Settings/MomentoConfig.json";
+import { MomentoServer } from "../Classes/MomentoServer";
 
 
 export class UserServices {
@@ -187,7 +188,7 @@ export class UserServices {
         return
     }
 
-    static async analyticProfile(guild: Guild, momentoUser: MomentoUser) {
+    static async analyticProfile(serverConfig: MomentoServer, guild: Guild, momentoUser: MomentoUser) {
         const embed = new EmbedBuilder()
             .setColor(0xdd247b)
             .setAuthor({
@@ -197,7 +198,7 @@ export class UserServices {
             .setDescription('Gerando seu Analytics!')
 
         const profilePosts = await this.fetchProfilePosts(guild, momentoUser)
-        const analyticsPosts = await AnalyticsService.getAnalyticsPosts(profilePosts)
+        const analyticsPosts = await AnalyticsService.getAnalyticsPosts(serverConfig, profilePosts)
         if (analyticsPosts.length == 0) { return }
         await NotificationsService.sendNotificationEmbed(guild, embed, momentoUser, true)
 
@@ -208,7 +209,7 @@ export class UserServices {
         })
         let newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
-        if (!momentoUser.isVerified) { await AnalyticsService.checkVerified(guild, newUser) }
+        if (!momentoUser.isVerified) { await AnalyticsService.checkVerified(serverConfig, guild, newUser) }
         return
     }
 

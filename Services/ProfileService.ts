@@ -138,7 +138,6 @@ export class ProfileServices {
                 await profileChannel.setParent(verifiedCategory, { lockPermissions: false })
                 const verifyEmbedNotification = MomentoNotification.createVerifyJoinNotificationEmbed()
                 await NotificationsService.sendNotificationEmbed(guild, verifyEmbedNotification, momentoUser, true)
-                console.log(newUser)
                 return newUser
             }
             catch (err) {

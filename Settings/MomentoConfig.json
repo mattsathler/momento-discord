@@ -2,14 +2,8 @@
     "maintenance": false,
 
     "usernameMaxLength": 32,
-    "momentoLatestVersion": 9.0,
+    "momentoLatestVersion": 10.0,
     "prefix" : "?",
-    "likesToTrend": 50,
-    "momentosTimeout": 24,
-    
-    "momentosToVerify": 60,
-    "trendsToVerify": 50,
-    "followersToVerify": 10000,
 
     "momento-server-id": "1084823963974246414",
     "momento-server-feed-channel-id": "1084825060696657940",

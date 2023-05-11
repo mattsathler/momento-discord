@@ -7,6 +7,7 @@ import { TimeConverter } from "../Utils/TimeConverter";
 import { MongoService } from "./MongoService";
 import { NotificationsService } from "./NotificationsService";
 import { ProfileServices } from "./ProfileService";
+import { MomentoServer } from "../Classes/MomentoServer";
 
 export class AnalyticsService {
     public static async logAnalytic(client: Client, content: String, type?: String) {
@@ -110,12 +111,12 @@ export class AnalyticsService {
         }
     }
 
-    static async getAnalyticsPosts(profilePosts: MomentoPost[]) {
+    static async getAnalyticsPosts(serverConfig: MomentoServer, profilePosts: MomentoPost[]) {
         let analyticsPosts: MomentoPost[] = []
         await Promise.all(
             profilePosts.map(async momentoPost => {
                 const timePassed = TimeConverter.msToTime(momentoPost.postMessage.createdTimestamp)
-                if (timePassed.hours >= Config.momentosTimeout) {
+                if (timePassed.hours >= serverConfig.momentosTimeout) {
                     analyticsPosts.push(momentoPost)
                 }
             })
@@ -123,11 +124,11 @@ export class AnalyticsService {
         return analyticsPosts
     }
 
-    static async checkVerified(guild: Guild, momentoUser: MomentoUser, force?: Boolean) {
+    static async checkVerified(serverConfig: MomentoServer, guild: Guild, momentoUser: MomentoUser, force?: Boolean) {
         if (
-            Number(momentoUser.trends) >= Config.trendsToVerify &&
-            Number(momentoUser.followers) >= Config.followersToVerify &&
-            Number(momentoUser.momentos) >= Config.momentosToVerify || force && !momentoUser.isVerified
+            Number(momentoUser.trends) >= serverConfig.trendsToVerify &&
+            Number(momentoUser.followers) >= serverConfig.followersToVerify &&
+            Number(momentoUser.momentos) >= serverConfig.momentosToVerify || force && !momentoUser.isVerified
         ) {
             const serverConfig = await MongoService.getServerConfigById(guild.id)
             const newUser = await ProfileServices.verifyUser(guild, momentoUser, serverConfig)

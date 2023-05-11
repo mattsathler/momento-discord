@@ -112,7 +112,6 @@ export class PostService {
         AnalyticsService.logAnalytic(client, `Subindo para o Analytics Global`, "command")
         let momentoServer: Guild = null
         momentoServer = await client.guilds.fetch(config["momento-server-id"])
-        console.log(momentoServer)
         const globalFeedChannel: TextChannel = await momentoServer.channels.fetch(config["momento-server-feed-channel-id"]) as TextChannel
         const postGuild: Guild = client.guilds.cache.get(String(momentoPost.postMessage.guildId))
         const postEmbed = new EmbedBuilder()

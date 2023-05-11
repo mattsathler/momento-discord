@@ -22,6 +22,11 @@ const schema = new mongo.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    'isPublic': {
+        type: Boolean,
+        required: true,
+        default: false
     }
 })
 

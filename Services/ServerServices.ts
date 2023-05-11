@@ -6,6 +6,33 @@ import { sendReplyMessage } from "../Utils/MomentoMessages";
 import * as Config from "../Settings/MomentoConfig.json"
 
 export class ServerServices {
+    static async disableServerConfig(message: Message) {
+        const isServerConfigurated = await MongoService.getServerConfigById(message.guild.id)
+        if (isServerConfigurated) {
+            const guild: Guild = message.guild;
+            let channelToDelete
+
+            try {
+                channelToDelete = await guild.channels.fetch(String(isServerConfigurated.askProfileChannelId))
+                await channelToDelete.delete()
+                channelToDelete = await guild.channels.fetch(String(isServerConfigurated.chatsChannelsId))
+                await channelToDelete.delete()
+                channelToDelete = await guild.channels.fetch(String(isServerConfigurated.verifiedCategoryId))
+                await channelToDelete.delete()
+                channelToDelete = await guild.channels.fetch(String(isServerConfigurated.uploaderChannelId))
+                await channelToDelete.delete()
+                channelToDelete = await guild.channels.fetch(String(isServerConfigurated.trendsChannelId))
+                await channelToDelete.delete()
+                channelToDelete = await guild.channels.fetch(String(isServerConfigurated.profilesChannelId))
+                await channelToDelete.delete()
+                channelToDelete = await guild.channels.fetch(String(isServerConfigurated.groupsCategoryId))
+                await channelToDelete.delete()
+            }
+            catch (err) {
+                console.log(err)
+            }
+        }
+    }
     static async createServerConfig(message: Message) {
         const isServerConfigurated = await MongoService.getServerConfigById(message.guild.id)
         if (isServerConfigurated) {
@@ -19,7 +46,6 @@ export class ServerServices {
                 channelsId.askprofileChannelId,
                 channelsId.profilesCategoryId,
                 channelsId.trendsChannelId,
-                channelsId.chatChannelId,
                 channelsId.groupsCategoryId,
                 channelsId.verifiedCategoryId
             )
@@ -34,10 +60,6 @@ export class ServerServices {
         })
         const askProfileChannel = await guild.channels.create({
             name: "pedir-perfil",
-            type: ChannelType.GuildText,
-        })
-        const chatChannelId = await guild.channels.create({
-            name: "💭momentochat",
             type: ChannelType.GuildText,
         })
         const verifiedCategory = await guild.channels.create({
@@ -63,7 +85,6 @@ export class ServerServices {
 
         await askProfileChannel.setParent(momentoCategory);
         await trendsChannel.setParent(momentoCategory);
-        await chatChannelId.setParent(momentoCategory);
 
         momentoUploaderChannel.permissionOverwrites.create(guild.roles.everyone, {
             ViewChannel: false
@@ -78,7 +99,6 @@ export class ServerServices {
             profilesCategoryId: profilesCategory.id,
             askprofileChannelId: askProfileChannel.id,
             trendsChannelId: trendsChannel.id,
-            chatChannelId: chatChannelId.id,
             groupsCategoryId: groupsCategory.id,
             verifiedCategoryId: verifiedCategory.id
         }
@@ -96,8 +116,8 @@ export class ServerServices {
         })
         userProfileChannel.setRateLimitPerUser(20)
 
-       
-        if(momentoUser.isVerified) {
+
+        if (momentoUser.isVerified) {
             const verifiedCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.verifiedCategoryId)) as CategoryChannel
             await userProfileChannel.setParent(verifiedCategoryChannel)
         }
@@ -105,7 +125,7 @@ export class ServerServices {
             const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
             await userProfileChannel.setParent(profileCategoryChannel)
         }
-        
+
 
 
         await userProfileChannel.permissionOverwrites.create(message.guild.roles.everyone, {

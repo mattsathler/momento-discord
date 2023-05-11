@@ -12,6 +12,16 @@ const schema = new mongo.Schema({
         required: true,
         unique: true
     },
+    'isActive': {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
+    'paymentDate': {
+        type: Date,
+        required: true,
+        default: Date.now()
+    },
     'uploaderChannelId': reqString,
     'askProfileChannelId': reqString,
     'verifiedCategoryId': reqString,
@@ -23,7 +33,56 @@ const schema = new mongo.Schema({
         blackbox: true,
         default: []
     },
-    'momentoVersion': Number
+    'likesToTrend': {
+        type: Number,
+        required: true,
+        default: 20,
+    },
+    'momentosToVerify': {
+        type: Number,
+        required: true,
+        default: 40,
+    },
+    'followersToVerify': {
+        type: Number,
+        required: true,
+        default: 2000,
+    },
+    'trendsToVerify': {
+        type: Number,
+        required: true,
+        default: 20,
+    },
+    'momentosTimeout': {
+        type: Number,
+        required: true,
+        default: 24,
+    },
+    'profilesCreated': {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    'profilesTotalCreated': {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    'subscriptionDay': {
+        type: Date,
+        required: true,
+        default: Date.now()
+    },
+    'subscriptionType': {
+        type: Number,
+        required: true,
+        default: 25
+    },
+    'clientMessageId': {
+        type: String,
+        required: false,
+    },
+    'momentoVersion': Number,
 })
 
 module.exports = mongo.model('servers', schema)

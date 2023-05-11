@@ -55,6 +55,11 @@ export class MongoService {
                 response.groupsCategoryId,
                 response.verifiedCategoryId,
                 response.momentoVersion ?? 8.0,
+                response.likesToTrend,
+                response.momentosToVerify,
+                response.followersToVerify,
+                response.trendsToVerify,
+                response.momentosTimeout,
             )
             return serverConfig
         }
@@ -275,7 +280,6 @@ export class MongoService {
         askProfileChannelId: String,
         profilesChannelId: String,
         trendsChannelId: String,
-        chatChannelId: String,
         groupsCategoryId: String,
         verifiedCategoryId: String,
     ) {
@@ -286,7 +290,6 @@ export class MongoService {
             askProfileChannelId: askProfileChannelId,
             profilesChannelId: profilesChannelId,
             trendsChannelId: trendsChannelId,
-            chatChannelId: chatChannelId,
             groupsCategoryId: groupsCategoryId,
             verifiedCategoryId: verifiedCategoryId,
         }

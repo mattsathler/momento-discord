@@ -154,9 +154,14 @@ export async function messageCreate(message: Message, client: Client) {
 
             switch (command) {
                 case "configurar":
-                    // reply = await message.reply("Configurando servidor, aguarde...")
-                    // await ServerServices.createServerConfig(message)
-                    await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
+                    reply = await message.reply("Configurando servidor, aguarde...")
+                    await ServerServices.createServerConfig(message)
+                    // await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
+                    break
+                case "desconfigurar":
+                    // reply = await message.reply("Desinstalando servidor, aguarde...")
+                    // await ServerServices.disableServerConfig(message)
+                    await sendReplyMessage(message, "A opção de desintalar o MOMENTO está desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
                     break
                 case "atualizar":
                     reply = await message.reply("Atualizando servidor, aguarde...")

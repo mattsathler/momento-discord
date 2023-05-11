@@ -78,13 +78,12 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                 case "🔧":
                     AnalyticsService.logAnalytic(client, `Consertando perfil de ${reactedUser.username}...`, "command")
                     await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true)
-                    const serverConfig = await MongoService.getServerConfigById(message.guildId)
                     // await ProfileServices.verifyUser(message.guild, reactedUser, serverConfig)
                     break
                 case "✅":
                     AnalyticsService.logAnalytic(client, `Verificando perfil de ${reactedUser.username}...`, "command")
                     await removeUserReaction(reactedUser, message, reaction.emoji.name)
-                    await AnalyticsService.checkVerified(message.guild, reactedUser, true)
+                    await AnalyticsService.checkVerified(serverConfig, message.guild, reactedUser, true)
                     break
                 case "❤️":
                     if (isPost) {
@@ -102,11 +101,11 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         // post.imageURL = message.attachments.first().url
                         const timePassed = TimeConverter.msToTime(post.postMessage.createdTimestamp)
                         AnalyticsService.logAnalytic(client, `${reactUser.username} curtiu o post de ${reactedUser.username}...`, "command")
-                        const likesToTrend = reactedUser.isVerified ? Config.likesToTrend * 0.9 : Config.likesToTrend
+                        const likesToTrend = reactedUser.isVerified ? serverConfig.likesToTrend * 0.9 : serverConfig.likesToTrend
                         if (
                             !post.isTrending &&
                             likesCount >= likesToTrend &&
-                            Number(timePassed.hours) <= Config.momentosTimeout
+                            Number(timePassed.hours) <= Number(serverConfig.momentosTimeout)
                         ) {
                             await PostService.trendPost(message.guild, post, notification)
                             AnalyticsService.logAnalytic(client, `Post de ${reactedUser.username} entrando para trending`, "command")
@@ -116,7 +115,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                     break
                 case "🫂":
                     AnalyticsService.logAnalytic(client, `${reactUser.username} começou a seguir ${reactedUser.username}...`, "command")
-                    if (isCollage && reactUser.id != reactedUser.id) {
+                    // if (isCollage && reactUser.id != reactedUser.id) {
                         await UserServices.changeFollowers(message.guild, reactedUser, true)
                         const notification: MomentoNotification = new MomentoNotification(
                             reactedUser,
@@ -128,7 +127,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         )
                         await NotificationsService.sendNotification(message.guild, notification, false)
                         break
-                    }
+                    // }
                     await removeUserReaction(reactUser, message, String(reactEmoji))
                     break
                 case "🔁":
@@ -183,7 +182,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         await removeAllReactions(message, reaction.emoji.name)
                         try {
                             await removeUserReaction(reactUser, message, reaction.emoji.name)
-                            await UserServices.analyticProfile(message.guild, reactedUser)
+                            await UserServices.analyticProfile(serverConfig, message.guild, reactedUser)
                             await message.react('📊')
                             return
                         }
