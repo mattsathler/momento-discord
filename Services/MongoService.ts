@@ -60,6 +60,11 @@ export class MongoService {
                 response.followersToVerify,
                 response.trendsToVerify,
                 response.momentosTimeout,
+                response.profilesCreated,
+                response.profilesTotalCreated,
+                response.subscriptionDay,
+                response.subscriptionType,
+                response.clientMessageId ?? '',
             )
             return serverConfig
         }

@@ -15,9 +15,17 @@ export class MomentoServer {
     public trendsToVerify: number;
     public momentosTimeout: number;
 
+    public profilesCreated: number;
+    public profilesTotalCreated: number;
+    public subscriptionDay: Date;
+    public subscriptionType: number;
+    public clientMessageId: number;
+
     constructor(id: String, profilesChannelId: String, askProfileChannelId: String, uploaderChannelId: String,
         trendsChannelId: String, chatsChannelsId: [String], groupsCategoryId: String, verifiedCategoryId: String, momentoVersion: Number,
         likesToTrend: number, momentosToVerify: number, followersToVerify: number, trendsToVerify: number, momentosTimeout: number,
+        profilesCreated: number, profilesTotalCreated: number, subscriptionDay: Date, subscriptionType: number, clientMessageId: number,
+
         ) {
         this.id = id
         this.profilesChannelId = profilesChannelId
@@ -33,5 +41,11 @@ export class MomentoServer {
         this.followersToVerify = followersToVerify
         this.trendsToVerify = trendsToVerify
         this.momentosTimeout = momentosTimeout
+
+        this.profilesCreated = profilesCreated
+        this.profilesTotalCreated = profilesTotalCreated
+        this.subscriptionDay = subscriptionDay
+        this.subscriptionType = subscriptionType
+        this.clientMessageId = clientMessageId
     }
 }

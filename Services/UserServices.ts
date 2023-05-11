@@ -34,6 +34,7 @@ export class UserServices {
 
     static async askProfile(client: Client, message: Message): Promise<MomentoUser> {
         let user: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
+        let serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
 
         //CADASTRA SE NÃO EXISTIR
         if (!user) { user = await this.registerUser(message) }
@@ -72,6 +73,8 @@ export class UserServices {
             "https://i.imgur.com/TvJJmjx.png"
         )
         await NotificationsService.sendNotification(message.guild, createdNotification, true)
+        await MongoService.updateServerSettings(message.guildId, { profilesTotalCreated: serverConfig.profilesTotalCreated + 1 }
+        )
         AnalyticsService.logAnalytic(client, `Usuário ${message.author.username} cadastrado`, "success")
         return user
     }
@@ -127,7 +130,7 @@ export class UserServices {
         AnalyticsService.logAnalytic(client, `Alterando o usuário de ${user.username} para ${newUsername}`, "command")
         if (newUsername.length == 0 || newUsername.length > config.usernameMaxLength) { throw new Error(`O nome de usuário inválido! Não pode ter espaços e deve possuir no máximo ${config.usernameMaxLength} caracteres!`) }
         if (StringFormater.containsSpecialChars(newUsername)) { throw new Error('O nome de usuário não pode conter caracteres especiais') }
-        
+
         try {
             const newUser = await MongoService.updateProfile(user, {
                 username: String(newUsername)

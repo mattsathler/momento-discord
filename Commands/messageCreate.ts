@@ -163,10 +163,10 @@ export async function messageCreate(message: Message, client: Client) {
                     // await ServerServices.disableServerConfig(message)
                     await sendReplyMessage(message, "A opção de desintalar o MOMENTO está desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
                     break
-                case "atualizar":
-                    reply = await message.reply("Atualizando servidor, aguarde...")
-                    await ServerServices.updateServer(message, serverConfig)
-                    break
+                // case "atualizar":
+                //     reply = await message.reply("Atualizando servidor, aguarde...")
+                //     await ServerServices.updateServer(message, serverConfig)
+                //     break
                 case "pedirperfil":
                     AnalyticsService.logAnalytic(client, `criando perfil de ${message.author.username}`, "command")
                     if (channel.id == serverConfig.askProfileChannelId) {

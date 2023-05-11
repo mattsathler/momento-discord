@@ -4,6 +4,7 @@ import { MomentoUser } from "../Classes/MomentoUser"
 import { MongoService } from "./MongoService"
 import { sendReplyMessage } from "../Utils/MomentoMessages";
 import * as Config from "../Settings/MomentoConfig.json"
+import { AnalyticsService } from "./AnalyticsService";
 
 export class ServerServices {
     static async disableServerConfig(message: Message) {
@@ -106,6 +107,19 @@ export class ServerServices {
         return defaultChannelsIds
     }
 
+    static async createMoreProfileCategory(message: Message) {
+        const profilesCategoryId = await message.guild.channels.create({
+            name: "🫂perfis",
+            type: ChannelType.GuildCategory,
+        })
+        await MongoService.updateServerSettings(message.guildId,
+            {
+                profilesCreated: 0,
+                profilesCategoryId: profilesCategoryId
+            }
+        )
+    }
+
     static async createProfileChannel(message: Message, momentoUser: MomentoUser): Promise<TextChannel> {
         const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
         const discordUser: User = message.author
@@ -122,11 +136,10 @@ export class ServerServices {
             await userProfileChannel.setParent(verifiedCategoryChannel)
         }
         else {
+            if (serverConfig.profilesCreated > 49) { await this.createMoreProfileCategory(message) }
             const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
             await userProfileChannel.setParent(profileCategoryChannel)
         }
-
-
 
         await userProfileChannel.permissionOverwrites.create(message.guild.roles.everyone, {
             SendMessages: false,

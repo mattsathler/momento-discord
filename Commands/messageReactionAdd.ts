@@ -6,7 +6,6 @@ import { NotificationsService } from "../Services/NotificationsService";
 import { PostService } from "../Services/PostService";
 import { UserServices } from "../Services/UserServices";
 import { removeAllReactions, removeUserReaction, tryDeleteMessage } from "../Utils/MomentoMessages";
-import * as Config from '../Settings/MomentoConfig.json';
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { ProfileServices } from "../Services/ProfileService";
 import { TimeConverter } from "../Utils/TimeConverter";
