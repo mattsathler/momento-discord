@@ -47,19 +47,7 @@ export default class ImageCropper {
 
     public static async drawUserPicture(imageUrl: string): Promise<Canvas> {
         try {
-
-            let loadedImage: Image = await loadImage(imageUrl)
-            let treatedImage: Canvas
-
-            if (loadedImage.width <= 800 || loadedImage.height <= 800) {
-                treatedImage = await ImageCropper.quickCropWithURL(imageUrl, 800, 800)
-            }
-            else if (loadedImage.width >= 2240 || loadedImage.height >= 2240) {
-                treatedImage = await ImageCropper.quickCropWithURL(imageUrl, 2240, 2240)
-            }
-            else {
-                treatedImage = await ImageCropper.quickCropWithURL(imageUrl, loadedImage.width, loadedImage.height)
-            }
+            let profileImage: Image = await loadImage(imageUrl)
             const canvas = createCanvas(800, 800)
             const context = canvas.getContext('2d')
 
@@ -69,7 +57,7 @@ export default class ImageCropper {
             context.clip();
 
 
-            context.drawImage(treatedImage, 0, 0);
+            context.drawImage(profileImage, 0, 0);
             context.restore();
 
             // const dataURL = canvas.toDataURL()

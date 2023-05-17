@@ -42,9 +42,8 @@ export class ProfileServices {
 
     static async changeProfilePicture(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
-        console.log(`Alterando a foto de perfil de ${user.username}`)
         if (message.attachments.first()) {
-            const newProfilePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
+            const newProfilePicture: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url, 800, 800)
             const newUser = await MongoService.updateProfile(user, {
                 profilePicture: newProfilePicture
             })
@@ -61,9 +60,8 @@ export class ProfileServices {
 
     static async changeProfileCover(message: Message, user: MomentoUser) {
         const guild: Guild = message.guild
-        console.log(`Alterando a foto de capa de ${user.username}`)
         if (message.attachments.first()) {
-            const newProfileCover: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url)
+            const newProfileCover: String = await LinkGenerator.uploadLinkToMomento(guild, message.attachments.first().url, 1280, 288)
             const newUser = await MongoService.updateProfile(user, {
                 profileCover: newProfileCover
             })

@@ -21,11 +21,11 @@ export class LinkGenerator {
         }
     }
 
-    static async uploadLinkToMomento(guild: Guild, image: String): Promise<string> {
+    static async uploadLinkToMomento(guild: Guild, image: String, width?: number, height?: number): Promise<string> {
         try {
             const serverConfig: MomentoServer = await MongoService.getServerConfigById(guild.id)
             const uploaderChannel: TextChannel = guild.channels.cache.get(String(serverConfig.uploaderChannelId)) as TextChannel;
-            const uploadedImage: Buffer = await CanvasUtils.drawFromURL(image)
+            const uploadedImage: Buffer = await CanvasUtils.drawFromURL(image, width, height)
 
             const msg: Message = await uploaderChannel.send({ files: [uploadedImage] })
             const attachment: Attachment = msg.attachments.first()
