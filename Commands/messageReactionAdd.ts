@@ -28,9 +28,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
     let isComment: Boolean = false;
     const isMessage = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
 
-    if (!reactUser || !reactedUser) {
-        return
-    }
+    if (!reactUser) { return }
 
     if (config.maintenance && reactUser.id != "598301572325310474") {
         await removeUserReaction(reactUser, message, String(reactEmoji))
