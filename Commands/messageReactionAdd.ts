@@ -87,7 +87,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                     await AnalyticsService.checkVerified(serverConfig, message.guild, reactedUser, true)
                     break
                 case "❤️":
-                    if (isPost) {
+                    if (isPost && message.attachments) {
                         const notification: MomentoNotification = new MomentoNotification(
                             reactedUser,
                             reactUser,
