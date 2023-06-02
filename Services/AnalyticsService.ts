@@ -93,14 +93,14 @@ export class AnalyticsService {
 
             //CONTA BIZARRA PARA CALCULAR O RESULTADO DO POST
             const newFollowersBase = Math.random() * (25 - 10) + 10
-            const followersMultiplier = Math.random() * (4 - 1) + 1
+            const followersMultiplier = Math.random() * (6 - 1) + 1
 
             let followersFromPost = Math.floor(newFollowersBase * followersMultiplier / 2)
             followersFromPost += post.postMessage.reactions.cache.get('❤️').count
             if (followersFromPost == 0) { followersFromPost = 1 }
 
-            if (post.author.isVerified) { followersFromPost = followersFromPost * 2 }
-            if (post.isTrending) { followersFromPost = followersFromPost * 2 }
+            if (post.author.isVerified) { followersFromPost = followersFromPost * 6 }
+            if (post.isTrending) { followersFromPost = followersFromPost * 4 }
             newFollowersList.push(followersFromPost)
         })
 

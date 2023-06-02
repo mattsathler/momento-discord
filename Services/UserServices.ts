@@ -73,7 +73,12 @@ export class UserServices {
             "https://i.imgur.com/TvJJmjx.png"
         )
         await NotificationsService.sendNotification(message.guild, createdNotification, true)
-        await MongoService.updateServerSettings(message.guildId, { profilesTotalCreated: serverConfig.profilesTotalCreated + 1 }
+        await MongoService.updateServerSettings(
+            message.guildId,
+            {
+                profilesTotalCreated: serverConfig.profilesTotalCreated + 1,
+                profilesCreated: serverConfig.profilesCreated + 1
+            }
         )
         AnalyticsService.logAnalytic(client, `Usuário ${message.author.username} cadastrado`, "success")
         return user
