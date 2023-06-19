@@ -168,7 +168,7 @@ export class Post {
     }
 
     public static calculateDescriptionHeight(username: String, text: String, maxWidth: number): number {
-        if (!text) return 50 + postConfig.postSafeAreaSize + 16
+        if (!text) { return 50 + postConfig.postSafeAreaSize + 16 }
         let words = text.split(' ');
         let line = '';
 
