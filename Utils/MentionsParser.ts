@@ -41,7 +41,7 @@ export class MentionsParser {
     }
 
     public static parseDescriptionLocation(input: string): { description: string, location: string } {
-        const regex = /l:"([^"]*)"/g;
+        const regex = /`([^`]+)`/g;
         const matches = regex.exec(input);
         const extractedValue = matches ? matches[1] : "";
         const output = input.replace(regex, "");
@@ -49,6 +49,11 @@ export class MentionsParser {
             description: output,
             location: extractedValue
         };
+    }
+
+    public static parseBreakedLines(description: string): string {
+        const padrao = /\n/g;
+        return description.replace(padrao, " ");
     }
 }
 

@@ -37,8 +37,9 @@ export class MomentoPost {
     public static async createPost(client: Client, message: Message, user: MomentoUser, isRepost?: Boolean): Promise<MomentoPost> {
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para criar um post!") }
         if (message.content.length > PostConfig.descriptionLimit) { throw new Error("O limite máximo de caracteres para a descrição é de: " + PostConfig.descriptionLimit + " letras!") }
-        const postDescription: String[] = await MentionsParser.parseUserMentions(message)
-        const parsedDescription = MentionsParser.parseLocations(postDescription.join(' '))
+        const parsedMentions: String[] = await MentionsParser.parseUserMentions(message)
+        const parsedBreakedLines: String = MentionsParser.parseBreakedLines(parsedMentions.join(' '))
+        const parsedDescription = MentionsParser.parseLocations(String(parsedBreakedLines))
         let momentoPost: MomentoPost;
         if (isRepost) {
             momentoPost = await MongoService.getPostById(message.id, message.guildId)
