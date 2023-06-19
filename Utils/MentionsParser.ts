@@ -25,6 +25,31 @@ export class MentionsParser {
 
         return Promise.all(mentionsContent)
     }
+
+    public static parseLocations(description: string): { description: string, location: string } {
+        const parsed = this.parseDescriptionLocation(description)
+        if (parsed == undefined) {
+            return {
+                description: description,
+                location: null
+            }
+        }
+        return {
+            description: parsed.description,
+            location: parsed.location
+        }
+    }
+
+    public static parseDescriptionLocation(input: string): { description: string, location: string } {
+        const regex = /loc="([^"]*)"/g;
+        const matches = regex.exec(input);
+        const extractedValue = matches ? matches[1] : "";
+        const output = input.replace(regex, "");
+        return {
+            description: output,
+            location: extractedValue
+        };
+    }
 }
 
 // if (notificate) {

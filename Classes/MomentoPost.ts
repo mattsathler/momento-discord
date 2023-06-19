@@ -38,6 +38,7 @@ export class MomentoPost {
         if (message.attachments.size == 0) { throw new Error("Você precisa anexar uma imagem com a mensagem para criar um post!") }
         if (message.content.length > PostConfig.descriptionLimit) { throw new Error("O limite máximo de caracteres para a descrição é de: " + PostConfig.descriptionLimit + " letras!") }
         const postDescription: String[] = await MentionsParser.parseUserMentions(message)
+        const parsedDescription = MentionsParser.parseLocations(postDescription.join(' '))
         let momentoPost: MomentoPost;
         if (isRepost) {
             momentoPost = await MongoService.getPostById(message.id, message.guildId)
@@ -47,8 +48,8 @@ export class MomentoPost {
                 new MomentoPost(
                     user,
                     message.attachments.first().url,
-                    postDescription.join(' '),
-                    "Creekhills"
+                    parsedDescription.description,
+                    parsedDescription.location.length > 25 || !parsedDescription ? null : parsedDescription.location
                 )
         }
         try {

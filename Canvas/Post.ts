@@ -24,7 +24,7 @@ export class Post {
         let imageCanvas: Canvas
         imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 1080, 1350)
 
-        const description = await this.createDescription(post.author.username, post.location, post.description, imageCanvas.width - postConfig.postSafeGap * 2, postConfig.lineHeight, postConfig.postSafeGap, colors)
+        const description = await this.createDescription(post.author.username, post.location, post.description, imageCanvas.width - postConfig.postSafeGap * 2, postConfig.lineHeight, postConfig.postSafeGap, colors, post.author.darkmode)
         const canvas = createCanvas(
             imageCanvas.width + postConfig.postSafeAreaSize * 2,
             imageCanvas.height + postConfig.postHeaderSize + description.height + postConfig.postSafeGap)
@@ -38,11 +38,11 @@ export class Post {
         context.drawImage(authorRoundImage, postConfig.postSafeGap * 2, postConfig.postSafeGap, postConfig.profilePictureSize, postConfig.profilePictureSize)
 
         context.font = '36px sfpro-bold'
-        context.fillStyle = `#${colors.primary}`
+        context.fillStyle = `#${colors.secondary}`
         context.fillText(`${post.author.name} ${post.author.surname}`, postConfig.postSafeGap * 8, postConfig.postHeaderSize / 2 - postConfig.postSafeGap * 1.6)
 
         context.font = '28px sfpro'
-        context.fillStyle = `#${colors.onBackground}`
+        context.fillStyle = `#${colors.secondary}`
         context.fillText(`@${post.author.username}`, postConfig.postSafeGap * 8, postConfig.postHeaderSize / 2 + 2)
         const usernameWidth = context.measureText(`@${String(post.author.username)}`)
 
@@ -66,7 +66,8 @@ export class Post {
         maxWidth: number,
         lineHeight: number,
         gap: number,
-        colors: Colors
+        colors: Colors,
+        isDarkMode?: Boolean
     ) {
         let words = text.split(' ');
         let line = '';
@@ -79,7 +80,7 @@ export class Post {
         let x = postConfig.postSafeGap * 2;
         let y = lineHeight
 
-        if(location) {
+        if (location) {
             const locationIcon = await loadImage('./Assets/Icons/location.png')
 
             context.font = '32px sfpro-bold'
@@ -87,21 +88,29 @@ export class Post {
             context.fillStyle = `#${colors.secondary}`
             context.fillText(String(location), x + 45, y);
             context.drawImage(locationIcon, x, 0, 40, 40)
-            
+
             context.strokeStyle = `#${colors.secondary}`;
             context.lineWidth = 1;
-    
+
             y += 18;
-    
+
             context.beginPath();
             context.moveTo(x, y);
             context.lineTo(canvas.width / 2, y);
             context.stroke();
         }
 
-        const likeIcon = await loadImage('./Assets/Icons/like.png')
-        const commentIcon = await loadImage('./Assets/Icons/comment.png')
-        const shareIcon = await loadImage('./Assets/Icons/share.png')
+        let likeIcon, commentIcon, shareIcon;
+        if (isDarkMode) {
+            likeIcon = await loadImage('./Assets/Icons/like-dark.png')
+            commentIcon = await loadImage('./Assets/Icons/comment-dark.png')
+            shareIcon = await loadImage('./Assets/Icons/share-dark.png')
+        }
+        else {
+            likeIcon = await loadImage('./Assets/Icons/like.png')
+            commentIcon = await loadImage('./Assets/Icons/comment.png')
+            shareIcon = await loadImage('./Assets/Icons/share.png')
+        }
 
         context.drawImage(shareIcon, canvas.width - 64, 0, 40, 40)
         context.drawImage(commentIcon, canvas.width - 64 - 60, 0, 40, 40)
@@ -185,6 +194,6 @@ export class Post {
             }
         }
 
-        return y + postConfig.postSafeAreaSize + 16
+        return y + postConfig.postSafeAreaSize
     }
 }
