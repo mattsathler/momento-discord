@@ -41,7 +41,7 @@ export class MentionsParser {
     }
 
     public static parseDescriptionLocation(input: string): { description: string, location: string } {
-        const regex = /-l:"([^"]*)"/g;
+        const regex = /l:"([^"]*)"/g;
         const matches = regex.exec(input);
         const extractedValue = matches ? matches[1] : "";
         const output = input.replace(regex, "");
