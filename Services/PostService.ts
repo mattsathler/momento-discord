@@ -144,7 +144,6 @@ export class PostService {
                     name: '_', value: `[Conferir](https://discord.com/channels/${momentoPost.postMessage.guildId}/${momentoPost.postMessage.channelId})`
                 }
             )
-        console.log(globalFeedChannel)
         if (globalFeedChannel) {
             const globalFeedMessage: Message = await globalFeedChannel.send({ embeds: [postEmbed] })
             await globalFeedMessage.react('⚠️')
