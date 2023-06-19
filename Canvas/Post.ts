@@ -22,7 +22,7 @@ export class Post {
         let imageCanvas: Canvas
         imageCanvas = await ImageCropper.quickCropWithURL(String(post.imageURL), 1080, 1350)
 
-        const description = this.createDescription(post.description, imageCanvas.width, postConfig.lineHeight, postConfig.postSafeGap, colors)
+        const description = this.createDescription(post.author.username, post.description, imageCanvas.width - postConfig.postSafeGap * 4, postConfig.lineHeight, postConfig.postSafeGap, colors)
         const canvas = createCanvas(
             imageCanvas.width + postConfig.postSafeAreaSize * 2,
             imageCanvas.height + postConfig.postHeaderSize + description.height + postConfig.postSafeGap)
@@ -64,6 +64,7 @@ export class Post {
     }
 
     public static createDescription(
+        authorUsername: String,
         text: String,
         maxWidth: number,
         lineHeight: number,
@@ -73,40 +74,58 @@ export class Post {
         let words = text.split(' ');
         let line = '';
 
-        const descriptionHeight = this.calculateDescriptionHeight(text, maxWidth)
+        const descriptionHeight = this.calculateDescriptionHeight(authorUsername, text, maxWidth)
         const canvas = createCanvas(maxWidth + postConfig.postSafeAreaSize * 2, descriptionHeight)
+        registerFont('./Assets/Fonts/SFPRODISPLAYMEDIUM.otf', { family: 'sfpro' })
+        registerFont('./Assets/Fonts/SFPRODISPLAYBOLD.otf', { family: 'sfpro-bold' })
         const context = canvas.getContext('2d')
 
         let y = lineHeight
-        let x = maxWidth / 2 + postConfig.postSafeGap / 2
+
+        context.font = '32px sfpro-bold'
+        const usernameWidth = context.measureText(String(authorUsername) + ' ').width
+        let x = postConfig.postSafeGap * 2;
+        let lineNumber = 0
 
         for (let n = 0; n < words.length; n++) {
-            context.font = '40px FORTE'
-            context.textAlign = "center"
+            console.log(n + '/' + words.length)
+            context.font = '32px sfpro'
+            context.textAlign = "left"
             context.fillStyle = `#${colors.secondary}`
             let testLine = line + words[n] + ' ';
             let metrics = context.measureText(testLine);
-            let testWidth = metrics.width;
+            let testWidth = lineNumber === 0 ? metrics.width + usernameWidth : metrics.width;
 
-            if (testWidth > maxWidth && n > 0) {
-                context.fillText(line, x, y);
+            if (testWidth > maxWidth) {
+                const startingLine = lineNumber === 0 ? x + usernameWidth : x;
+                context.fillText(line, startingLine, y);
                 line = words[n] + ' ';
                 y = y + lineHeight;
+                lineNumber++
             }
             else {
                 line = testLine;
             }
+
         }
 
-        context.font = '40px FORTE'
+        context.font = '32px sfpro'
+        context.textAlign = "left"
         context.fillStyle = `#${colors.secondary}`
-        context.textAlign = "center"
-        context.fillText(line, x, y);
+        if(lineNumber === 0) {
+            context.fillText(line, x + usernameWidth, y);
+        }
+        else {
+            context.fillText(line, x, y);
+        }
+
+        context.font = '32px sfpro-bold'
+        context.fillText(String(authorUsername), postConfig.postSafeGap * 2, lineHeight);
 
         return canvas
     }
 
-    public static calculateDescriptionHeight(text: String, maxWidth: number): number {
+    public static calculateDescriptionHeight(username: String, text: String, maxWidth: number): number {
         let words = text.split(' ');
         let line = '';
 
@@ -114,17 +133,19 @@ export class Post {
         const context = canvas.getContext('2d')
 
         let y = postConfig.lineHeight
-
+        context.font = '32px sfpro-bold'
+        const usernameWidth = context.measureText(username + ' ').width
+        let lineNumber = 0;
         for (let n = 0; n < words.length; n++) {
-            context.font = '40px FORTE'
-            context.textAlign = "center"
+            context.font = '32px sfpro'
+            context.textAlign = "left"
             let testLine = line + words[n] + ' ';
             let metrics = context.measureText(testLine);
-            let testWidth = metrics.width;
-
-            if (testWidth > maxWidth && n > 0) {
+            let testWidth = lineNumber === 0 ? metrics.width + usernameWidth : metrics.width;
+            if (testWidth > maxWidth) {
                 line = words[n] + '  ';
                 y = y + postConfig.lineHeight;
+                lineNumber++
             } else {
                 line = testLine;
             }
