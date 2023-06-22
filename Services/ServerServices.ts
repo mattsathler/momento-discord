@@ -115,7 +115,7 @@ export class ServerServices {
         await MongoService.updateServerSettings(message.guildId,
             {
                 profilesCreated: 0,
-                profilesCategoryId: profilesCategoryId
+                profilesChannelId: profilesCategoryId
             }
         )
     }
@@ -136,7 +136,7 @@ export class ServerServices {
             await userProfileChannel.setParent(verifiedCategoryChannel)
         }
         else {
-            if (serverConfig.profilesCreated > 45) {
+            if (serverConfig.profilesCreated > 48) {
                 await this.createMoreProfileCategory(message)
                 serverConfig = await MongoService.getServerConfigById(message.guildId)
             }
