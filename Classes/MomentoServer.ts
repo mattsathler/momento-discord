@@ -7,6 +7,7 @@ export class MomentoServer {
     public groupsCategoryId: String;
     public chatsChannelsId: [String];
     public verifiedCategoryId: String;
+    public sharedTrendWebhooks: [String];
     public momentoVersion: Number;
 
     public likesToTrend: number;
@@ -23,7 +24,7 @@ export class MomentoServer {
 
     constructor(id: String, profilesChannelId: String, askProfileChannelId: String, uploaderChannelId: String,
         trendsChannelId: String, chatsChannelsId: [String], groupsCategoryId: String, verifiedCategoryId: String, momentoVersion: Number,
-        likesToTrend: number, momentosToVerify: number, followersToVerify: number, trendsToVerify: number, momentosTimeout: number,
+        likesToTrend: number, sharedTrendWebhooks: [String], momentosToVerify: number, followersToVerify: number, trendsToVerify: number, momentosTimeout: number,
         profilesCreated: number, profilesTotalCreated: number, subscriptionDay: Date, subscriptionType: number, clientMessageId: number,
 
         ) {
@@ -35,6 +36,8 @@ export class MomentoServer {
         this.chatsChannelsId = chatsChannelsId
         this.groupsCategoryId = groupsCategoryId
         this.verifiedCategoryId = verifiedCategoryId
+        this.sharedTrendWebhooks = sharedTrendWebhooks
+        this.momentoVersion = momentoVersion
         this.momentoVersion = momentoVersion
         this.likesToTrend = likesToTrend
         this.momentosToVerify = momentosToVerify

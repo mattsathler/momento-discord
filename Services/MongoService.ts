@@ -56,6 +56,7 @@ export class MongoService {
                 response.verifiedCategoryId,
                 response.momentoVersion ?? 8.0,
                 response.likesToTrend,
+                response.sharedTrendWebhooks,
                 response.momentosToVerify,
                 response.followersToVerify,
                 response.trendsToVerify,

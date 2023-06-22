@@ -27,6 +27,7 @@ const schema = new mongo.Schema({
     'verifiedCategoryId': reqString,
     'profilesChannelId': reqString,
     'trendsChannelId': reqString,
+    'sharedTrendWebhooks': [String],
     'groupsCategoryId': reqString,
     'chatsChannelsId': {
         type: [String],

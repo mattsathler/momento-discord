@@ -10,6 +10,9 @@ import { ProfileServices } from "./ProfileService";
 import { ThreadService } from "./ThreadsService";
 import * as config from "../Settings/MomentoConfig.json";
 import { AnalyticsService } from "./AnalyticsService";
+import { MomentoServer } from "../Classes/MomentoServer";
+import axios from "axios";
+import { Post } from "../Canvas/Post";
 
 export class PostService {
     public static async savePostInDatabase(post: MomentoPost, postOriginalImageURL: String): Promise<void> {
@@ -28,32 +31,33 @@ export class PostService {
         })
         const serverConfig = await MongoService.getServerConfigById(guild.id)
         const trendChannel: TextChannel = guild.channels.cache.get(String(serverConfig.trendsChannelId)) as TextChannel;
-        const trendImageURL: String = await LinkGenerator.uploadLinkToMomento(guild, post.imageURL)
         const embed = MomentoNotification.createTrendNotificationEmbed(notification)
         await NotificationsService.sendNotificationEmbed(guild, embed, post.author, true)
-        let description = post.description == '' ? 'Momento sem legenda.' : post.description
-
+        const postImage = await Post.drawPost(post)
+        const trendImageURL = await LinkGenerator.uploadImageToMomento(guild, postImage)
         const trendEmbed = new EmbedBuilder()
             .setImage(String(trendImageURL))
-            .setDescription(String(description))
             .setColor(0xdd247b)
             .setAuthor({
-                name: String(`@${post.author.username}`),
-                iconURL: String(post.author.profilePicture)
+                name: "MOMENTO TRENDING",
+                iconURL: "https://imgur.com/eRYLRQ4.png"
             })
+            .setDescription(`**@${post.author.username}** está em alta no *#momento!*`)
+            .setThumbnail("https://imgur.com/EBZfW7D.png")
             .addFields({
                 name: ' ', value: `[Confira o perfil](https://discord.com/channels/${post.postMessage.guildId}/${post.author.profileChannelId})`
             })
         const trendPost: Message = await trendChannel.send({
             embeds: [trendEmbed],
         })
-
-        trendPost.react('❤️‍🔥')
+        await trendPost.react('❤️‍🔥')
         const mentionMsg = await trendChannel.send(`<@${post.author.id}>`)
         await tryDeleteMessage(mentionMsg)
         const newUser = await MongoService.updateProfile(post.author, {
             trends: Number(post.author.trends) + 1
         })
+        
+        await this.shareTrend(serverConfig, trendEmbed);
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
         return
     }
@@ -151,5 +155,20 @@ export class PostService {
         else {
             AnalyticsService.logAnalytic(client, "Não foi possível subir para o Global Analytics!", "error")
         }
+    }
+
+    public static async shareTrend(serverConfig: MomentoServer, embed: EmbedBuilder) {
+        serverConfig.sharedTrendWebhooks?.map(
+            async webhook => {
+                try{
+                    await axios.post(String(webhook), {
+                        embeds: [embed]
+                    })
+                }
+                catch(err) {
+                    console.log("Erro ao enviar para o webhook")
+                }
+            }
+        )
     }
 }

@@ -121,7 +121,7 @@ export class ServerServices {
     }
 
     static async createProfileChannel(message: Message, momentoUser: MomentoUser): Promise<TextChannel> {
-        const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
+        let serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
         const discordUser: User = message.author
 
         const userProfileChannel = await message.guild.channels.create({
@@ -136,7 +136,10 @@ export class ServerServices {
             await userProfileChannel.setParent(verifiedCategoryChannel)
         }
         else {
-            if (serverConfig.profilesCreated > 49) { await this.createMoreProfileCategory(message) }
+            if (serverConfig.profilesCreated > 45) {
+                await this.createMoreProfileCategory(message)
+                serverConfig = await MongoService.getServerConfigById(message.guildId)
+            }
             const profileCategoryChannel: CategoryChannel = await message.guild.channels.fetch(String(serverConfig.profilesChannelId)) as CategoryChannel
             await userProfileChannel.setParent(profileCategoryChannel)
         }

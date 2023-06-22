@@ -199,7 +199,7 @@ export async function messageCreate(message: Message, client: Client) {
         if (isProfileCommand) {
             AnalyticsService.logAnalytic(client, `Criando post de ${momentoUser.username}...`, "command")
             reply = await message.reply("Criando seu post, aguarde...")
-            const post: MomentoPost = await MomentoPost.createPost(client, message, momentoUser)
+            await MomentoPost.createPost(client, message, momentoUser)
             if (reply) { tryDeleteMessage(reply) }
             await tryDeleteMessage(message)
             AnalyticsService.logAnalytic(client, `Post de ${momentoUser.username} criado!`, "success")
