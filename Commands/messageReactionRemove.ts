@@ -3,16 +3,18 @@ import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
 import { UserServices } from "../Services/UserServices";
 import * as Config from '../Settings/MomentoConfig.json';
+import { MomentoServer } from "../Classes/MomentoServer";
 
 export async function messageReactionRemove(user: User, reaction: MessageReaction) {
     if (user.bot) { return }
     const message: Message = reaction.message as Message;
-
+    const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
     const reactUser: MomentoUser = await MongoService.getUserById(user.id, message.guildId)
     let reactedUser: MomentoUser = await MongoService.getUserByProfileChannel(reaction.message.channelId, message.guildId)
     let isComment: Boolean = false;
 
-    if (Config.maintenance && user.id != "598301572325310474") { return }
+    if (!serverConfig) { return }
+    if (Config.maintenance && user.id != "598301572325310474" || !serverConfig.isActive) { return }
     if (reactedUser && reactUser || isComment) {
         const messageId: String = reaction.message.id;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;

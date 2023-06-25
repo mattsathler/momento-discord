@@ -1,5 +1,6 @@
 export class MomentoServer {
     public id: String;
+    public isActive: Boolean;
     public profilesChannelId: String;
     public askProfileChannelId: String;
     public uploaderChannelId: String;
@@ -22,13 +23,14 @@ export class MomentoServer {
     public subscriptionType: number;
     public clientMessageId: number;
 
-    constructor(id: String, profilesChannelId: String, askProfileChannelId: String, uploaderChannelId: String,
+    constructor(id: String, isActive: Boolean, profilesChannelId: String, askProfileChannelId: String, uploaderChannelId: String,
         trendsChannelId: String, chatsChannelsId: [String], groupsCategoryId: String, verifiedCategoryId: String, momentoVersion: Number,
         likesToTrend: number, sharedTrendWebhooks: [String], momentosToVerify: number, followersToVerify: number, trendsToVerify: number, momentosTimeout: number,
         profilesCreated: number, profilesTotalCreated: number, subscriptionDay: Date, subscriptionType: number, clientMessageId: number,
 
         ) {
         this.id = id
+        this.isActive = isActive
         this.profilesChannelId = profilesChannelId
         this.askProfileChannelId = askProfileChannelId
         this.uploaderChannelId = uploaderChannelId
