@@ -15,7 +15,7 @@ const schema = new mongo.Schema({
     'isActive': {
         type: Boolean,
         required: true,
-        default: true,
+        default: false,
     },
     'paymentDate': {
         type: Date,
