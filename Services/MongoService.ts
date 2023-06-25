@@ -47,6 +47,7 @@ export class MongoService {
             if (!response) { return null }
             const serverConfig: MomentoServer = new MomentoServer(
                 response.id,
+                response.isActive ?? false,
                 response.profilesChannelId,
                 response.askProfileChannelId,
                 response.uploaderChannelId,
