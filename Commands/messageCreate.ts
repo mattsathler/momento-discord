@@ -154,9 +154,9 @@ export async function messageCreate(message: Message, client: Client) {
 
             switch (command) {
                 case "configurar":
-                    reply = await message.reply("Configurando servidor, aguarde...")
-                    await ServerServices.createServerConfig(message)
-                    // await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *Dougg#1767* para mais informações.", null, false)
+                    // reply = await message.reply("Configurando servidor, aguarde...")
+                    // await ServerServices.createServerConfig(message)
+                    await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *@doougzera* para mais informações.", null, false)
                     break
                 case "desconfigurar":
                     // reply = await message.reply("Desinstalando servidor, aguarde...")
