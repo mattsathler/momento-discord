@@ -19,16 +19,16 @@ import { MomentoServer } from "../Classes/MomentoServer";
 
 
 export class UserServices {
-    static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<Boolean> {
+    static async userAlreadyHaveProfileChannel(guild: Guild, user: MomentoUser): Promise<TextChannel> {
         try {
-            const channel = guild.channels.cache.get(String(user.profileChannelId))
+            const channel = await guild.channels.fetch(String(user.profileChannelId))
             if (!channel) {
-                return false
+                return null
             }
-            return true
+            return channel as TextChannel
         }
         catch (err) {
-            return true
+            return null
         }
     }
 
@@ -40,7 +40,18 @@ export class UserServices {
         if (!user) { user = await this.registerUser(message) }
         if (user.profileChannelId != "") {
             const userHaveProfile = await this.userAlreadyHaveProfileChannel(message.guild, user)
-            if (userHaveProfile) {
+            if (userHaveProfile != null) {
+                await userHaveProfile.permissionOverwrites.create(message.author,
+                    {
+                        SendMessages: false,
+                        SendMessagesInThreads: true,
+                        AddReactions: false
+                    })
+                await userHaveProfile.permissionOverwrites.create(message.author, {
+                    SendMessages: true,
+                    SendMessagesInThreads: true,
+                    AddReactions: false
+                })
                 throw new Error(`Usuário já cadastrado nesse servidor! Confira: <#${user.profileChannelId}>`)
             }
         }
