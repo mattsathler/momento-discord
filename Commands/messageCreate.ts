@@ -22,7 +22,7 @@ export async function messageCreate(message: Message, client: Client) {
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
     if (!serverConfig) return
-    if (!serverConfig.isActive) {
+    if (serverConfig && !serverConfig.isActive) {
         try {
             await message.reply("Esse servidor possui pendências. Entre em contato com o administrador para mais informações!")
             return
