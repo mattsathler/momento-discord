@@ -21,7 +21,7 @@ export async function messageCreate(message: Message, client: Client) {
     const momentoUser = await MongoService.getUserById(message.author.id, message.guildId);
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
-    if(!serverConfig) return
+    if (!serverConfig) return
     if (!serverConfig.isActive) {
         try {
             await message.reply("Esse servidor possui pendências. Entre em contato com o administrador para mais informações!")
@@ -161,9 +161,12 @@ export async function messageCreate(message: Message, client: Client) {
 
             switch (command) {
                 case "configurar":
-                    // reply = await message.reply("Configurando servidor, aguarde...")
-                    // await ServerServices.createServerConfig(message)
-                    await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *@doougzera* para mais informações.", null, false)
+                    if (message.author.id != "598301572325310474") {
+                        await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *@doougzera* para mais informações.", null, false)
+                        return;
+                    }
+                    reply = await message.reply("Configurando servidor, aguarde...")
+                    await ServerServices.createServerConfig(message)
                     break
                 case "desconfigurar":
                     // reply = await message.reply("Desinstalando servidor, aguarde...")
