@@ -14,6 +14,7 @@ import { AnalyticsService } from "../Services/AnalyticsService";
 
 export async function messageCreate(message: Message, client: Client) {
     if (!message) return
+    if (!message.guildId) return
     if (message.author.bot) return;
     if (message.type == MessageType.ThreadCreated) return;
     if (message.type == MessageType.ThreadStarterMessage) return;
@@ -21,7 +22,7 @@ export async function messageCreate(message: Message, client: Client) {
     const momentoUser = await MongoService.getUserById(message.author.id, message.guildId);
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
-    if (!serverConfig) return
+    // if (!serverConfig) return
     if (serverConfig && !serverConfig.isActive) {
         try {
             await message.reply("Esse servidor possui pendências. Entre em contato com o administrador para mais informações!")
@@ -36,6 +37,9 @@ export async function messageCreate(message: Message, client: Client) {
 
     let isComment: Boolean = false;
 
+    if(!message.guild) {
+        return
+    }
     if (!isSomeoneProfileChannel) {
         const messageChannel = message.guild.channels.cache.get(message.channelId)
         isComment = await MongoService.getUserByProfileChannel(String(messageChannel.parentId), message.guildId) ? true : false
