@@ -51,6 +51,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                 }
                 const msg = await MessageService.getMessage(messageId, message.channelId, message.guildId)
                 if (msg) {
+                    if (!reactUser || !reactedUser) { return }
                     if (msg.authorProfileChannelId === reactUser.profileChannelId || reactUser.id == reactedUser.id) {
                         AnalyticsService.logAnalytic(client, `Excluindo mensagem de ${reactUser.username}...`, "command")
                         await tryDeleteMessage(message);
@@ -117,17 +118,17 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                 case "🫂":
                     AnalyticsService.logAnalytic(client, `${reactUser.username} começou a seguir ${reactedUser.username}...`, "command")
                     // if (isCollage && reactUser.id != reactedUser.id) {
-                        await UserServices.changeFollowers(message.guild, reactedUser, true)
-                        const notification: MomentoNotification = new MomentoNotification(
-                            reactedUser,
-                            reactUser,
-                            new Date,
-                            `Começou a te seguir!`,
-                            null,
-                            `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
-                        )
-                        await NotificationsService.sendNotification(message.guild, notification, false)
-                        break
+                    await UserServices.changeFollowers(message.guild, reactedUser, true)
+                    const notification: MomentoNotification = new MomentoNotification(
+                        reactedUser,
+                        reactUser,
+                        new Date,
+                        `Começou a te seguir!`,
+                        null,
+                        `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
+                    )
+                    await NotificationsService.sendNotification(message.guild, notification, false)
+                    break
                     // }
                     await removeUserReaction(reactUser, message, String(reactEmoji))
                     break
