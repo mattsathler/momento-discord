@@ -114,7 +114,7 @@ export class ServerServices {
         })
         await MongoService.updateServerSettings(message.guildId,
             {
-                profilesCreated: 1,
+                profilesCreated: 0,
                 profilesChannelId: profilesCategoryId.id
             }
         )

@@ -84,11 +84,12 @@ export class UserServices {
             "https://i.imgur.com/TvJJmjx.png"
         )
         await NotificationsService.sendNotification(message.guild, createdNotification, true)
+        const updatedChannelConfig = await MongoService.getServerConfigById(message.guildId); 
         await MongoService.updateServerSettings(
             message.guildId,
             {
-                profilesTotalCreated: serverConfig.profilesTotalCreated + 1,
-                profilesCreated: serverConfig.profilesCreated + 1
+                profilesTotalCreated: updatedChannelConfig.profilesTotalCreated + 1,
+                profilesCreated: updatedChannelConfig.profilesCreated + 1
             }
         )
         AnalyticsService.logAnalytic(client, `Usuário ${message.author.username} cadastrado`, "success")
