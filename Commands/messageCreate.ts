@@ -23,14 +23,17 @@ export async function messageCreate(message: Message, client: Client) {
     const channel: TextChannel = message.channel as TextChannel
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(channel.guildId)
     // if (!serverConfig) return
-    if (serverConfig && !serverConfig.isActive) {
+    const isCommand = message.content.charAt(0) == config.prefix ? true : false;
+    if (serverConfig && !serverConfig.isActive && isCommand) {
         try {
-            await message.reply("Esse servidor possui pendências. Entre em contato com o administrador para mais informações!")
+            const pendingMessage = await message.reply("Esse servidor possui pendências. Entre em contato com o administrador para mais informações!")
+            setTimeout(async () => {
+                await tryDeleteMessage(pendingMessage);
+            }, 4000);
             return
         }
         catch { }
     }
-    const isCommand = message.content.charAt(0) == config.prefix ? true : false;
 
 
     const isSomeoneProfileChannel: Boolean = await MongoService.getUserByProfileChannel(String(message.channelId), message.guildId) ? true : false
