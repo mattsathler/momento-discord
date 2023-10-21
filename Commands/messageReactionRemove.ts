@@ -14,7 +14,7 @@ export async function messageReactionRemove(user: User, reaction: MessageReactio
     let isComment: Boolean = false;
 
     if (!serverConfig) { return }
-    if (Config.maintenance && user.id != "598301572325310474" || !serverConfig.isActive) { return }
+    if (Config.maintenance && user.id != "609916240760406056" || !serverConfig.isActive) { return }
     if (reactedUser && reactUser || isComment) {
         const messageId: String = reaction.message.id;
         const isCollage: Boolean = messageId == reactedUser.profileCollageId ? true : false;

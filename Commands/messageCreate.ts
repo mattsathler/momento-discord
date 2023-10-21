@@ -57,7 +57,7 @@ export async function messageCreate(message: Message, client: Client) {
     const isGroupChat = serverConfig ? serverConfig.chatsChannelsId.includes(message.channelId) : false;
     const isOffChat: Boolean = !isCommand && !isComment && !isGroupChat && !isProfileCommand
 
-    if (config.maintenance && message.author.id != "598301572325310474" && !isOffChat) {
+    if (config.maintenance && message.author.id != "609916240760406056" && !isOffChat) {
         await sendErrorMessage(message, "Ops! Estamos em manutenção... Tente novamente mais tarde! =(");
         return
     }
@@ -168,7 +168,7 @@ export async function messageCreate(message: Message, client: Client) {
 
             switch (command) {
                 case "configurar":
-                    if (message.author.id != "598301572325310474") {
+                    if (message.author.id != "609916240760406056") {
                         await sendReplyMessage(message, "Novas configurações estão desativadas por tempo indeterminado. Entre me contato com *@doougzera* para mais informações.", null, false)
                         return;
                     }

@@ -30,7 +30,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
 
     if (!reactUser) { return }
 
-    if (config.maintenance && reactUser.id != "598301572325310474" || !serverConfig.isActive) {
+    if (config.maintenance && reactUser.id != "609916240760406056" || !serverConfig.isActive) {
         await removeUserReaction(reactUser, message, String(reactEmoji))
         return
     }
