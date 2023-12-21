@@ -40,7 +40,7 @@ export async function messageCreate(message: Message, client: Client) {
 
     let isComment: Boolean = false;
 
-    if(!message.guild) {
+    if (!message.guild) {
         return
     }
     if (!isSomeoneProfileChannel) {
@@ -113,10 +113,23 @@ export async function messageCreate(message: Message, client: Client) {
                         reply = await message.reply("Alterando o estilo da collage, aguarde...")
                         await ProfileServices.changeCollageStyle(message, momentoUser, Number(args[0]))
                         break
-                    case "modo":
-                        AnalyticsService.logAnalytic(client, `Alterando o darkmode de ${momentoUser.username}...`, "command")
-                        reply = await message.reply("Alterando o darkmode, aguarde...")
-                        await ProfileServices.toggleDarkmode(message, momentoUser)
+                    case "pri":
+                    case "primary":
+                        AnalyticsService.logAnalytic(client, `Alterando a cor primária de ${momentoUser.username}...`, "command")
+                        reply = await message.reply("Alterando a cor primária, aguarde...")
+                        await ProfileServices.changeThemeColor(message, momentoUser, args[0], "primary")
+                        break
+                    case "sec":
+                    case "secondary":
+                        AnalyticsService.logAnalytic(client, `Alterando a cor secundária de ${momentoUser.username}...`, "command")
+                        reply = await message.reply("Alterando a cor secundária, aguarde...")
+                        await ProfileServices.changeThemeColor(message, momentoUser, args[0], "secondary")
+                        break
+                    case "ter":
+                    case "tertiary":
+                        AnalyticsService.logAnalytic(client, `Alterando a cor terciária de ${momentoUser.username}...`, "command")
+                        reply = await message.reply("Alterando a cor terciária, aguarde...")
+                        await ProfileServices.changeThemeColor(message, momentoUser, args[0], "tertiary")
                         break
                     case "talks":
                         AnalyticsService.logAnalytic(client, `Criando o talks de ${momentoUser.username}...`, "command")

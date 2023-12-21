@@ -12,7 +12,6 @@ export class ProfileServices {
     static async changeCollageStyle(message: Message, user: MomentoUser, newCollageStyle: Number) {
         const guild: Guild = message.guild
         const collage = Number(newCollageStyle) - 1
-        console.log(`Alterando o estilo de collage de ${user.username}`)
         if (newCollageStyle && collage <= 4 && collage >= 0) {
             const newUser = await MongoService.updateProfile(user, {
                 profileCollageStyle: collage
@@ -26,16 +25,30 @@ export class ProfileServices {
         }
     }
 
-    static async toggleDarkmode(message: Message, user: MomentoUser) {
+    static async changeThemeColor(message: Message, user: MomentoUser, color: string, name: string) {
         const guild: Guild = message.guild
-        const newDarkmode = !user.darkmode
-        console.log(`Alterando o darkmode de ${user.username}`)
-        const newUser = await MongoService.updateProfile(user, {
-            darkmode: newDarkmode
-        })
-
+        let newUser: MomentoUser;
+        if (color.indexOf('#') == -1) { color = '#' + String(color) }
+        if (color.length != 7) { throw new Error("Você precisa definir uma cor válida! Use ?cor <#hex> para alterar.") }
+        if (RegExp(/^#(?:[0-9a-fA-F]{3}){1,2}$/).test(color) == false) { throw new Error("Você precisa definir uma cor válida! Use ?cor <#hex> para alterar.") }
+        const newColor = color.replace('#', '')
+        if (name === 'primary') {
+            newUser = await MongoService.updateProfile(user, {
+                'theme.primary': newColor
+            })
+        }
+        else if (name === 'secondary') {
+            newUser = await MongoService.updateProfile(user, {
+                'theme.secondary': newColor
+            })
+        }
+        else {
+            newUser = await MongoService.updateProfile(user, {
+                'theme.tertiary': newColor
+            })
+        }
+        
         await this.updateProfileImages(guild, newUser, true, true)
-        // await sendReplyMessage(message, "Estilo de collage alterado com sucesso!", null, false)
         return newUser;
     }
 
