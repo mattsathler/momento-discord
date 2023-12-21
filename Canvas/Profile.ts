@@ -39,12 +39,12 @@ export class ProfileCanvas {
 
         // Add User Info
         context.font = '30px FORTE'
-        context.fillStyle = `#${this.momentoUser.theme.primary}`
+        context.fillStyle = `#${this.momentoUser.theme.secondary}`
         context.fillText("@" + this.momentoUser.username, canvas.width / 2, canvas.height - 270)
         const usernameWidth = context.measureText(`@${String(this.momentoUser.username)}`)
 
         context.font = '55px FORTE'
-        context.fillStyle = `#${this.momentoUser.theme.secondary}`
+        context.fillStyle = `#${this.momentoUser.theme.primary}`
         context.fillText(`${this.momentoUser.name} ${this.momentoUser.surname}`, canvas.width / 2, canvas.height - 220)
 
         context.font = '30px OpenSans-Italic'
