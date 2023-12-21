@@ -45,7 +45,8 @@ export class MomentoComment {
         const commentEmbed = MomentoComment.createCommentEmbed(comment)
         tryDeleteMessage(message)
 
-        const commentMessage = await message.channel.send({ embeds: [commentEmbed] })
+        const textChannel = message.channel as TextChannel;
+        const commentMessage = await textChannel.send({ embeds: [commentEmbed] })
         await commentMessage.react('❤️')
         await commentMessage.react('🗑️')
 

@@ -1,4 +1,4 @@
-import { Attachment, EmbedBuilder, Message } from "discord.js";
+import { Attachment, EmbedBuilder, Message, TextChannel } from "discord.js";
 import { LinkGenerator } from "../Utils/LinkGenerator";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MomentoUser } from "./MomentoUser";
@@ -32,7 +32,8 @@ export class MomentoMessage {
             const momentoMessageEmbed = await MomentoMessage.createMomentoMessageEmbed(author, message)
             tryDeleteMessage(message)
 
-            const momentoMessage = await message.channel.send({ embeds: [momentoMessageEmbed] })
+            const channel = message.channel as TextChannel;
+            const momentoMessage = await channel.send({ embeds: [momentoMessageEmbed] })
             await MessageService.uploadMessage(author, "talks", momentoMessage.id, momentoMessage.channelId, momentoMessage.guildId, message.content)
             return momentoMessage
         }

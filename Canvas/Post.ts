@@ -1,9 +1,8 @@
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
 import { MomentoPost } from "../Classes/MomentoPost";
 import ImageCropper from "../Utils/ImageCropper";
-import * as styleColors from '../Settings/StyleColors.json'
 import * as postConfig from '../Settings/PostConfig.json';
-import { Colors } from "./Colors";
+import { ITheme } from "../Classes/MomentoUser";
 
 export class Post {
     public static async drawPost(post: MomentoPost): Promise<Buffer> {
@@ -11,14 +10,9 @@ export class Post {
         registerFont('./Assets/Fonts/SFPRODISPLAYBOLD.otf', { family: 'sfpro-bold' })
         registerFont('./Assets/Fonts/fortefont.ttf', { family: 'Forte' })
 
-        let colors: Colors
+        let colors: ITheme;
 
-        if (post.author.darkmode) {
-            colors = styleColors["dark-mode"]
-        }
-        else {
-            colors = styleColors["light-mode"]
-        }
+        colors = post.author.theme;
 
         let image: Image = await loadImage(String(post.imageURL));
         let imageCanvas: Canvas
@@ -30,7 +24,7 @@ export class Post {
             imageCanvas.height + postConfig.postHeaderSize + description.height + postConfig.postSafeGap)
         const context = canvas.getContext('2d')
         // BACKGROUND
-        context.fillStyle = `#${colors.background}`;
+        context.fillStyle = `#${colors.tertiary}`;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         const authorRoundImage: Canvas = await ImageCropper.drawUserPicture(String(post.author.profilePicture));
@@ -38,7 +32,7 @@ export class Post {
         context.drawImage(authorRoundImage, postConfig.postSafeGap * 2, postConfig.postSafeGap, postConfig.profilePictureSize, postConfig.profilePictureSize)
 
         context.font = '36px sfpro-bold'
-        context.fillStyle = `#${colors.secondary}`
+        context.fillStyle = `#${colors.primary}`
         context.fillText(`${post.author.name} ${post.author.surname}`, postConfig.postSafeGap * 8, postConfig.postHeaderSize / 2 - postConfig.postSafeGap * 1.6)
 
         context.font = '28px sfpro'
@@ -66,7 +60,7 @@ export class Post {
         maxWidth: number,
         lineHeight: number,
         gap: number,
-        colors: Colors,
+        colors: ITheme,
         isDarkMode?: Boolean
     ) {
         let words = text.split(' ');

@@ -1,24 +1,13 @@
 import { createCanvas, registerFont, Canvas, loadImage, Image } from "canvas";
-import { MomentoUser } from "../Classes/MomentoUser";
+import { ITheme, MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
 import { StringFormater } from "../Utils/StringFormater";
-import * as colors from '../Settings/StyleColors.json'
-import { Colors } from "./Colors";
 
 export class ProfileCanvas {
     private momentoUser: MomentoUser
 
-    private colors: Colors
-
     constructor(user: MomentoUser) {
         this.momentoUser = user
-
-        if (!user.darkmode) {
-            this.colors = colors["light-mode"]
-        }
-        else {
-            this.colors = colors["dark-mode"]
-        }
     }
 
     public async drawProfile(): Promise<Buffer> {
@@ -36,7 +25,7 @@ export class ProfileCanvas {
         // const profileBackground: Image = await loadImage('./Assets/background.png')
 
         // BACKGROUND
-        context.fillStyle = `#${this.colors.background}`;
+        context.fillStyle = `#${this.momentoUser.theme.tertiary}`;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         // context.drawImage(profileBackground, 0, 0, canvas.width, canvas.height)
@@ -50,43 +39,43 @@ export class ProfileCanvas {
 
         // Add User Info
         context.font = '30px FORTE'
-        context.fillStyle = `#${this.colors.onBackground}`
+        context.fillStyle = `#${this.momentoUser.theme.secondary}`
         context.fillText("@" + this.momentoUser.username, canvas.width / 2, canvas.height - 270)
         const usernameWidth = context.measureText(`@${String(this.momentoUser.username)}`)
 
         context.font = '55px FORTE'
-        context.fillStyle = `#${this.colors.secondary}`
+        context.fillStyle = `#${this.momentoUser.theme.secondary}`
         context.fillText(`${this.momentoUser.name} ${this.momentoUser.surname}`, canvas.width / 2, canvas.height - 220)
 
         context.font = '30px OpenSans-Italic'
-        context.fillStyle = `#${this.colors.onBackground}`
+        context.fillStyle = `#${this.momentoUser.theme.secondary}`
         context.fillText(String(this.momentoUser.bio), canvas.width / 2, canvas.height - 180)
 
         // Add User Statistics
 
         context.font = '42px FORTE'
-        context.fillStyle = `#${this.colors.primary}`
+        context.fillStyle = `#${this.momentoUser.theme.primary}`
         context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.momentos), 1)), canvas.width / 2 - 250, canvas.height - 110)
 
         context.font = '38px FORTE'
-        context.fillStyle = `#${this.colors.onBackground}`
+        context.fillStyle = `#${this.momentoUser.theme.secondary}`
         context.fillText("momentos", canvas.width / 2 - 250, canvas.height - 70)
 
 
         context.font = '42px FORTE'
-        context.fillStyle = `#${this.colors.primary}`
+        context.fillStyle = `#${this.momentoUser.theme.primary}`
         context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.trends), 1)), canvas.width / 2, canvas.height - 110)
 
         context.font = '38px FORTE'
-        context.fillStyle = `#${this.colors.onBackground}`
+        context.fillStyle = `#${this.momentoUser.theme.secondary}`
         context.fillText("trends", canvas.width / 2, canvas.height - 70)
 
         context.font = '42px FORTE'
-        context.fillStyle = `#${this.colors.primary}`
+        context.fillStyle = `#${this.momentoUser.theme.primary}`
         context.fillText(String(StringFormater.formatForProfile(Number(this.momentoUser.followers), 2)), canvas.width / 2 + 250, canvas.height - 110)
 
         context.font = '38px FORTE'
-        context.fillStyle = `#${this.colors.onBackground}`
+        context.fillStyle = `#${this.momentoUser.theme.secondary}`
         context.fillText("followers", canvas.width / 2 + 250, canvas.height - 70)
 
         if (this.momentoUser.isVerified) {

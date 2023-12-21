@@ -79,10 +79,6 @@ const schema = new mongo.Schema({
         type: Boolean,
         default: true
     },
-    'darkmode': {
-        type: Boolean,
-        default: false
-    },
     'groupChatId': {
         type: String,
         default: ""
@@ -91,6 +87,18 @@ const schema = new mongo.Schema({
         type: Boolean,
         default: false
     },
+    'theme': {
+        'type': {
+            'primary': String,
+            'secondary': String,
+            'tertiary': String,
+        },
+        default: {
+            primary: "000000",
+            secondary: "B3B3B3",
+            tertiary: "FFFFFF",
+        }
+    }
 })
 
 module.exports = mongo.model('users', schema)

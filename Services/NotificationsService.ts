@@ -1,5 +1,4 @@
 import { Collection, EmbedBuilder, Guild, Message, MessageType, TextChannel, ThreadChannel, User } from "discord.js";
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
@@ -27,7 +26,7 @@ export class NotificationsService {
 
         if (notifiedUserChannel) {
 
-            let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel)
+            let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel) as ThreadChannel;
 
             const notificationEmbed: EmbedBuilder = MomentoNotification.createSimpleNotificationEmbed(notification)
             if (notification.thumbnailURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }

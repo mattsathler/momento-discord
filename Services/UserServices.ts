@@ -16,6 +16,7 @@ import { ProfileServices } from "./ProfileService";
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import * as config from "../Settings/MomentoConfig.json";
 import { MomentoServer } from "../Classes/MomentoServer";
+import { defaultTheme } from "../Settings/DefaultTheme";
 
 
 export class UserServices {
@@ -125,7 +126,8 @@ export class UserServices {
             true,
             false,
             "",
-            false
+            false,
+            defaultTheme
         )
         await MongoService.registerUser(newMomentoUser)
         return newMomentoUser

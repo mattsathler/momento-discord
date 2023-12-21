@@ -1,23 +1,12 @@
-import { createCanvas, loadImage, Image, registerFont, Canvas } from "canvas";
-import { MomentoUser } from "../Classes/MomentoUser";
+import { createCanvas, loadImage } from "canvas";
+import { ITheme, MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
 import * as CollageStyles from "../Settings/CollageStyles.json";
-import * as styleColors from '../Settings/StyleColors.json'
-
-import { Colors } from "./Colors";
 
 export class CollageCanvas {
     public static async drawCollage(momentoUser: MomentoUser): Promise<Buffer> {
 
-        let colors: Colors
-
-        if (!momentoUser.darkmode) {
-            colors = styleColors["light-mode"]
-        }
-        else {
-            colors = styleColors["dark-mode"]
-        }
-
+        let colors: ITheme = momentoUser.theme
         
         const canvas = createCanvas(1280, 720)
         const context = canvas.getContext('2d')
@@ -25,7 +14,7 @@ export class CollageCanvas {
         const collage: String[] = momentoUser.collage
 
         // BACKGROUND
-        context.fillStyle = `#${colors.background}`;
+        context.fillStyle = `#${colors.tertiary}`;
         context.fillRect(0, 0, canvas.width, canvas.height);
         
         let rowIndex: number = 1
@@ -41,7 +30,7 @@ export class CollageCanvas {
 
 
             const treatedImage = await ImageCropper.quickCropWithImage(img, collageWidth, collageHeight)
-            context.drawImage(treatedImage, x, y)
+            context.drawImage(treatedImage, Number(x), Number(y))
 
             rowIndex++
             if (index == 2) { rowIndex = 1 }

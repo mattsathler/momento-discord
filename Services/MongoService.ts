@@ -5,6 +5,7 @@ import { MomentoPost } from "../Classes/MomentoPost";
 import { Guild, Message, TextChannel } from "discord.js";
 import { PostService } from "./PostService";
 import { MomentoMessage } from "../Classes/MomentoMessage";
+import { defaultTheme } from "../Settings/DefaultTheme";
 const MomentoMessageSchema = require("../Schemas/MomentoMessageSchema");
 
 require("dotenv").config();
@@ -143,7 +144,8 @@ export class MongoService {
                     response[0].notifications,
                     response[0].darkmode,
                     response[0].groupChatId ?? "",
-                    response[0].isVerified ?? false
+                    response[0].isVerified ?? false,
+                    response[0].theme ?? defaultTheme,
                 )
                 return momentoUser;
             }
@@ -183,6 +185,7 @@ export class MongoService {
                 response[0].darkmode,
                 response[0].groupChatId ?? "",
                 response[0].isVerified ?? false,
+                response[0].theme ?? defaultTheme,
             )
             return momentoUser;
         }
@@ -263,7 +266,8 @@ export class MongoService {
             const response = await posts.findOne({ id: message.id, channelId: message.channelId, guildId: message.guildId })
             if (!response) { return null }
             const postAuthor: MomentoUser = await this.getUserByProfileChannel(response.authorProfileChannelId, message.guildId)
-            const postMessage: Message = await message.channel.messages.fetch(message.id)
+            const channel = message.channel as TextChannel;
+            const postMessage: Message = await channel.messages.fetch(message.id)
 
             const post: MomentoPost = new MomentoPost(
                 postAuthor,

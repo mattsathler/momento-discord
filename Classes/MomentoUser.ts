@@ -1,3 +1,11 @@
+import { defaultTheme } from "../Settings/DefaultTheme";
+
+export interface ITheme {
+    primary: String;
+    secondary: String;
+    tertiary: String;
+}
+
 export class MomentoUser {
     public id: String;
     public username: String;
@@ -19,11 +27,12 @@ export class MomentoUser {
     public darkmode: Boolean;
     public groupChatId: String;
     public isVerified: Boolean;
+    public theme: ITheme;
 
     constructor(id: String, username: String, name: String, surname: String, guildId: String, profileChannelId: String,
         profileMessageId: String, profileCollageId: String, profileCollageStyle: Number, profilePicture: String, profileCover: String, collage: String[],
         bio: String, trends: Number, followers: Number, momentos: Number, notifications: Boolean,
-        darkmode: Boolean, groupChatId: String, isVerified: Boolean) {
+        darkmode: Boolean, groupChatId: String, isVerified: Boolean, theme: ITheme) {
         this.id = id
         this.username = username
         this.name = name
@@ -44,5 +53,6 @@ export class MomentoUser {
         this.darkmode = darkmode
         this.groupChatId = groupChatId
         this.isVerified = isVerified
+        this.theme = theme ?? defaultTheme
     };
 }
