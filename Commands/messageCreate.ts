@@ -145,7 +145,6 @@ export async function messageCreate(message: Message, client: Client) {
                         AnalyticsService.logAnalytic(client, `Deletando o perfil de ${momentoUser.username}...`, "command")
                         await UserServices.deleteProfile(message, momentoUser)
                         break
-
                 }
 
                 if (reply) { await tryDeleteMessage(reply) }
@@ -212,6 +211,14 @@ export async function messageCreate(message: Message, client: Client) {
                     sendReplyMessage(message, "PYTHON É UMA BOSTA!", null, true)
                     break
                 case "":
+                    break
+                case "addfollowers":
+                    AnalyticsService.logAnalytic(client, `Adicionando seguidores para os usuários`, "command")
+                    UserServices.addFollowers(message);
+                    break
+                case "setfollowers":
+                    AnalyticsService.logAnalytic(client, `Setando os seguidores para dos usuários`, "command")
+                    UserServices.setFollowers(message);
                     break
                 default:
                     sendErrorMessage(message, "Comando não encontrado!")

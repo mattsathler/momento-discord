@@ -85,7 +85,7 @@ export class UserServices {
             "https://i.imgur.com/TvJJmjx.png"
         )
         await NotificationsService.sendNotification(message.guild, createdNotification, true)
-        const updatedChannelConfig = await MongoService.getServerConfigById(message.guildId); 
+        const updatedChannelConfig = await MongoService.getServerConfigById(message.guildId);
         await MongoService.updateServerSettings(
             message.guildId,
             {
@@ -142,6 +142,45 @@ export class UserServices {
 
         await ProfileServices.updateProfileImages(guild, newUser, true, false)
         return newUser;
+    }
+
+    static async addFollowers(message: Message): Promise<MomentoUser> {
+        if (message.author.id !== "609916240760406056") return;
+        if (message.mentions.users.size === 0) {
+            return;
+        }
+        
+        const newFollowers = Number(message.content.split(' ')[1]);
+        if (!newFollowers) return;
+        message.mentions.users.forEach(async user => {
+            const momentoUser = await MongoService.getUserById(user.id, message.guildId) as MomentoUser;
+            if (!momentoUser) return;
+            const followers = Number(momentoUser.followers) + newFollowers;
+            const newUser = await MongoService.updateProfile(momentoUser, {
+                followers: followers
+            })
+            await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
+            return newUser;
+        })
+    }
+
+    static async setFollowers(message: Message): Promise<MomentoUser> {
+        if (message.author.id !== "609916240760406056") return;
+        if (message.mentions.users.size === 0) {
+            return;
+        }
+        
+        const newFollowers = Number(message.content.split(' ')[1]);
+        if (!newFollowers) return;
+        message.mentions.users.forEach(async user => {
+            const momentoUser = await MongoService.getUserById(user.id, message.guildId) as MomentoUser;
+            if (!momentoUser) return;
+            const newUser = await MongoService.updateProfile(momentoUser, {
+                followers: newFollowers
+            })
+            await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
+            return newUser;
+        })
     }
 
     static async changeProfileUsername(client: Client, message: Message, user: MomentoUser, newUsername: String) {
