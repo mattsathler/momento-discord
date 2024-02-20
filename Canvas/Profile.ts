@@ -2,6 +2,7 @@ import { createCanvas, registerFont, Canvas, loadImage, Image } from "canvas";
 import { ITheme, MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
 import { StringFormater } from "../Utils/StringFormater";
+import { Client, Guild, GuildChannel, Message } from "discord.js";
 
 export class ProfileCanvas {
     private momentoUser: MomentoUser
