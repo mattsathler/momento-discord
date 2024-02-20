@@ -220,6 +220,10 @@ export async function messageCreate(message: Message, client: Client) {
                     AnalyticsService.logAnalytic(client, `Setando os seguidores para dos usuários`, "command")
                     UserServices.setFollowers(message);
                     break
+                case "top":
+                    AnalyticsService.logAnalytic(client, `Buscando o top users do servidor ${message.guild.name}`, "command");
+                    UserServices.getTopUsers(message);     
+                    break;
                 default:
                     sendErrorMessage(message, "Comando não encontrado!")
                     break

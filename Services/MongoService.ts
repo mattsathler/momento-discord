@@ -448,4 +448,19 @@ export class MongoService {
             throw new Error(err.message)
         }
     }
+
+    static async getTopUsers(guildId) {
+        const users = mongo.model('users');
+        try {
+            const response = await users.find({guildId: guildId}).sort({ followers: -1 }).limit(5)
+            if (response) {
+                return response as MomentoUser[];
+            }
+            return null
+        }
+        catch (err) {
+            console.error(err)
+            return
+        }
+    }
 }

@@ -1,6 +1,6 @@
 const ms = require('ms');
 
-import { Client, EmbedBuilder, Guild, Message, TextChannel, User } from "discord.js"
+import { Client, Embed, EmbedBuilder, Guild, Message, TextChannel, User } from "discord.js"
 import { CollageCanvas } from "../Canvas/Collage"
 import { ProfileCanvas } from "../Canvas/Profile"
 import { MomentoUser } from "../Classes/MomentoUser"
@@ -149,7 +149,7 @@ export class UserServices {
         if (message.mentions.users.size === 0) {
             return;
         }
-        
+
         const newFollowers = Number(message.content.split(' ')[1]);
         if (!newFollowers) return;
         message.mentions.users.forEach(async user => {
@@ -160,6 +160,14 @@ export class UserServices {
                 followers: followers
             })
             await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
+            const createdNotification: MomentoNotification = new MomentoNotification(
+                momentoUser,
+                momentoUser,
+                new Date,
+                `Parabéns! Você recebeu ${newFollowers} novos seguidores!`,
+                "https://i.imgur.com/TvJJmjx.png"
+            )
+            await NotificationsService.sendNotification(message.guild, createdNotification, true);
             return newUser;
         })
     }
@@ -169,7 +177,7 @@ export class UserServices {
         if (message.mentions.users.size === 0) {
             return;
         }
-        
+
         const newFollowers = Number(message.content.split(' ')[1]);
         if (!newFollowers) return;
         message.mentions.users.forEach(async user => {
@@ -311,5 +319,61 @@ export class UserServices {
         catch (err) {
             console.log(err.message)
         }
+    }
+
+    static async getTopUsers(message: Message) {
+        const users = await MongoService.getTopUsers(message.guildId);
+        if (users.length !== 5) return
+        const topUsersEmbed: EmbedBuilder = new EmbedBuilder()
+            .setTitle('# Top 5 usuários deste momento!')
+            .setColor('#DD247B'); // Cor do Embed (opcional)
+
+        // Adicionar os resultados ao Embed
+        topUsersEmbed.addFields([
+            {
+                name: `**Top #1** - ${users[0].name} ${users[0].surname}    <#${users[0].profileChannelId}>`,
+                value: `Seguidores: ${String(users[0].followers)}`,
+            },
+            {
+                name: `**Top #2** - ${users[1].name} ${users[1].surname}    <#${users[1].profileChannelId}>`,
+                value: `Seguidores: ${String(users[1].followers)}`,
+            },
+            {
+                name: `**Top #3** - ${users[2].name} ${users[2].surname}    <#${users[2].profileChannelId}>`,
+                value: `Seguidores: ${String(users[2].followers)}`,
+            },
+            {
+                name: `**Top #4** - ${users[3].name} ${users[3].surname}    <#${users[3].profileChannelId}>`,
+                value: `Seguidores: ${String(users[3].followers)}`,
+            },
+            {
+                name: `**Top #5** - ${users[4].name} ${users[4].surname}    <#${users[4].profileChannelId}>`,
+                value: `Seguidores: ${String(users[4].followers)}`,
+            },
+            {
+                name: `**Top #6** - ${users[5].name} ${users[5].surname}    <#${users[5].profileChannelId}>`,
+                value: `Seguidores: ${String(users[5].followers)}`,
+            },
+            {
+                name: `**Top #7** - ${users[6].name} ${users[6].surname}    <#${users[6].profileChannelId}>`,
+                value: `Seguidores: ${String(users[6].followers)}`,
+            },
+            {
+                name: `**Top #8** - ${users[7].name} ${users[7].surname}    <#${users[7].profileChannelId}>`,
+                value: `Seguidores: ${String(users[7].followers)}`,
+            },
+            {
+                name: `**Top #9** - ${users[8].name} ${users[8].surname}    <#${users[8].profileChannelId}>`,
+                value: `Seguidores: ${String(users[8].followers)}`,
+            },
+            {
+                name: `**Top #10** - ${users[9].name} ${users[9].surname}    <#${users[9].profileChannelId}>`,
+                value: `Seguidores: ${String(users[9].followers)}`,
+            }
+        ]);
+
+        message.reply({
+            embeds: [topUsersEmbed]
+        })
     }
 }
