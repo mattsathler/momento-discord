@@ -323,9 +323,9 @@ export class UserServices {
 
     static async getTopUsers(message: Message) {
         const users = await MongoService.getTopUsers(message.guildId);
-        if (users.length !== 5) return
+        if (users.length !== 10) return
         const topUsersEmbed: EmbedBuilder = new EmbedBuilder()
-            .setTitle('# Top 5 usuários deste momento!')
+            .setTitle('# Top 10 usuários deste momento!')
             .setColor('#DD247B'); // Cor do Embed (opcional)
 
         // Adicionar os resultados ao Embed
