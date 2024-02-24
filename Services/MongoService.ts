@@ -452,7 +452,7 @@ export class MongoService {
     static async getTopUsers(guildId) {
         const users = mongo.model('users');
         try {
-            const response = await users.find({guildId: guildId}).sort({ followers: -1 }).limit(5)
+            const response = await users.find({guildId: guildId}).sort({ followers: -1 }).limit(10)
             if (response) {
                 return response as MomentoUser[];
             }
