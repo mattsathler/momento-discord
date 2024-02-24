@@ -10,6 +10,7 @@ import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
 import * as PostConfig from '../Settings/PostConfig.json'
 import ImageCropper from "../Utils/ImageCropper";
+import { ProfileServices } from "../Services/ProfileService";
 
 
 export class MomentoPost {
@@ -65,6 +66,7 @@ export class MomentoPost {
                 newPost = await profileChannel.send({ files: [post] })
             }
             else {
+                const profilePictureURL = await ProfileServices.getProfilePictureURL(client, user);
                 const sharedPostEmber =
                     new EmbedBuilder()
                         .setDescription("Compartilhou um Momento!")
@@ -72,7 +74,7 @@ export class MomentoPost {
                         .setColor(0xdd247b)
                         .setAuthor({
                             name: String(`@${user.username}`),
-                            iconURL: String(user.profilePicture),
+                            iconURL: profilePictureURL,
                             url: String(`https://discord.com/channels/${message.guildId}/${user.profileChannelId}`)
                         })
                         .setImage(String(postImageURL))
