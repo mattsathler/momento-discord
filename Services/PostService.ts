@@ -34,7 +34,7 @@ export class PostService {
         const embed = MomentoNotification.createTrendNotificationEmbed(notification)
         await NotificationsService.sendNotificationEmbed(guild, embed, post.author, true)
         const postImage = await Post.drawPost(client, post)
-        const trendImageURL = await LinkGenerator.uploadImageToMomento(client, postImage)
+        const trendImageURL = (await LinkGenerator.uploadImageToMomento(client, postImage)).attachments.first().url
         const trendEmbed = new EmbedBuilder()
             .setImage(String(trendImageURL))
             .setColor(0xdd247b)
