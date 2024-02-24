@@ -1,9 +1,10 @@
-import { Collection, EmbedBuilder, Guild, Message, MessageType, TextChannel, ThreadChannel, User } from "discord.js";
+import { Client, Collection, EmbedBuilder, Guild, Message, MessageType, TextChannel, ThreadChannel, User } from "discord.js";
 import { MomentoNotification } from "../Classes/MomentoNotification";
 import { MomentoPost } from "../Classes/MomentoPost";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MongoService } from "./MongoService";
+import { ProfileServices } from "./ProfileService";
 
 export class NotificationsService {
     public static async sendNotificationEmbed(guild: Guild, embed: EmbedBuilder, momentoUser: MomentoUser, force?: Boolean) {
@@ -20,7 +21,7 @@ export class NotificationsService {
         await tryDeleteMessage(mentionMsg)
     }
 
-    public static async sendNotification(guild: Guild, notification: MomentoNotification, force?: Boolean): Promise<Message> {
+    public static async sendNotification(client: Client, guild: Guild, notification: MomentoNotification, force?: Boolean): Promise<Message> {
         if (!notification.notifiedUser.notifications && !force) { return }
         const notifiedUserChannel: TextChannel = await guild.channels.fetch(String(notification.notifiedUser.profileChannelId)) as TextChannel
 
@@ -28,7 +29,7 @@ export class NotificationsService {
 
             let userNotificationChannel = await this.getUserNotificationChannel(notifiedUserChannel) as ThreadChannel;
 
-            const notificationEmbed: EmbedBuilder = MomentoNotification.createSimpleNotificationEmbed(notification)
+            const notificationEmbed: EmbedBuilder = await MomentoNotification.createSimpleNotificationEmbed(client, notification)
             if (notification.thumbnailURL) { notificationEmbed.setThumbnail(String(notification.thumbnailURL)) }
 
             const notificationMessage = await userNotificationChannel.send({
@@ -63,11 +64,10 @@ export class NotificationsService {
         return notifiedUserNotificationsChannel;
     }
 
-    public static async notifyMentions(guild: Guild, users: Collection<string, User>, userAuthor: MomentoUser, text: String) {
+    public static async notifyMentions(client: Client, guild: Guild, users: Collection<string, User>, userAuthor: MomentoUser, text: String) {
         users.map(async user => {
             const mentionedUser: MomentoUser = await MongoService.getUserById(user.id, guild.id)
             if (!mentionedUser) { return }
-
             const notification: MomentoNotification = new MomentoNotification(
                 mentionedUser,
                 userAuthor,
@@ -76,7 +76,7 @@ export class NotificationsService {
             )
 
             try {
-                await this.sendNotification(guild, notification, true);
+                await this.sendNotification(client, guild, notification, true);
             }
             catch (err) {
                 console.log(err)

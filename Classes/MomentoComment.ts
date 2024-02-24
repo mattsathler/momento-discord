@@ -1,4 +1,4 @@
-import { EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
+import { Client, EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
 import { MongoService } from "../Services/MongoService";
 import { NotificationsService } from "../Services/NotificationsService";
 import { MentionsParser } from "../Utils/MentionsParser";
@@ -6,6 +6,7 @@ import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MomentoNotification } from "./MomentoNotification";
 import { MomentoUser } from "./MomentoUser";
 import { MessageService } from "../Services/MessageService";
+import { ProfileServices } from "../Services/ProfileService";
 
 
 export class MomentoComment {
@@ -23,11 +24,13 @@ export class MomentoComment {
         this.post = post
     }
 
-    public static async createComment(guild: Guild, message: Message): Promise<MomentoComment> {
+    public static async createComment(client: Client, guild: Guild, message: Message): Promise<MomentoComment> {
         const ThreadChannel: TextChannel = guild.channels.cache.get(message.channelId) as TextChannel
 
         const postAuthor: MomentoUser = await MongoService.getUserByProfileChannel(String(ThreadChannel.parentId), message.guildId)
-        const commentAuthor: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
+        let commentAuthor: MomentoUser = await MongoService.getUserById(message.author.id, message.guildId)
+        // const authorProfilePictureURL = await ProfileServices.getProfilePictureURL(client, commentAuthor)
+        // commentAuthor.profilePicture = authorProfilePictureURL;
 
         const postAuthorProfileChannel: TextChannel = await guild.channels.cache.get(String(postAuthor.profileChannelId)) as TextChannel
         const postMessage = await postAuthorProfileChannel.messages.fetch(ThreadChannel.id)
@@ -42,7 +45,7 @@ export class MomentoComment {
             postMessage
         )
 
-        const commentEmbed = MomentoComment.createCommentEmbed(comment)
+        const commentEmbed = await MomentoComment.createCommentEmbed(client, comment)
         tryDeleteMessage(message)
 
         const textChannel = message.channel as TextChannel;
@@ -58,19 +61,20 @@ export class MomentoComment {
             postMessage.attachments.first().url,
             `https://discord.com/channels/${comment.post.guildId}/${comment.post.channelId}/${commentMessage.id}`
         )
-        await NotificationsService.sendNotification(message.guild, notification, false)
+        await NotificationsService.sendNotification(client, message.guild, notification, false)
 
-        await NotificationsService.notifyMentions(message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
+        await NotificationsService.notifyMentions(client, message.guild, message.mentions.users, comment.commentAuthor, `Mencionou você em um comentário!`)
         await MessageService.uploadMessage(commentAuthor, "comment", commentMessage.id, commentMessage.channelId, commentMessage.guildId, message.content);
 
         return comment
     }
 
-    public static createCommentEmbed(comment: MomentoComment): EmbedBuilder {
+    public static async createCommentEmbed(client: Client, comment: MomentoComment): Promise<EmbedBuilder> {
+        const iconURL = await ProfileServices.getProfilePictureURL(client, comment.commentAuthor);
         const commentEmbed: EmbedBuilder = new EmbedBuilder()
             .setColor(0xdd247b)
             .setAuthor({
-                name: String(`@${comment.commentAuthor.username}`), iconURL: String(comment.commentAuthor.profilePicture)
+                name: String(`@${comment.commentAuthor.username}`), iconURL: iconURL
             })
             .setDescription(`${String(comment.content)}`)
             .setFooter({

@@ -55,11 +55,11 @@ export class MomentoPost {
         }
         try {
             const croppedImg = await ImageCropper.quickCropWithURL(String(momentoPost.imageURL), 1080, 1350)
-            const post: Buffer = await Post.drawPost(momentoPost)
+            const post: Buffer = await Post.drawPost(client, momentoPost)
             const bufferedImg = croppedImg.toBuffer()
-            const profileChannel: TextChannel = message.guild.channels.cache.get(String(user.profileChannelId)) as TextChannel
-            const postOriginalImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, bufferedImg)
-            const postImageURL: String = await LinkGenerator.uploadImageToMomento(message.guild, post)
+            const profileChannel: TextChannel = await message.guild.channels.fetch(String(user.profileChannelId)) as TextChannel
+            const postOriginalImageURL: String = (await LinkGenerator.uploadImageToMomento(client, bufferedImg)).attachments.first().url
+            const postImageURL: String = (await LinkGenerator.uploadImageToMomento(client, post)).attachments.first().url
             let newPost: Message
             if (!isRepost) {
                 newPost = await profileChannel.send({ files: [post] })
@@ -99,10 +99,12 @@ export class MomentoPost {
             await PostService.savePostInDatabase(momentoPost, postOriginalImageURL)
 
             if (!isRepost) {
-                await NotificationsService.notifyMentions(message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
+                console.log('Notifying mentions')
+                await NotificationsService.notifyMentions(client, message.guild, message.mentions.users, momentoPost.author, "Marcou você em um Momento!")
+                console.log('Notified, sending post to analytics!')
                 await PostService.sendPostToAnalytics(client, momentoPost)
             }
-            await PostService.addNewMomento(momentoPost.postMessage.guild, user)
+            await PostService.addNewMomento(client, momentoPost.postMessage.guild, user)
 
             return momentoPost
         }
@@ -128,7 +130,7 @@ export class MomentoPost {
             "Repostou seu momento!",
             `https://discord.com/channels/${message.guildId}/${user.profileChannelId}`
         )
-        await NotificationsService.sendNotification(message.guild, notification, false)
+        await NotificationsService.sendNotification(client, message.guild, notification, false)
         return sharedPost
     }
 }

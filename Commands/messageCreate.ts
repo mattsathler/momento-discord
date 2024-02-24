@@ -76,7 +76,7 @@ export async function messageCreate(message: Message, client: Client) {
 
                     reply = await message.reply("Alterando sua foto de collage, aguarde...")
                     const collageNumber: Number = Number(command.charAt(7)) - 1
-                    await ProfileServices.changeProfileCollage(message, momentoUser, collageNumber)
+                    await ProfileServices.changeProfileCollage(client, message, momentoUser, collageNumber)
                     if (reply) { await tryDeleteMessage(reply) }
                     tryDeleteMessage(message)
                     return
@@ -86,12 +86,12 @@ export async function messageCreate(message: Message, client: Client) {
                     case "perfil":
                         AnalyticsService.logAnalytic(client, `Alterando foto de perfil de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando sua foto de perfil, aguarde...")
-                        await ProfileServices.changeProfilePicture(message, momentoUser)
+                        await ProfileServices.changeProfilePicture(client, message, momentoUser)
                         break
                     case "capa":
                         AnalyticsService.logAnalytic(client, `Alterando foto de capa de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando sua foto de capa, aguarde...")
-                        await ProfileServices.changeProfileCover(message, momentoUser)
+                        await ProfileServices.changeProfileCover(client, message, momentoUser)
                         break
                     case "user":
                         AnalyticsService.logAnalytic(client, `Alterando usuário de ${momentoUser.username}...`, "command")
@@ -101,35 +101,35 @@ export async function messageCreate(message: Message, client: Client) {
                     case "nome":
                         AnalyticsService.logAnalytic(client, `Alterando nome de perfil de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando seu nome, aguarde...")
-                        await UserServices.changeUserNameAndSurname(message, momentoUser, args)
+                        await UserServices.changeUserNameAndSurname(client, message, momentoUser, args)
                         break
                     case "bio":
                         AnalyticsService.logAnalytic(client, `Alterando bio de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando sua bio, aguarde...")
-                        await UserServices.changeProfileBio(message, momentoUser, args)
+                        await UserServices.changeProfileBio(client, message, momentoUser, args)
                         break
                     case "estilo":
                         AnalyticsService.logAnalytic(client, `Alterando o estilo da collage de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando o estilo da collage, aguarde...")
-                        await ProfileServices.changeCollageStyle(message, momentoUser, Number(args[0]))
+                        await ProfileServices.changeCollageStyle(client, message, momentoUser, Number(args[0]))
                         break
                     case "pri":
                     case "primary":
                         AnalyticsService.logAnalytic(client, `Alterando a cor primária de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando a cor primária, aguarde...")
-                        await ProfileServices.changeThemeColor(message, momentoUser, args[0], "primary")
+                        await ProfileServices.changeThemeColor(client, message, momentoUser, args[0], "primary")
                         break
                     case "sec":
                     case "secondary":
                         AnalyticsService.logAnalytic(client, `Alterando a cor secundária de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando a cor secundária, aguarde...")
-                        await ProfileServices.changeThemeColor(message, momentoUser, args[0], "secondary")
+                        await ProfileServices.changeThemeColor(client, message, momentoUser, args[0], "secondary")
                         break
                     case "ter":
                     case "tertiary":
                         AnalyticsService.logAnalytic(client, `Alterando a cor terciária de ${momentoUser.username}...`, "command")
                         reply = await message.reply("Alterando a cor terciária, aguarde...")
-                        await ProfileServices.changeThemeColor(message, momentoUser, args[0], "tertiary")
+                        await ProfileServices.changeThemeColor(client, message, momentoUser, args[0], "tertiary")
                         break
                     case "talks":
                         AnalyticsService.logAnalytic(client, `Criando o talks de ${momentoUser.username}...`, "command")
@@ -214,11 +214,11 @@ export async function messageCreate(message: Message, client: Client) {
                     break
                 case "addfollowers":
                     AnalyticsService.logAnalytic(client, `Adicionando seguidores para os usuários`, "command")
-                    UserServices.addFollowers(message);
+                    UserServices.addFollowers(client, message);
                     break
                 case "setfollowers":
                     AnalyticsService.logAnalytic(client, `Setando os seguidores para dos usuários`, "command")
-                    UserServices.setFollowers(message);
+                    UserServices.setFollowers(client, message);
                     break
                 case "top":
                     AnalyticsService.logAnalytic(client, `Buscando o top users do servidor ${message.guild.name}`, "command");
@@ -234,7 +234,7 @@ export async function messageCreate(message: Message, client: Client) {
         }
         if (isComment) {
             AnalyticsService.logAnalytic(client, `Criando comentário de ${momentoUser.username}...`, "command")
-            await MomentoComment.createComment(message.guild, message)
+            await MomentoComment.createComment(client, message.guild, message)
             return
         }
         if (isProfileCommand) {
@@ -254,7 +254,7 @@ export async function messageCreate(message: Message, client: Client) {
             }
             AnalyticsService.logAnalytic(client, `Enviando mensagem de ${momentoUser.username}...`, "command")
 
-            const msg = await MomentoMessage.sendMomentoMessageEmbed(momentoUser, message)
+            const msg = await MomentoMessage.sendMomentoMessageEmbed(client, momentoUser, message)
             await msg.react('❤️')
             await msg.react('🗑️')
         }

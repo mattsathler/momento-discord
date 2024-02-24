@@ -74,18 +74,18 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
             switch (reactEmoji) {
                 case "↩️":
                     AnalyticsService.logAnalytic(client, `Recarregando de perfil de ${reactedUser.username}...`, "command")
-                    await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true);
+                    await ProfileServices.updateProfileImages(client, message.guild, reactedUser, true, true);
                     await removeUserReaction(reactUser, message, reaction.emoji.name)
                     break
                 case "🔧":
                     AnalyticsService.logAnalytic(client, `Consertando perfil de ${reactedUser.username}...`, "command")
-                    await ProfileServices.updateProfileImages(message.guild, reactedUser, true, true)
+                    await ProfileServices.updateProfileImages(client, message.guild, reactedUser, true, true)
                     // await ProfileServices.verifyUser(message.guild, reactedUser, serverConfig)
                     break
                 case "✅":
                     AnalyticsService.logAnalytic(client, `Verificando perfil de ${reactedUser.username}...`, "command")
                     await removeUserReaction(reactedUser, message, reaction.emoji.name)
-                    await AnalyticsService.checkVerified(serverConfig, message.guild, reactedUser, true)
+                    await AnalyticsService.checkVerified(client, serverConfig, message.guild, reactedUser, true)
                     break
                 case "❤️":
                     if (isPost && message.attachments) {
@@ -97,7 +97,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                             message.attachments.first().url,
                             `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                         )
-                        await NotificationsService.sendNotification(message.guild, notification, false)
+                        await NotificationsService.sendNotification(client, message.guild, notification, false)
                         const likesCount: number = message.reactions.cache.get("❤️").count - 1
                         let post: MomentoPost = await PostService.getPostFromMessage(message)
                         // post.imageURL = message.attachments.first().url
@@ -109,7 +109,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                             likesCount >= likesToTrend &&
                             Number(timePassed.hours) <= Number(serverConfig.momentosTimeout)
                         ) {
-                            await PostService.trendPost(message.guild, post, notification)
+                            await PostService.trendPost(client, message.guild, post, notification)
                             AnalyticsService.logAnalytic(client, `Post de ${reactedUser.username} entrando para trending`, "command")
                         }
                         break
@@ -118,7 +118,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                 case "🫂":
                     AnalyticsService.logAnalytic(client, `${reactUser.username} começou a seguir ${reactedUser.username}...`, "command")
                     // if (isCollage && reactUser.id != reactedUser.id) {
-                    await UserServices.changeFollowers(message.guild, reactedUser, true)
+                    await UserServices.changeFollowers(client, message.guild, reactedUser, true)
                     const notification: MomentoNotification = new MomentoNotification(
                         reactedUser,
                         reactUser,
@@ -127,7 +127,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         null,
                         `https://discord.com/channels/${message.guildId}/${reactUser.profileChannelId}`
                     )
-                    await NotificationsService.sendNotification(message.guild, notification, false)
+                    await NotificationsService.sendNotification(client, message.guild, notification, false)
                     break
                     // }
                     await removeUserReaction(reactUser, message, String(reactEmoji))
@@ -156,7 +156,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                             new Date,
                             notificationMsg
                         )
-                        await NotificationsService.sendNotification(message.guild, notification, true)
+                        await NotificationsService.sendNotification(client, message.guild, notification, true)
                         break
                     }
                 case '🗑️':
@@ -169,7 +169,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                             const newUser = await MongoService.updateProfile(reactUser, {
                                 momentos: newMomentos
                             })
-                            await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
+                            await ProfileServices.updateProfileImages(client, message.guild, newUser, true, false)
                             break
                         }
                         await removeUserReaction(reactUser, message, String(reactEmoji))
@@ -184,7 +184,7 @@ export async function messageReactionAdd(client: Client, user: User, reaction: M
                         await removeAllReactions(message, reaction.emoji.name)
                         try {
                             await removeUserReaction(reactUser, message, reaction.emoji.name)
-                            await UserServices.analyticProfile(serverConfig, message.guild, reactedUser)
+                            await UserServices.analyticProfile(client, serverConfig, message.guild, reactedUser)
                             await message.react('📊')
                             return
                         }

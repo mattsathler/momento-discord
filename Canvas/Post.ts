@@ -3,9 +3,11 @@ import { MomentoPost } from "../Classes/MomentoPost";
 import ImageCropper from "../Utils/ImageCropper";
 import * as postConfig from '../Settings/PostConfig.json';
 import { ITheme } from "../Classes/MomentoUser";
+import { Client, Guild, TextChannel } from "discord.js";
+import { ProfileServices } from "../Services/ProfileService";
 
 export class Post {
-    public static async drawPost(post: MomentoPost): Promise<Buffer> {
+    public static async drawPost(client: Client, post: MomentoPost): Promise<Buffer> {
         registerFont('./Assets/Fonts/SFPRODISPLAYMEDIUM.otf', { family: 'sfpro' })
         registerFont('./Assets/Fonts/SFPRODISPLAYBOLD.otf', { family: 'sfpro-bold' })
         registerFont('./Assets/Fonts/fortefont.ttf', { family: 'Forte' })
@@ -27,7 +29,9 @@ export class Post {
         context.fillStyle = `#${colors.tertiary}`;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        const authorRoundImage: Canvas = await ImageCropper.drawUserPicture(String(post.author.profilePicture));
+        const profileMessageURL = await ProfileServices.getProfilePictureURL(client, post.author)
+        const authorRoundImage = await ImageCropper.drawUserPicture(profileMessageURL)
+
         context.drawImage(imageCanvas, postConfig.postSafeAreaSize, postConfig.profilePictureSize + postConfig.postSafeGap * 2, imageCanvas.width, imageCanvas.height)
         context.drawImage(authorRoundImage, postConfig.postSafeGap * 2, postConfig.postSafeGap, postConfig.profilePictureSize, postConfig.profilePictureSize)
 

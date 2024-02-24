@@ -25,7 +25,7 @@ export class PostService {
         return post
     }
 
-    public static async trendPost(guild: Guild, post: MomentoPost, notification: MomentoNotification) {
+    public static async trendPost(client: Client, guild: Guild, post: MomentoPost, notification: MomentoNotification) {
         await MongoService.updatePost(post, {
             isTrending: true
         })
@@ -33,8 +33,8 @@ export class PostService {
         const trendChannel: TextChannel = guild.channels.cache.get(String(serverConfig.trendsChannelId)) as TextChannel;
         const embed = MomentoNotification.createTrendNotificationEmbed(notification)
         await NotificationsService.sendNotificationEmbed(guild, embed, post.author, true)
-        const postImage = await Post.drawPost(post)
-        const trendImageURL = await LinkGenerator.uploadImageToMomento(guild, postImage)
+        const postImage = await Post.drawPost(client, post)
+        const trendImageURL = await LinkGenerator.uploadImageToMomento(client, postImage)
         const trendEmbed = new EmbedBuilder()
             .setImage(String(trendImageURL))
             .setColor(0xdd247b)
@@ -58,7 +58,7 @@ export class PostService {
         })
         
         await this.shareTrend(serverConfig, trendEmbed);
-        await ProfileServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
         return
     }
 
@@ -91,13 +91,13 @@ export class PostService {
         })
     }
 
-    static async addNewMomento(guild: Guild, user: MomentoUser) {
+    static async addNewMomento(client: Client, guild: Guild, user: MomentoUser) {
         const newMomentos = Number(user.momentos) + 1
         const newUser = await MongoService.updateProfile(user, {
             momentos: newMomentos
         })
 
-        await ProfileServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
         return newUser
     }
 

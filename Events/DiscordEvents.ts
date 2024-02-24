@@ -51,6 +51,6 @@ export class DiscordEvents {
             }
         }
 
-        messageReactionRemove(user, reaction)
+        messageReactionRemove(user, reaction, this.client)
     }
 }

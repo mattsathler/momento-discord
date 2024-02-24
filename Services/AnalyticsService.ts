@@ -124,7 +124,7 @@ export class AnalyticsService {
         return analyticsPosts
     }
 
-    static async checkVerified(serverConfig: MomentoServer, guild: Guild, momentoUser: MomentoUser, force?: Boolean) {
+    static async checkVerified(client: Client, serverConfig: MomentoServer, guild: Guild, momentoUser: MomentoUser, force?: Boolean) {
         if (
             Number(momentoUser.trends) >= serverConfig.trendsToVerify &&
             Number(momentoUser.followers) >= serverConfig.followersToVerify &&
@@ -132,7 +132,7 @@ export class AnalyticsService {
         ) {
             const serverConfig = await MongoService.getServerConfigById(guild.id)
             const newUser = await ProfileServices.verifyUser(guild, momentoUser, serverConfig)
-            await ProfileServices.updateProfileImages(guild, newUser, true, false)
+            await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
             return newUser
         }
     }

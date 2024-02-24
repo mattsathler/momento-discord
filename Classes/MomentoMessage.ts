@@ -1,4 +1,4 @@
-import { Attachment, EmbedBuilder, Message, TextChannel } from "discord.js";
+import { Attachment, Client, EmbedBuilder, Message, TextChannel } from "discord.js";
 import { LinkGenerator } from "../Utils/LinkGenerator";
 import { tryDeleteMessage } from "../Utils/MomentoMessages";
 import { MomentoUser } from "./MomentoUser";
@@ -27,9 +27,9 @@ export class MomentoMessage {
     }
 
 
-    public static async sendMomentoMessageEmbed(author: MomentoUser, message: Message): Promise<Message> {
+    public static async sendMomentoMessageEmbed(client: Client, author: MomentoUser, message: Message): Promise<Message> {
         try {
-            const momentoMessageEmbed = await MomentoMessage.createMomentoMessageEmbed(author, message)
+            const momentoMessageEmbed = await MomentoMessage.createMomentoMessageEmbed(client, author, message)
             tryDeleteMessage(message)
 
             const channel = message.channel as TextChannel;
@@ -42,13 +42,13 @@ export class MomentoMessage {
         }
     }
 
-    public static async createMomentoMessageEmbed(author: MomentoUser, message: Message): Promise<EmbedBuilder> {
+    public static async createMomentoMessageEmbed(client: Client, author: MomentoUser, message: Message): Promise<EmbedBuilder> {
         let attachment: Attachment;
         let attachmentUrl: string;
         let comment = message.content == '' ? '_' : message.content
         if (message.attachments.size > 0) {
             attachment = message.attachments.first()
-            attachmentUrl = String(await LinkGenerator.uploadLinkToMomento(message.guild, attachment.url))
+            attachmentUrl = String(await LinkGenerator.uploadLinkToMomento(client, attachment.url))
         }
         const commentEmbed: EmbedBuilder = new EmbedBuilder()
             .setColor(0xdd247b)

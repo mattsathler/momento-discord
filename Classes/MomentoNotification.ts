@@ -1,5 +1,7 @@
 import { EmbedBuilder } from "@discordjs/builders"
 import { MomentoUser } from "./MomentoUser"
+import { Client } from "discord.js"
+import { ProfileServices } from "../Services/ProfileService"
 
 export class MomentoNotification {
     public notifiedUser: MomentoUser
@@ -18,12 +20,13 @@ export class MomentoNotification {
         if (url) { this.url = url }
     }
 
-    public static createSimpleNotificationEmbed(notification: MomentoNotification): EmbedBuilder {
+    public static async createSimpleNotificationEmbed(client: Client, notification: MomentoNotification): Promise<EmbedBuilder> {
         const url = notification.url ? notification.url : `https://discord.com/channels/${notification.notificatorUser.guildId}/${notification.notificatorUser.profileChannelId}`
+        const authorURL = await ProfileServices.getProfilePictureURL(client, notification.notificatorUser);
         const commentEmbed: EmbedBuilder = new EmbedBuilder()
             .setColor(0xdd247b)
             .setAuthor({
-                name: `@${notification.notificatorUser.username}`, iconURL: String(notification.notificatorUser.profilePicture),
+                name: `@${notification.notificatorUser.username}`, iconURL: authorURL,
             })
             .setDescription(`${String(notification.text)}`)
             .setFooter({

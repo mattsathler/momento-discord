@@ -1,11 +1,11 @@
-import { Message, MessageReaction, User } from "discord.js";
+import { Client, Message, MessageReaction, User } from "discord.js";
 import { MomentoUser } from "../Classes/MomentoUser";
 import { MongoService } from "../Services/MongoService";
 import { UserServices } from "../Services/UserServices";
 import * as Config from '../Settings/MomentoConfig.json';
 import { MomentoServer } from "../Classes/MomentoServer";
 
-export async function messageReactionRemove(user: User, reaction: MessageReaction) {
+export async function messageReactionRemove(user: User, reaction: MessageReaction, client: Client) {
     if (user.bot) { return }
     const message: Message = reaction.message as Message;
     const serverConfig: MomentoServer = await MongoService.getServerConfigById(message.guildId)
@@ -24,7 +24,7 @@ export async function messageReactionRemove(user: User, reaction: MessageReactio
         switch (reactEmoji) {
             case "🫂":
                 if (isCollage && reactUser.id != reactedUser.id) {
-                    await UserServices.changeFollowers(message.guild, reactedUser, false)
+                    await UserServices.changeFollowers(client, message.guild, reactedUser, false)
                     break
                 }
                 break

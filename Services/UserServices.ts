@@ -59,15 +59,15 @@ export class UserServices {
         AnalyticsService.logAnalytic(client, "Usuário cadastrado, criando perfil...", "command")
         const profileCanvas: ProfileCanvas = new ProfileCanvas(user)
 
-        const userProfileImage: Buffer = await profileCanvas.drawProfile()
-        const userProfileImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userProfileImage)
+        const userProfileImage: Buffer = await profileCanvas.drawProfile(client)
+        const userProfileImageURL: Message = await LinkGenerator.uploadImageToMomento(client, userProfileImage)
 
-        const userCollageImage: Buffer = await CollageCanvas.drawCollage(user)
-        const userCollageImageURL: string = await LinkGenerator.uploadImageToMomento(message.guild, userCollageImage)
+        const userCollageImage: Buffer = await CollageCanvas.drawCollage(client, user)
+        const userCollageImageURL: Message = await LinkGenerator.uploadImageToMomento(client, userCollageImage)
 
         const userProfileChannel = await ServerServices.createProfileChannel(message, user)
-        const userProfileMessage: Message = await userProfileChannel.send(userProfileImageURL)
-        const userCollageMessage: Message = await userProfileChannel.send(userCollageImageURL)
+        const userProfileMessage: Message = await userProfileChannel.send(userProfileImageURL.attachments.first().url)
+        const userCollageMessage: Message = await userProfileChannel.send(userCollageImageURL.attachments.first().url)
 
         const notificationEmoji: string = !user.notifications ? "🔔" : "🔕"
         userCollageMessage.react("🫂")
@@ -84,7 +84,7 @@ export class UserServices {
             "Bem vindo ao Seu Momento!",
             "https://i.imgur.com/TvJJmjx.png"
         )
-        await NotificationsService.sendNotification(message.guild, createdNotification, true)
+        await NotificationsService.sendNotification(client, message.guild, createdNotification, true)
         const updatedChannelConfig = await MongoService.getServerConfigById(message.guildId);
         await MongoService.updateServerSettings(
             message.guildId,
@@ -133,18 +133,18 @@ export class UserServices {
         return newMomentoUser
     }
 
-    static async changeFollowers(guild: Guild, user: MomentoUser, isAdding: Boolean): Promise<MomentoUser> {
+    static async changeFollowers(client: Client, guild: Guild, user: MomentoUser, isAdding: Boolean): Promise<MomentoUser> {
         console.log(`Alterando seguidores de ${user.username}`)
         const newFollowers = isAdding ? Number(user.followers) + 1 : Number(user.followers) - 1
         const newUser = await MongoService.updateProfile(user, {
             followers: newFollowers
         })
 
-        await ProfileServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
         return newUser;
     }
 
-    static async addFollowers(message: Message): Promise<MomentoUser> {
+    static async addFollowers(client: Client, message: Message): Promise<MomentoUser> {
         if (message.author.id !== "609916240760406056") return;
         if (message.mentions.users.size === 0) {
             return;
@@ -159,7 +159,7 @@ export class UserServices {
             const newUser = await MongoService.updateProfile(momentoUser, {
                 followers: followers
             })
-            await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
+            await ProfileServices.updateProfileImages(client, message.guild, newUser, true, false)
             const createdNotification: MomentoNotification = new MomentoNotification(
                 momentoUser,
                 momentoUser,
@@ -167,12 +167,12 @@ export class UserServices {
                 `Parabéns! Você recebeu ${newFollowers} novos seguidores!`,
                 "https://i.imgur.com/TvJJmjx.png"
             )
-            await NotificationsService.sendNotification(message.guild, createdNotification, true);
+            await NotificationsService.sendNotification(client, message.guild, createdNotification, true);
             return newUser;
         })
     }
 
-    static async setFollowers(message: Message): Promise<MomentoUser> {
+    static async setFollowers(client: Client, message: Message): Promise<MomentoUser> {
         if (message.author.id !== "609916240760406056") return;
         if (message.mentions.users.size === 0) {
             return;
@@ -186,7 +186,7 @@ export class UserServices {
             const newUser = await MongoService.updateProfile(momentoUser, {
                 followers: newFollowers
             })
-            await ProfileServices.updateProfileImages(message.guild, newUser, true, false)
+            await ProfileServices.updateProfileImages(client, message.guild, newUser, true, false)
             return newUser;
         })
     }
@@ -201,7 +201,7 @@ export class UserServices {
             const newUser = await MongoService.updateProfile(user, {
                 username: String(newUsername)
             })
-            await ProfileServices.updateProfileImages(guild, newUser, true, false)
+            await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
             AnalyticsService.logAnalytic(client, `Usuário ${user.username} alteardo para ${newUsername}`, "success")
         }
         catch (err) {
@@ -218,7 +218,7 @@ export class UserServices {
     }
 
 
-    static async changeUserNameAndSurname(message: Message, user: MomentoUser, newName: String[]) {
+    static async changeUserNameAndSurname(client: Client, message: Message, user: MomentoUser, newName: String[]) {
         const guild: Guild = message.guild
 
         console.log(`Alterando o usuário de ${user.username} para ${newName}`)
@@ -233,7 +233,7 @@ export class UserServices {
                 surname: String(newName[1])
             }
             const newUser = await MongoService.updateProfile(user, field)
-            await ProfileServices.updateProfileImages(guild, newUser, true, false)
+            await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
         }
         catch (err) {
             console.log(err)
@@ -241,7 +241,7 @@ export class UserServices {
         return
     }
 
-    static async changeProfileBio(message: Message, user: MomentoUser, newBio: String[]) {
+    static async changeProfileBio(client: Client, message: Message, user: MomentoUser, newBio: String[]) {
         const guild: Guild = message.guild
         let bio = ""
         newBio.forEach(word => { bio += ` ${word.toString()}` });
@@ -252,12 +252,12 @@ export class UserServices {
         const newUser = await MongoService.updateProfile(user, {
             bio: bio
         })
-        await ProfileServices.updateProfileImages(guild, newUser, true, false)
+        await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
         console.log('Bio alterada com sucesso!')
         return
     }
 
-    static async analyticProfile(serverConfig: MomentoServer, guild: Guild, momentoUser: MomentoUser) {
+    static async analyticProfile(client: Client, serverConfig: MomentoServer, guild: Guild, momentoUser: MomentoUser) {
         const embed = new EmbedBuilder()
             .setColor(0xdd247b)
             .setAuthor({
@@ -277,8 +277,8 @@ export class UserServices {
             await AnalyticsService.generateAnalytics(guild, momentoPost, newFollowers.list[index])
         })
         let newUser: MomentoUser = await MongoService.updateProfile(momentoUser, { followers: newFollowers.sum })
-        await ProfileServices.updateProfileImages(guild, newUser, true, false)
-        if (!momentoUser.isVerified) { await AnalyticsService.checkVerified(serverConfig, guild, newUser) }
+        await ProfileServices.updateProfileImages(client, guild, newUser, true, false)
+        if (!momentoUser.isVerified) { await AnalyticsService.checkVerified(client, serverConfig, guild, newUser) }
         return
     }
 

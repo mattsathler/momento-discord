@@ -2,36 +2,54 @@ import { createCanvas, registerFont, Canvas, loadImage, Image } from "canvas";
 import { ITheme, MomentoUser } from "../Classes/MomentoUser";
 import ImageCropper from "../Utils/ImageCropper";
 import { StringFormater } from "../Utils/StringFormater";
-import { Client, Guild, GuildChannel, Message } from "discord.js";
+import { Client, Guild, GuildChannel, Message, TextChannel } from "discord.js";
+import { MomentoServer } from "../Classes/MomentoServer";
+import { ProfileServices } from "../Services/ProfileService";
+import { MongoService } from "../Services/MongoService";
+import { LinkGenerator } from "../Utils/LinkGenerator";
+
+require("dotenv").config();
 
 export class ProfileCanvas {
+    
     private momentoUser: MomentoUser
 
     constructor(user: MomentoUser) {
         this.momentoUser = user
     }
 
-    public async drawProfile(): Promise<Buffer> {
+    public async drawProfile(client: Client): Promise<Buffer> {
         const canvas = createCanvas(1280, 720)
         const context = canvas.getContext('2d')
+        // const serverConfig = await MongoService.getServerConfigById(guild.id)
 
         registerFont('./Assets/Fonts/fortefont.ttf', { family: 'Forte' })
         registerFont('./Assets/Fonts/opensans-italic.ttf', { family: 'OpenSans-Italic' })
         registerFont('./Assets/Fonts/opensans-semibold.ttf', { family: 'OpenSans-Bold' })
         registerFont('./Assets/Fonts/opensans-regular.ttf', { family: 'OpenSans-Regular' })
 
-        const ProfilePicture: Canvas = await ImageCropper.drawUserPicture(String(this.momentoUser.profilePicture))
-        const CroppedCover: Canvas = await ImageCropper.quickCropWithURL(String(this.momentoUser.profileCover), canvas.width, canvas.height / 2.5)
+        let profilePicture: Canvas
 
-        // const profileBackground: Image = await loadImage('./Assets/background.png')
+        const apiServer: Guild = await client.guilds.fetch(process.env.MOMENTO_API_SERVER_ID) as Guild;
+        const uploadChannel: TextChannel = await apiServer.channels.fetch(process.env.MOMENTO_IMAGE_DB_ID) as TextChannel;
+        
+        if (!uploadChannel) return;
+
+        const pictureMessageId = this.momentoUser.profilePicture.split('/')[6]
+        const coverMessageId = this.momentoUser.profileCover.split('/')[6]
+
+        const profileMessage = await uploadChannel.messages.fetch(pictureMessageId);
+        const coverMessage = await uploadChannel.messages.fetch(coverMessageId);
+
+        profilePicture = await ImageCropper.drawUserPicture(profileMessage.attachments.first().url)
+        const croppedCover: Canvas = await ImageCropper.quickCropWithURL(coverMessage.attachments.first().url, canvas.width, canvas.height / 2.5)
 
         // BACKGROUND
         context.fillStyle = `#${this.momentoUser.theme.tertiary}`;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        // context.drawImage(profileBackground, 0, 0, canvas.width, canvas.height)
-        context.drawImage(CroppedCover, 0, 0, canvas.width, canvas.height / 2.5)
-        context.drawImage(ProfilePicture, canvas.width / 2.5, canvas.height / 7, canvas.height / 2.5, canvas.height / 2.5)
+        context.drawImage(croppedCover, 0, 0, canvas.width, canvas.height / 2.5)
+        context.drawImage(profilePicture, canvas.width / 2.5, canvas.height / 7, canvas.height / 2.5, canvas.height / 2.5)
 
 
         // Create Profile Texts
