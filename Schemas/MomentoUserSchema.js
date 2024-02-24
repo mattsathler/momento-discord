@@ -35,23 +35,23 @@ const schema = new mongo.Schema({
     'profilePicture': {
         type: String,
         required: true,
-        default: 'https://imgur.com/ax98YzW.png'
+        default: 'https://discord.com/channels/1084823963974246414/1210763625250291772/1210778080940138528'
     },
     'profileCover': {
         type: String,
         required: true,
-        default: 'https://imgur.com/qb2S2mU.png'
+        default: 'https://discord.com/channels/1084823963974246414/1210763625250291772/1210778701990727710'
     },
     'collage': {
         type: [String],
         blackbox: true,
         default: [
-            'https://imgur.com/fbiUIMs.png',
-            'https://imgur.com/fbiUIMs.png',
-            'https://imgur.com/fbiUIMs.png',
-            'https://imgur.com/fbiUIMs.png',
-            'https://imgur.com/fbiUIMs.png',
-            'https://imgur.com/fbiUIMs.png',
+            'https://discord.com/channels/1084823963974246414/1210763625250291772/1210772888463081493',
+            'https://discord.com/channels/1084823963974246414/1210763625250291772/1210772888463081493',
+            'https://discord.com/channels/1084823963974246414/1210763625250291772/1210772888463081493',
+            'https://discord.com/channels/1084823963974246414/1210763625250291772/1210772888463081493',
+            'https://discord.com/channels/1084823963974246414/1210763625250291772/1210772888463081493',
+            'https://discord.com/channels/1084823963974246414/1210763625250291772/1210772888463081493',
         ],
         required: true
     },
